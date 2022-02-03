@@ -1,4 +1,4 @@
-package com.lateam06.minidarkmoodle.module.questionnaire;
+package com.lateam06.minidarkmoodle.module.questionnary;
 
 public class Question {
     private final int id;

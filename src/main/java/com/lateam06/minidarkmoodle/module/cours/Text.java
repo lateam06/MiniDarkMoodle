@@ -1,10 +1,10 @@
 package com.lateam06.minidarkmoodle.module.cours;
 
-public class Texte {
+public class Text {
     private int num;
     private String content;
 
-    public Texte(int num, String content) {
+    public Text(int num, String content) {
         this.num = num;
         this.content = content;
     }

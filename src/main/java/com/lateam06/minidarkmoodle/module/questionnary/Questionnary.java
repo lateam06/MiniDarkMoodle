@@ -1,14 +1,13 @@
-package com.lateam06.minidarkmoodle.module.questionnaire;
+package com.lateam06.minidarkmoodle.module.questionnary;
 
 import com.lateam06.minidarkmoodle.module.AbstractRessource;
-import com.lateam06.minidarkmoodle.module.Ressource;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class Questionnaire extends AbstractRessource {
+public class Questionnary extends AbstractRessource {
   private final List<Question> questions;
-    public Questionnaire(String name, String desc, int id) {
+    public Questionnary(String name, String desc, int id) {
         super(name,desc,id);
         this.questions = new ArrayList<>();
     }
