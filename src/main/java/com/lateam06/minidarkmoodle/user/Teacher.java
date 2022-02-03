@@ -19,5 +19,5 @@ public class Teacher extends AbstractUser {
     public void setModules(List<Module> modules) {
         this.modules = modules;
     }
-    
+
 }

@@ -13,6 +13,13 @@ public class Course extends AbstractRessource {
         super(name, desc, id);
         this.textList = new ArrayList<>();
     }
-    
-    
+
+    public List<Text> getTextList() {
+        return textList;
+    }
+
+    public void setTextList(List<Text> textList) {
+        this.textList = textList;
+    }
+
 }

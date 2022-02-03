@@ -35,8 +35,5 @@ public abstract class AbstractRessource implements Ressource {
     public void setId(int id) {
         this.id = id;
     }
-    
 
-
-    
 }

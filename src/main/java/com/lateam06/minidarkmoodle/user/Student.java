@@ -9,7 +9,7 @@ public class Student extends AbstractUser {
 
     public Student(String name, String password, int id) {
         super(name, password, id);
-        this.setModules(new ArrayList<>());
+        this.modules = new ArrayList<>();
     }
 
     public List<Module> getModules() {
@@ -19,5 +19,5 @@ public class Student extends AbstractUser {
     public void setModules(List<Module> modules) {
         this.modules = modules;
     }
-    
+
 }

@@ -13,15 +13,31 @@ public class Module {
         this.name = name;
         this.desc = desc;
         this.id = id;
-        this.ressources = new ArrayList();
+        this.ressources = new ArrayList<>();
     }
-    public void addRessource(Ressource r){
+
+    public void addRessource(Ressource r) {
         ressources.add(r);
     }
-    public void removeRessource(Ressource r ){
+
+    public void removeRessource(Ressource r) {
         ressources.remove(r);
     }
 
+    public String getName() {
+        return name;
+    }
 
+    public String getDesc() {
+        return desc;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public List<Ressource> getRessources() {
+        return ressources;
+    }
 
 }

@@ -1,6 +1,6 @@
 package com.lateam06.minidarkmoodle.user;
 
-public abstract  class AbstractUser implements User {
+public abstract class AbstractUser implements User {
 
     private String name;
     private String password;
@@ -35,6 +35,5 @@ public abstract  class AbstractUser implements User {
     public void setId(int id) {
         this.id = id;
     }
-
 
 }
