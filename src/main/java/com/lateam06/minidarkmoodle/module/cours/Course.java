@@ -5,11 +5,11 @@ import java.util.List;
 
 import com.lateam06.minidarkmoodle.module.AbstractRessource;
 
-public class Cours extends AbstractRessource {
+public class Course extends AbstractRessource {
 
-    private List<Texte> textList;
+    private List<Text> textList;
 
-    public Cours(String name, String desc, int id) {
+    public Course(String name, String desc, int id) {
         super(name, desc, id);
         this.textList = new ArrayList<>();
     }
