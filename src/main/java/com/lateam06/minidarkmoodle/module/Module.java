@@ -7,7 +7,8 @@ public class Module {
     private final String name;
     private final String desc;
     private final int id;
-    private final List ressources;
+    private final List<Ressource> ressources;
+
     public Module(String name, String desc, int id) {
         this.name = name;
         this.desc = desc;
