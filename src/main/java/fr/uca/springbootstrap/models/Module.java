@@ -28,6 +28,12 @@ public class Module {
             inverseJoinColumns = @JoinColumn(name = "user_id"))
     private Set<User> participants;
 
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(name = "ressources_modules",
+            joinColumns = @JoinColumn(name = "module_id"),
+                inverseJoinColumns = @JoinColumn(name = "ressource_id"))
+    private Set<Ressources> ressources;
+
 
 
 
@@ -44,6 +50,14 @@ public class Module {
 
     public void setParticipants(Set<User> participants) {
         this.participants = participants;
+    }
+
+    public Set<Ressources> getRessources() {
+        return ressources;
+    }
+
+    public void setRessources(Set<Ressources> ressources) {
+        this.ressources = ressources;
     }
 
     public Long getId() {
