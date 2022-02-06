@@ -28,6 +28,9 @@ public class Module {
             inverseJoinColumns = @JoinColumn(name = "user_id"))
     private Set<User> participants;
 
+
+
+
     public Module() {
     }
 
