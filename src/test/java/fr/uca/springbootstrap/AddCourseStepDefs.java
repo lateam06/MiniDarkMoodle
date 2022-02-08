@@ -14,11 +14,13 @@ import io.cucumber.java.en.When;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.test.context.support.WithUserDetails;
+
 import static org.junit.jupiter.api.Assertions.*;
+
 import java.io.IOException;
 import java.util.HashSet;
 
-public class AddCourseStepDefs extends SpringIntegration{
+public class AddCourseStepDefs extends SpringIntegration {
     private static final String PASSWORD = "password";
 
     @Autowired
@@ -43,12 +45,24 @@ public class AddCourseStepDefs extends SpringIntegration{
     public void aTeacherNamedWithID(String arg0, int arg1) {
         User user = userRepository.findByUsername(arg0).
                 orElse(new User(arg0, arg0 + "@test.fr", encoder.encode(PASSWORD)));
-        user.setRoles(new HashSet<Role>(){{ add(roleRepository.findByName(ERole.ROLE_TEACHER).
-                orElseThrow(() -> new RuntimeException("Error: Role is not found."))); }});
+        user.setRoles(new HashSet<Role>() {{
+            add(roleRepository.findByName(ERole.ROLE_TEACHER).
+                    orElseThrow(() -> new RuntimeException("Error: Role is not found.")));
+        }});
         userRepository.save(user);
 
 
+    }
 
+    @And("a Student named {string}")
+    public void aStudentNamed(String arg0) {
+        User user = userRepository.findByUsername(arg0).
+                orElse(new User(arg0, arg0 + "@test.fr", encoder.encode(PASSWORD)));
+        user.setRoles(new HashSet<Role>() {{
+            add(roleRepository.findByName(ERole.ROLE_STUDENT).
+                    orElseThrow(() -> new RuntimeException("Error: Role is not found.")));
+        }});
+        userRepository.save(user);
 
     }
 
@@ -62,15 +76,10 @@ public class AddCourseStepDefs extends SpringIntegration{
 
     @And("a course with name {string}")
     public void aCourseWithName(String arg0) throws IOException {
-        Ressources r =   ressourcesRepository.findByName(arg0).orElse(new Ressources(arg0, EType.COURSE));
-//        Module module = moduleRepository.findByName(arg1).orElse(new Module(arg0));
-
-        //executePost("http://localhost:8080/api/module/"+module.getId()+"/ressources/"+r.getId(),"token");
+        Ressources r = ressourcesRepository.findByName(arg0).orElse(new Ressources(arg0, EType.COURSE));
         ressourcesRepository.save(r);
-//        moduleRepository.save(module);
 
     }
-
 
 
     @Given("{string} is the teacher registered to the module {string}")
@@ -78,8 +87,8 @@ public class AddCourseStepDefs extends SpringIntegration{
         Module module = moduleRepository.findByName(arg1).get();
         User user = userRepository.findByUsername(arg0).get();
         String jwt = authController.generateJwt(arg0, PASSWORD);
-        executePost("http://localhost:8080/api/module/"+module.getId()+"/participants/"+user.getId(),jwt);
-
+        executePost("http://localhost:8080/api/module/" + module.getId() + "/participants/" + user.getId(), jwt);
+        System.out.println("ajout du prof , debug " + latestHttpResponse.getStatusLine().getStatusCode());
     }
 
     @When("{string} want to add the course {string}  to the module {string}")
@@ -88,8 +97,8 @@ public class AddCourseStepDefs extends SpringIntegration{
         String jwt = authController.generateJwt(arg0, PASSWORD);
         Ressources course = ressourcesRepository.findByName(arg1).get();
         Module module = moduleRepository.findByName(arg2).get();
-        executePost("http://localhost:8080/api/module/"+module.getId()+"/ressources/"+course.getId(),jwt);
-
+        executePost("http://localhost:8080/api/module/" + module.getId() + "/ressources/" + course.getId(), jwt);
+        System.out.println("ajout du cours , debug \n" + latestHttpResponse.toString());
 
 
     }
@@ -101,4 +110,22 @@ public class AddCourseStepDefs extends SpringIntegration{
         System.out.println(module.getRessources());
         assertTrue(module.getRessources().contains(course));
     }
+    @When("{string} wants to add the course {string} to the module {string}")
+    public void wantsToAddTheCourseToTheModule(String arg0, String arg1, String arg2) throws IOException {
+        User user = userRepository.findByUsername(arg0).get();
+        String jwt = authController.generateJwt(arg0, PASSWORD);
+        Module module = moduleRepository.findByName(arg2).get();
+        Ressources course = ressourcesRepository.findByName(arg1).get();
+        executePost("http://localhost:8080/api/module/" + module.getId() + "/ressources/" + course.getId(), jwt);
+
+
+
+    }
+    @Then("the course is not added and the return status of the request is {int}")
+    public void theCourseIsNotAddedAndTheReturnStatusOfTheRequestIs(int status) {
+        assertEquals(status, latestHttpResponse.getStatusLine().getStatusCode());
+    }
+
+
+
 }

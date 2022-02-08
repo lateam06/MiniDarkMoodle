@@ -5,6 +5,7 @@ import fr.uca.springbootstrap.models.ERole;
 import fr.uca.springbootstrap.models.Module;
 import fr.uca.springbootstrap.models.Role;
 import fr.uca.springbootstrap.models.User;
+import fr.uca.springbootstrap.payload.request.SignupRequest;
 import fr.uca.springbootstrap.repository.ModuleRepository;
 import fr.uca.springbootstrap.repository.RoleRepository;
 import fr.uca.springbootstrap.repository.UserRepository;
@@ -45,6 +46,7 @@ public class RegisterTeacherStepDefs extends SpringIntegration {
         user.setRoles(new HashSet<Role>(){{ add(roleRepository.findByName(ERole.ROLE_TEACHER).
                 orElseThrow(() -> new RuntimeException("Error: Role is not found."))); }});
         userRepository.save(user);
+
     }
 
     @And("a module named {string}")
