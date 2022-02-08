@@ -123,6 +123,46 @@ public class ModuleController {
 
 
 
+	@DeleteMapping("/{id}/ressources/{ressourcesId}")
+	@PreAuthorize("hasRole('TEACHER')")
+	public ResponseEntity<?> removeRessource(Principal principal, @PathVariable long id, @PathVariable long ressourcesId){
+		Optional<Module> omodule = moduleRepository.findById(id);
+		Optional<Ressources> oressource = ressourcesRepository.findById(ressourcesId);
+		if (!omodule.isPresent()) {
+			return ResponseEntity
+					.badRequest()
+					.body(new MessageResponse("Error: No such module!"));
+		}
+		if (!oressource.isPresent()) {
+			return ResponseEntity
+					.badRequest()
+					.body(new MessageResponse("Error: not a course in this module!"));
+		}
+
+		Module module = omodule.get();
+		Ressources res  = oressource.get();
+
+
+
+		Ressources actorRessource = ressourcesRepository.findByName(res.getName()).get();
+
+		Set<Ressources> ressources = module.getRessources();
+
+		if ((ressources.isEmpty() && actorRessource.equals(res))
+				|| ressources.contains(actorRessource)) {
+			ressources.remove(res);
+		} else {
+			return ResponseEntity
+					.badRequest()
+					.body(new MessageResponse("Error: Not allowed to add ressource!"));
+		}
+		moduleRepository.save(module);
+		return ResponseEntity.ok(new MessageResponse("Ressource successfully added to module!"));
+
+
+	}
+
+
 	User createUser(String userName, String email, String password, Set<String> strRoles) {
 		User user = new User(userName, email, password);
 		Set<Role> roles = new HashSet<>();

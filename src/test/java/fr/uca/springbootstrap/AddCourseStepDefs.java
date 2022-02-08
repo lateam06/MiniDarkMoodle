@@ -88,7 +88,7 @@ public class AddCourseStepDefs extends SpringIntegration {
         User user = userRepository.findByUsername(arg0).get();
         String jwt = authController.generateJwt(arg0, PASSWORD);
         executePost("http://localhost:8080/api/module/" + module.getId() + "/participants/" + user.getId(), jwt);
-        System.out.println("ajout du prof , debug " + latestHttpResponse.getStatusLine().getStatusCode());
+//        System.out.println("ajout du prof , debug " + latestHttpResponse.getStatusLine().getStatusCode());
     }
 
     @When("{string} want to add the course {string}  to the module {string}")
@@ -98,7 +98,7 @@ public class AddCourseStepDefs extends SpringIntegration {
         Ressources course = ressourcesRepository.findByName(arg1).get();
         Module module = moduleRepository.findByName(arg2).get();
         executePost("http://localhost:8080/api/module/" + module.getId() + "/ressources/" + course.getId(), jwt);
-        System.out.println("ajout du cours , debug \n" + latestHttpResponse.toString());
+//        System.out.println("ajout du cours , debug \n" + latestHttpResponse.toString());
 
 
     }
@@ -128,4 +128,22 @@ public class AddCourseStepDefs extends SpringIntegration {
 
 
 
+    @When("{string} wants to delete the course {string} from the module {string}")
+    public void wantsToDeleteTheCourseFromTheModule(String arg0, String arg1, String arg2) throws IOException {
+        User user = userRepository.findByUsername(arg0).get();
+        String jwt = authController.generateJwt(arg0, PASSWORD);
+        Module module = moduleRepository.findByName(arg2).get();
+        Ressources course = ressourcesRepository.findByName(arg1).get();
+        executeDelete("http://localhost:8080/api/module/" + module.getId() + "/ressources/" + course.getId(), jwt);
+
+
+    }
+
+    @Then("the course {string} is deleted from the module {string}")
+    public void theCourseIsDeletedFromTheModule(String arg0, String arg1) {
+        Ressources course = ressourcesRepository.findByName(arg0).get();
+        Module module = moduleRepository.findByName(arg1).get();
+        assertFalse(module.getRessources().contains(course));
+
+    }
 }

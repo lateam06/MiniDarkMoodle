@@ -85,4 +85,6 @@ public class RegisterTeacherStepDefs extends SpringIntegration {
         User user = userRepository.findByUsername(arg0).get();
         assertFalse(module.getParticipants().contains(user));
     }
+
+
 }
