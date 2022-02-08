@@ -22,7 +22,7 @@ Feature: AddCourse
         When "Marcel" wants to delete the course "introduction" from the module "le C pour les nuls"
         Then the course "introduction" is deleted from the module "le C pour les nuls"
 
-      Scenario: Louis is a Student registered by Marcel to the module "el C pour les nuls"
+      Scenario: Louis is a Student registered by Marcel to the module "le C pour les nuls"
         Given "Marcel" is the teacher registered to the module "le C pour les nuls"
         When  "Louis" wants to delete the course "introduction" to the module "le C pour les nuls"
         Then the course is not deleted and the return status of the request is 403
