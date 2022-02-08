@@ -41,6 +41,8 @@ public class AddCourseStepDefs extends SpringIntegration {
     @Autowired
     PasswordEncoder encoder;
 
+    private String jwt;
+
     @Given("a teacher named {string} with ID {int}")
     public void aTeacherNamedWithID(String arg0, int arg1) {
         User user = userRepository.findByUsername(arg0).
@@ -86,21 +88,9 @@ public class AddCourseStepDefs extends SpringIntegration {
     public void isTheTeacherRegisteredToTheModule(String arg0, String arg1) throws IOException {
         Module module = moduleRepository.findByName(arg1).get();
         User user = userRepository.findByUsername(arg0).get();
-        String jwt = authController.generateJwt(arg0, PASSWORD);
+        jwt = authController.generateJwt(arg0, PASSWORD);
         executePost("http://localhost:8080/api/module/" + module.getId() + "/participants/" + user.getId(), jwt);
 //        System.out.println("ajout du prof , debug " + latestHttpResponse.getStatusLine().getStatusCode());
-    }
-
-    @When("{string} want to add the course {string}  to the module {string}")
-    public void wantToAddTheCourseToTheModule(String arg0, String arg1, String arg2) throws IOException {
-        User user = userRepository.findByUsername(arg0).get();
-        String jwt = authController.generateJwt(arg0, PASSWORD);
-        Ressources course = ressourcesRepository.findByName(arg1).get();
-        Module module = moduleRepository.findByName(arg2).get();
-        executePost("http://localhost:8080/api/module/" + module.getId() + "/ressources/" + course.getId(), jwt);
-//        System.out.println("ajout du cours , debug \n" + latestHttpResponse.toString());
-
-
     }
 
     @Then("The course {string} is added to the module {string}")
@@ -117,10 +107,8 @@ public class AddCourseStepDefs extends SpringIntegration {
         Module module = moduleRepository.findByName(arg2).get();
         Ressources course = ressourcesRepository.findByName(arg1).get();
         executePost("http://localhost:8080/api/module/" + module.getId() + "/ressources/" + course.getId(), jwt);
-
-
-
     }
+
     @Then("the course is not added and the return status of the request is {int}")
     public void theCourseIsNotAddedAndTheReturnStatusOfTheRequestIs(int status) {
         assertEquals(status, latestHttpResponse.getStatusLine().getStatusCode());
@@ -131,10 +119,10 @@ public class AddCourseStepDefs extends SpringIntegration {
     @When("{string} wants to delete the course {string} from the module {string}")
     public void wantsToDeleteTheCourseFromTheModule(String arg0, String arg1, String arg2) throws IOException {
         User user = userRepository.findByUsername(arg0).get();
-        String jwt = authController.generateJwt(arg0, PASSWORD);
+        String jwtStudent = authController.generateJwt(arg0, PASSWORD);
         Module module = moduleRepository.findByName(arg2).get();
         Ressources course = ressourcesRepository.findByName(arg1).get();
-        executeDelete("http://localhost:8080/api/module/" + module.getId() + "/ressources/" + course.getId(), jwt);
+        executeDelete("http://localhost:8080/api/module/" + module.getId() + "/ressources/" + course.getId(), jwtStudent);
 
 
     }
@@ -163,5 +151,19 @@ public class AddCourseStepDefs extends SpringIntegration {
     @Then("the course is not deleted and the return status of the request is {int}")
     public void theCourseIsNotDeletedAndTheReturnStatusOfTheRequestIs(int status) {
         assertEquals(status, latestHttpResponse.getStatusLine().getStatusCode());
+    }
+
+    @And("a course {string} has already been added by {string} in the module {string}")
+    public void aCourseHasAlreadyBeenAddedByInTheModule(String courseName, String teacherName, String moduleName) throws IOException {
+        User user = userRepository.findByUsername(teacherName).get();
+        //String jwt = authController.generateJwt(teacherName, PASSWORD);
+        Module module = moduleRepository.findByName(moduleName).get();
+        Ressources course = ressourcesRepository.findByName(courseName).orElse(new Ressources(courseName, EType.COURSE));
+        ressourcesRepository.save(course);
+
+        executePost("http://localhost:8080/api/module/" + module.getId() + "/ressources/" + course.getId(), jwt);
+
+        //module = moduleRepository.findByName(moduleName).get();
+        //assertTrue(module.getRessources().contains(course));
     }
 }
