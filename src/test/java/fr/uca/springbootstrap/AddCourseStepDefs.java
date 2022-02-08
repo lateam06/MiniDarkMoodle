@@ -146,4 +146,22 @@ public class AddCourseStepDefs extends SpringIntegration {
         assertFalse(module.getRessources().contains(course));
 
     }
+
+    @When("{string} wants to delete the course {string} to the module {string}")
+    public void wantsToDeleteTheCourseToTheModule(String arg0, String arg1, String arg2) throws IOException {
+        User user = userRepository.findByUsername(arg0).get();
+        String jwt = authController.generateJwt(arg0, PASSWORD);
+        Module module = moduleRepository.findByName(arg2).get();
+        Ressources course = ressourcesRepository.findByName(arg1).get();
+        executeDelete("http://localhost:8080/api/module/" + module.getId() + "/ressources/" + course.getId(), jwt);
+
+
+
+
+    }
+
+    @Then("the course is not deleted and the return status of the request is {int}")
+    public void theCourseIsNotDeletedAndTheReturnStatusOfTheRequestIs(int status) {
+        assertEquals(status, latestHttpResponse.getStatusLine().getStatusCode());
+    }
 }
