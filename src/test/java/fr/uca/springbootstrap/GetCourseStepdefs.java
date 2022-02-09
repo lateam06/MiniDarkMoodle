@@ -87,4 +87,18 @@ public class GetCourseStepdefs extends SpringIntegration  {
         System.out.println(module.getResources());
         assertTrue(module.getResources().contains(course));
     }
+
+    @And("{string} wants to get the course {string} from {string} and make sure the description is {string}")
+    public void wantsToGetTheCourseFromAndMakeSureTheDescriptionIs(String arg0, String arg1, String arg2, String arg3) throws IOException {
+        Course course = courseRepository.findByName(arg1).get();
+        Module module = moduleRepository.findByName(arg2).get();
+        String jwt = authController.generateJwt(arg0, PASSWORD);
+
+        executeGet("http://localhost:8080/api/module/" + module.getId() + "/resources/" + course.getId());
+
+        System.out.println(latestHttpResponse);
+
+
+
+    }
 }

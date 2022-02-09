@@ -53,6 +53,40 @@ public class ModuleController {
 	@Autowired
 	CourseRepository courseRepository;
 
+
+	@GetMapping("/{id}/resources/{resourcesId}")
+	public ResponseEntity<?> getressource( @PathVariable long id, @PathVariable long resourcesId) throws JsonProcessingException {
+		Optional<Module> omodule = moduleRepository.findById(id);
+		Optional<Resource> oresource = resourcesRepository.findById(resourcesId);
+		if (!omodule.isPresent()) {
+			return ResponseEntity
+					.badRequest()
+					.body(new MessageResponse("Error: No such module!"));
+		}
+		if (!oresource.isPresent()) {
+			return ResponseEntity
+					.badRequest()
+					.body(new MessageResponse("Error: there is no course registered in database"));
+		}
+
+		Module module = omodule.get();
+		Resource res  = oresource.get();
+
+		if(!module.getResources().contains(res)){
+			return ResponseEntity
+					.notFound().build();
+
+		}
+		else{
+			ObjectMapper Obj = new ObjectMapper();
+			return ResponseEntity.ok(Obj.writeValueAsString(res));
+		}
+
+	}
+
+
+
+
 	@PostMapping("/{id}/participants/{userid}")
 	@PreAuthorize("hasRole('TEACHER')")
 	public ResponseEntity<?> addUser(Principal principal, @PathVariable long id, @PathVariable long userid) {
@@ -170,35 +204,6 @@ public class ModuleController {
 
 
 
-	@GetMapping("/{id}/resources/{resourcesId}")
-	public ResponseEntity<?> getressource(Principal principal, @PathVariable long id, @PathVariable long resourcesId) throws JsonProcessingException {
-		Optional<Module> omodule = moduleRepository.findById(id);
-		Optional<Resource> oresource = resourcesRepository.findById(resourcesId);
-		if (!omodule.isPresent()) {
-			return ResponseEntity
-					.badRequest()
-					.body(new MessageResponse("Error: No such module!"));
-		}
-		if (!oresource.isPresent()) {
-			return ResponseEntity
-					.badRequest()
-					.body(new MessageResponse("Error: there is no course registered in database"));
-		}
-
-		Module module = omodule.get();
-		Resource res  = oresource.get();
-
-		if(!module.getResources().contains(res)){
-			return ResponseEntity
-					.notFound().build();
-
-		}
-		else{
-			ObjectMapper Obj = new ObjectMapper();
-			return ResponseEntity.ok(Obj.writeValueAsString(res));
-		}
-
-	}
 
 
 
