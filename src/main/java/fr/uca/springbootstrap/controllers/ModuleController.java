@@ -1,16 +1,16 @@
 package fr.uca.springbootstrap.controllers;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.uca.springbootstrap.models.modules.Module;
 import fr.uca.springbootstrap.models.modules.Resource;
+import fr.uca.springbootstrap.models.modules.courses.Course;
 import fr.uca.springbootstrap.models.users.ERole;
 import fr.uca.springbootstrap.models.users.Role;
 import fr.uca.springbootstrap.models.users.User;
 import fr.uca.springbootstrap.payload.request.SignupRequest;
 import fr.uca.springbootstrap.payload.response.MessageResponse;
-import fr.uca.springbootstrap.repository.ModuleRepository;
-import fr.uca.springbootstrap.repository.ResourcesRepository;
-import fr.uca.springbootstrap.repository.RoleRepository;
-import fr.uca.springbootstrap.repository.UserRepository;
+import fr.uca.springbootstrap.repository.*;
 import fr.uca.springbootstrap.security.jwt.JwtUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -42,13 +42,16 @@ public class ModuleController {
 	ModuleRepository moduleRepository;
 
 	@Autowired
-	ResourcesRepository ressourcesRepository;
+	ResourcesRepository resourcesRepository;
 
 	@Autowired
 	PasswordEncoder encoder;
 
 	@Autowired
 	JwtUtils jwtUtils;
+
+	@Autowired
+	CourseRepository courseRepository;
 
 	@PostMapping("/{id}/participants/{userid}")
 	@PreAuthorize("hasRole('TEACHER')")
@@ -83,12 +86,14 @@ public class ModuleController {
 		return ResponseEntity.ok(new MessageResponse("User successfully added to module!"));
 	}
 
+
+
 	//TODO
 	@PostMapping("/{id}/resources/{resourcesId}")
 	@PreAuthorize("hasRole('TEACHER')")
-	public ResponseEntity<?> addCourse(Principal principal, @PathVariable long id, @PathVariable long resourcesId){
+	public ResponseEntity<?> addResource(Principal principal, @PathVariable long id, @PathVariable long resourcesId){
 		Optional<Module> omodule = moduleRepository.findById(id);
-		Optional<Resource> oresource = ressourcesRepository.findById(resourcesId);
+		Optional<Resource> oresource = resourcesRepository.findById(resourcesId);
 		if (!omodule.isPresent()) {
 			return ResponseEntity
 					.badRequest()
@@ -97,7 +102,7 @@ public class ModuleController {
 		if (!oresource.isPresent()) {
 			return ResponseEntity
 					.badRequest()
-					.body(new MessageResponse("Error: There is already this course in this module!"));
+					.body(new MessageResponse("Error: there is no course registered in database"));
 		}
 
 		Module module = omodule.get();
@@ -105,64 +110,101 @@ public class ModuleController {
 
 
 
-		Resource actorRessource = ressourcesRepository.findByName(res.getName()).get();
+		Resource actorresource = courseRepository.findByName(res.getName()).get();
 
-		Set<Resource> ressources = module.getResources();
+		Set<Resource> resources = module.getResources();
 
-		if ((ressources.isEmpty() && actorRessource.equals(res))
-				|| ressources.contains(actorRessource)) {
-			ressources.add(res);
+		if ((resources.isEmpty() && actorresource.equals(res))
+				|| !resources.contains(actorresource)) {
+			resources.add(res);
 		} else {
 			return ResponseEntity
 					.badRequest()
-					.body(new MessageResponse("Error: Not allowed to add ressource!"));
+					.body(new MessageResponse("Error: Not allowed to add resource!"));
 		}
 		moduleRepository.save(module);
-		return ResponseEntity.ok(new MessageResponse("Ressource successfully added to module!"));
+		return ResponseEntity.ok(new MessageResponse("resource successfully added to module!"));
 
 
 	}
 
 
 
-	@DeleteMapping("/{id}/ressources/{ressourcesId}")
+	@DeleteMapping("/{id}/resources/{resourcesId}")
 	@PreAuthorize("hasRole('TEACHER')")
-	public ResponseEntity<?> removeRessource(Principal principal, @PathVariable long id, @PathVariable long ressourcesId){
+	public ResponseEntity<?> removeresource(Principal principal, @PathVariable long id, @PathVariable long resourcesId){
 		Optional<Module> omodule = moduleRepository.findById(id);
-		Optional<Resource> oressource = ressourcesRepository.findById(ressourcesId);
+		Optional<Resource> oresource = resourcesRepository.findById(resourcesId);
 		if (!omodule.isPresent()) {
 			return ResponseEntity
 					.badRequest()
 					.body(new MessageResponse("Error: No such module!"));
 		}
-		if (!oressource.isPresent()) {
+		if (!oresource.isPresent()) {
 			return ResponseEntity
 					.badRequest()
 					.body(new MessageResponse("Error: not a course in this module!"));
 		}
 
 		Module module = omodule.get();
-		Resource res  = oressource.get();
+		Resource res  = oresource.get();
 
 
 
-		Resource actorRessource = ressourcesRepository.findByName(res.getName()).get();
+		Resource actorresource = resourcesRepository.findByName(res.getName()).get();
 
-		Set<Resource> ressources = module.getResources();
+		Set<Resource> resources = module.getResources();
 
-		if ((ressources.isEmpty() && actorRessource.equals(res))
-				|| ressources.contains(actorRessource)) {
-			ressources.remove(res);
+		if ((resources.isEmpty() && actorresource.equals(res))
+				|| resources.contains(actorresource)) {
+			resources.remove(res);
 		} else {
 			return ResponseEntity
 					.badRequest()
-					.body(new MessageResponse("Error: Not allowed to add ressource!"));
+					.body(new MessageResponse("Error: Not allowed to add resource!"));
 		}
 		moduleRepository.save(module);
-		return ResponseEntity.ok(new MessageResponse("Ressource successfully added to module!"));
-
+		return ResponseEntity.ok(new MessageResponse("resource successfully added to module!"));
 
 	}
+
+
+
+	@GetMapping("/{id}/resources/{resourcesId}")
+	public ResponseEntity<?> getressource(Principal principal, @PathVariable long id, @PathVariable long resourcesId) throws JsonProcessingException {
+		Optional<Module> omodule = moduleRepository.findById(id);
+		Optional<Resource> oresource = resourcesRepository.findById(resourcesId);
+		if (!omodule.isPresent()) {
+			return ResponseEntity
+					.badRequest()
+					.body(new MessageResponse("Error: No such module!"));
+		}
+		if (!oresource.isPresent()) {
+			return ResponseEntity
+					.badRequest()
+					.body(new MessageResponse("Error: there is no course registered in database"));
+		}
+
+		Module module = omodule.get();
+		Resource res  = oresource.get();
+
+		if(!module.getResources().contains(res)){
+			return ResponseEntity
+					.notFound().build();
+
+		}
+		else{
+			ObjectMapper Obj = new ObjectMapper();
+			return ResponseEntity.ok(Obj.writeValueAsString(res));
+		}
+
+	}
+
+
+
+
+
+
 
 
 	User createUser(String userName, String email, String password, Set<String> strRoles) {

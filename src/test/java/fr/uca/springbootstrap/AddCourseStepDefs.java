@@ -3,13 +3,11 @@ package fr.uca.springbootstrap;
 import fr.uca.springbootstrap.controllers.AuthController;
 import fr.uca.springbootstrap.models.modules.Module;
 import fr.uca.springbootstrap.models.modules.Resource;
+import fr.uca.springbootstrap.models.modules.courses.Course;
 import fr.uca.springbootstrap.models.users.ERole;
 import fr.uca.springbootstrap.models.users.Role;
 import fr.uca.springbootstrap.models.users.User;
-import fr.uca.springbootstrap.repository.ModuleRepository;
-import fr.uca.springbootstrap.repository.ResourcesRepository;
-import fr.uca.springbootstrap.repository.RoleRepository;
-import fr.uca.springbootstrap.repository.UserRepository;
+import fr.uca.springbootstrap.repository.*;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
@@ -26,7 +24,7 @@ public class AddCourseStepDefs extends SpringIntegration {
     private static final String PASSWORD = "password";
 
     @Autowired
-    ResourcesRepository ressourcesRepository;
+    ResourcesRepository resourcesRepository;
 
     @Autowired
     ModuleRepository moduleRepository;
@@ -42,6 +40,10 @@ public class AddCourseStepDefs extends SpringIntegration {
 
     @Autowired
     PasswordEncoder encoder;
+
+    @Autowired
+    CourseRepository courseRepository;
+
 
     private String jwt;
 
@@ -78,10 +80,13 @@ public class AddCourseStepDefs extends SpringIntegration {
         moduleRepository.save(module);
     }
 
-    @And("a course with name {string}")
-    public void aCourseWithName(String arg0) throws IOException {
-//        Ressources r = ressourcesRepository.findByName(arg0).orElse(new Ressources(arg0, EType.COURSE));
-//        ressourcesRepository.save(r);
+    @And("a course with name {string} with a descritpion {string}")
+    public void aCourseWithName(String arg0,String arg1) throws IOException {
+        Course course = courseRepository.findByName(arg0).orElse(new Course(arg0));
+        course.setDescription(arg1);
+        courseRepository.save(course);
+//        resources r = resourcesRepository.findByName(arg0).orElse(new resources(arg0, EType.COURSE));
+//        resourcesRepository.save(r);
 
     }
 
@@ -97,7 +102,7 @@ public class AddCourseStepDefs extends SpringIntegration {
 
     @Then("The course {string} is added to the module {string}")
     public void theCourseIsAddedToTheModule(String arg0, String arg1) {
-        Resource course = ressourcesRepository.findByName(arg0).get();
+        Course course = courseRepository.findByName(arg0).get();
         Module module = moduleRepository.findByName(arg1).get();
         System.out.println(module.getResources());
         assertTrue(module.getResources().contains(course));
@@ -107,14 +112,10 @@ public class AddCourseStepDefs extends SpringIntegration {
         User user = userRepository.findByUsername(arg0).get();
         String jwt = authController.generateJwt(arg0, PASSWORD);
         Module module = moduleRepository.findByName(arg2).get();
-        Resource course = ressourcesRepository.findByName(arg1).get();
-        executePost("http://localhost:8080/api/module/" + module.getId() + "/ressources/" + course.getId(), jwt);
+        Course course = courseRepository.findByName(arg1).get();
+        executePost("http://localhost:8080/api/module/" + module.getId() + "/resources/" + course.getId(), jwt);
     }
 
-    @Then("the course is not added and the return status of the request is {int}")
-    public void theCourseIsNotAddedAndTheReturnStatusOfTheRequestIs(int status) {
-        assertEquals(status, latestHttpResponse.getStatusLine().getStatusCode());
-    }
 
 
 
@@ -123,15 +124,15 @@ public class AddCourseStepDefs extends SpringIntegration {
         User user = userRepository.findByUsername(arg0).get();
         String jwtStudent = authController.generateJwt(arg0, PASSWORD);
         Module module = moduleRepository.findByName(arg2).get();
-        Resource course = ressourcesRepository.findByName(arg1).get();
-        executeDelete("http://localhost:8080/api/module/" + module.getId() + "/ressources/" + course.getId(), jwtStudent);
+        Resource course = resourcesRepository.findByName(arg1).get();
+        executeDelete("http://localhost:8080/api/module/" + module.getId() + "/resources/" + course.getId(), jwtStudent);
 
 
     }
 
     @Then("the course {string} is deleted from the module {string}")
     public void theCourseIsDeletedFromTheModule(String arg0, String arg1) {
-        Resource course = ressourcesRepository.findByName(arg0).get();
+        Resource course = resourcesRepository.findByName(arg0).get();
         Module module = moduleRepository.findByName(arg1).get();
         assertFalse(module.getResources().contains(course));
 
@@ -142,12 +143,18 @@ public class AddCourseStepDefs extends SpringIntegration {
         User user = userRepository.findByUsername(arg0).get();
         String jwt = authController.generateJwt(arg0, PASSWORD);
         Module module = moduleRepository.findByName(arg2).get();
-        Resource course = ressourcesRepository.findByName(arg1).get();
-        executeDelete("http://localhost:8080/api/module/" + module.getId() + "/ressources/" + course.getId(), jwt);
+        Resource course = resourcesRepository.findByName(arg1).get();
+        executeDelete("http://localhost:8080/api/module/" + module.getId() + "/resources/" + course.getId(), jwt);
 
 
 
 
+    }
+
+
+    @Then("the course is not added and the return status of the request is {int} forbidden")
+    public void theCourseIsNotAddedAndTheReturnStatusOfTheRequestIs(int status) {
+        assertEquals(status, latestHttpResponse.getStatusLine().getStatusCode());
     }
 
     @Then("the course is not deleted and the return status of the request is {int}")
@@ -155,17 +162,17 @@ public class AddCourseStepDefs extends SpringIntegration {
         assertEquals(status, latestHttpResponse.getStatusLine().getStatusCode());
     }
 
-    @And("a course {string} has already been added by {string} in the module {string}")
-    public void aCourseHasAlreadyBeenAddedByInTheModule(String courseName, String teacherName, String moduleName) throws IOException {
-        /*User user = userRepository.findByUsername(teacherName).get();
-        //String jwt = authController.generateJwt(teacherName, PASSWORD);
-        Module module = moduleRepository.findByName(moduleName).get();
-        Ressources course = ressourcesRepository.findByName(courseName).orElse(new Ressources(courseName, EType.COURSE));
-        ressourcesRepository.save(course);
-
-        executePost("http://localhost:8080/api/module/" + module.getId() + "/ressources/" + course.getId(), jwt);
-
-        //module = moduleRepository.findByName(moduleName).get();
-        //assertTrue(module.getRessources().contains(course));*/
-    }
+//    @And("a course {string} has already been added by {string} in the module {string}")
+//    public void aCourseHasAlreadyBeenAddedByInTheModule(String courseName, String teacherName, String moduleName) throws IOException {
+//        /*User user = userRepository.findByUsername(teacherName).get();
+//        //String jwt = authController.generateJwt(teacherName, PASSWORD);
+//        Module module = moduleRepository.findByName(moduleName).get();
+//        resources course = resourcesRepository.findByName(courseName).orElse(new resources(courseName, EType.COURSE));
+//        resourcesRepository.save(course);
+//
+//        executePost("http://localhost:8080/api/module/" + module.getId() + "/resources/" + course.getId(), jwt);
+//
+//        //module = moduleRepository.findByName(moduleName).get();
+//        //assertTrue(module.getresources().contains(course));*/
+//    }
 }
