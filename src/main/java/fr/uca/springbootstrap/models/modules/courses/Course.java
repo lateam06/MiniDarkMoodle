@@ -6,7 +6,6 @@ import javax.persistence.*;
 import java.util.Set;
 
 @Entity
-@DiscriminatorValue("course")
 public class Course extends Resources {
 
     @OneToMany(fetch = FetchType.EAGER)
@@ -20,5 +19,13 @@ public class Course extends Resources {
     }
 
     public Course() {
+    }
+
+    public Set<Text> getTexts() {
+        return texts;
+    }
+
+    public void setTexts(Set<Text> texts) {
+        this.texts = texts;
     }
 }

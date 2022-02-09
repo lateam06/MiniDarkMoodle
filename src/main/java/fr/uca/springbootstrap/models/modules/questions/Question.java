@@ -4,13 +4,9 @@ package fr.uca.springbootstrap.models.modules.questions;
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
-import java.util.Set;
 
 @Entity
-@Table(name = "questions")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-@DiscriminatorColumn(name = "question_type")
-@DiscriminatorValue("question")
 public class Question {
 
     @Id
@@ -23,7 +19,7 @@ public class Question {
 
     @NotBlank
     @Size(max = 256)
-    private String desc;
+    private String description;
 
     @OneToOne(fetch = FetchType.EAGER)
     @JoinTable(name = "question_questionnaries",
@@ -31,9 +27,9 @@ public class Question {
             inverseJoinColumns = @JoinColumn(name = "questionnary_id"))
     private Questionnary questionnary;
 
-    public Question(String name, String desc) {
+    public Question(String name, String description) {
         this.name = name;
-        this.desc = desc;
+        this.description = description;
     }
 
     public Question() {
@@ -56,11 +52,19 @@ public class Question {
         this.name = name;
     }
 
-    public String getDesc() {
-        return desc;
+    public String getDescription() {
+        return description;
     }
 
-    public void setDesc(String desc) {
-        this.desc = desc;
+    public Questionnary getQuestionnary() {
+        return questionnary;
+    }
+
+    public void setQuestionnary(Questionnary questionnary) {
+        this.questionnary = questionnary;
+    }
+
+    public void setDescription(String desc) {
+        this.description = desc;
     }
 }

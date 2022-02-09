@@ -5,7 +5,6 @@ import javax.validation.constraints.NotNull;
 import java.util.Set;
 
 @Entity
-@DiscriminatorValue("qcm")
 public class QCM extends Question {
 
     @NotNull
@@ -17,8 +16,8 @@ public class QCM extends Question {
             inverseJoinColumns = @JoinColumn(name = "response_id"))
     private Set<QCMResponse> responses;
 
-    public QCM(String name, String desc, String response) {
-        super(name, desc);
+    public QCM(String name, String description, String response) {
+        super(name, description);
         this.response = response;
     }
 

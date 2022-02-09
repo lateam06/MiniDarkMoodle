@@ -10,11 +10,6 @@ import java.util.Set;
 
 @Entity
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-@DiscriminatorColumn(name = "type_resource")
-@DiscriminatorValue("resource")
-@Table(name = "resources",uniqueConstraints = {
-        @UniqueConstraint(columnNames = "name")}
-)
 public class Resources {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,7 +20,7 @@ public class Resources {
     private String name;
 
     @Size(max = 256)
-    private String desc;
+    private String description;
 
     //private EType type;
 
@@ -46,6 +41,26 @@ public class Resources {
 //        this.type = type;
     }
 
+    public void setId(long id) {
+        this.id = id;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String desc) {
+        this.description = desc;
+    }
+
+    public Set<Module> getModules() {
+        return modules;
+    }
+
+    public void setModules(Set<Module> modules) {
+        this.modules = modules;
+    }
+
     public long getId() {
         return id;
     }
@@ -63,7 +78,6 @@ public class Resources {
         Resources resources = (Resources) o;
         return id == resources.id && name.equals(resources.name);
     }
-
 
     @Override
     public int hashCode() {

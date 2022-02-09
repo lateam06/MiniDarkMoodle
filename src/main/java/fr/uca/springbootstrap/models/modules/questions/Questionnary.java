@@ -6,7 +6,6 @@ import javax.persistence.*;
 import java.util.Set;
 
 @Entity
-@DiscriminatorValue("questionnary")
 public class Questionnary extends Resources {
 
     @OneToMany(fetch = FetchType.EAGER)
@@ -20,5 +19,13 @@ public class Questionnary extends Resources {
     }
 
     public Questionnary() {
+    }
+
+    public Set<Question> getQuestionSet() {
+        return questionSet;
+    }
+
+    public void setQuestionSet(Set<Question> questionSet) {
+        this.questionSet = questionSet;
     }
 }

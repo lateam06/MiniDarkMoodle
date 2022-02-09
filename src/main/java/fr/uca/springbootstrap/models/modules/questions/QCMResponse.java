@@ -2,7 +2,6 @@ package fr.uca.springbootstrap.models.modules.questions;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
-import java.util.Set;
 
 @Entity
 @Table(name = "qcm_response")
@@ -13,10 +12,10 @@ public class QCMResponse {
     private Long id;
 
     @NotBlank
-    private String desc;
+    private String description;
 
-    public QCMResponse(String desc) {
-        this.desc = desc;
+    public QCMResponse(String description) {
+        this.description = description;
     }
 
     public QCMResponse() {
@@ -31,11 +30,11 @@ public class QCMResponse {
         this.id = id;
     }
 
-    public String getDesc() {
-        return desc;
+    public String getDescription() {
+        return description;
     }
 
-    public void setDesc(String desc) {
-        this.desc = desc;
+    public void setDescription(String desc) {
+        this.description = desc;
     }
 }
