@@ -10,7 +10,9 @@ import java.util.Set;
 
 @Entity
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-public class Resources {
+@DiscriminatorColumn(name = "resource_type")
+@DiscriminatorValue("resource")
+public class Resource {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
@@ -22,23 +24,18 @@ public class Resources {
     @Size(max = 256)
     private String description;
 
-    //private EType type;
-
     @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(	name = "resources_modules",
+    @JoinTable(name = "resource_modules",
             joinColumns = @JoinColumn(name = "resource_id"),
             inverseJoinColumns = @JoinColumn(name = "module_id"))
     private Set<Module> modules = new HashSet<>();
 
-
-
-    public Resources() {
+    public Resource() {
     }
 
-    public Resources(String name/*, EType type*/) {
+    public Resource(String name) {
         //TODO ajouter le text ou la question associé etc ...
         this.name = name;
-//        this.type = type;
     }
 
     public void setId(long id) {
@@ -68,19 +65,21 @@ public class Resources {
     public String getName() {
         return name;
     }
+
     public void setName(String name) {
         this.name = name;
     }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Resources resources = (Resources) o;
-        return id == resources.id && name.equals(resources.name);
+        Resource resource = (Resource) o;
+        return id == resource.id && name.equals(resource.name);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name/*, type*/);
+        return Objects.hash(id, name);
     }
 }

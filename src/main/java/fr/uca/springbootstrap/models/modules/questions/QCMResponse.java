@@ -4,7 +4,7 @@ import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 
 @Entity
-@Table(name = "qcm_response")
+@Table(name = "qcm_responses")
 public class QCMResponse {
 
     @Id

@@ -31,11 +31,10 @@ public class Module {
     private Set<User> participants;
 
     @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(name = "resources_modules",
+    @JoinTable(name = "resource_modules",
             joinColumns = @JoinColumn(name = "module_id"),
             inverseJoinColumns = @JoinColumn(name = "resource_id"))
-    private Set<Resources> resources;
-
+    private Set<Resource> resources;
 
     public Module() {
     }
@@ -52,11 +51,11 @@ public class Module {
         this.participants = participants;
     }
 
-    public Set<Resources> getResources() {
+    public Set<Resource> getResources() {
         return resources;
     }
 
-    public void setResources(Set<Resources> resources) {
+    public void setResources(Set<Resource> resources) {
         this.resources = resources;
     }
 

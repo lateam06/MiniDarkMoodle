@@ -4,9 +4,12 @@ package fr.uca.springbootstrap.models.modules.questions;
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
+import java.util.List;
 
 @Entity
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(name = "question_type")
+@DiscriminatorValue("question")
 public class Question {
 
     @Id
@@ -21,10 +24,14 @@ public class Question {
     @Size(max = 256)
     private String description;
 
+    @OneToMany(targetEntity = Result.class, mappedBy = "userId", fetch = FetchType.EAGER)
+    private List<Result> results;
+
     @OneToOne(fetch = FetchType.EAGER)
-    @JoinTable(name = "question_questionnaries",
+    @JoinTable(name = "question_questionnary",
             joinColumns = @JoinColumn(name = "question_id"),
-            inverseJoinColumns = @JoinColumn(name = "questionnary_id"))
+            inverseJoinColumns = @JoinColumn(name = "questionnary_id")
+        )
     private Questionnary questionnary;
 
     public Question(String name, String description) {
@@ -66,5 +73,13 @@ public class Question {
 
     public void setDescription(String desc) {
         this.description = desc;
+    }
+
+    public List<Result> getResults() {
+        return results;
+    }
+
+    public void setResults(List<Result> results) {
+        this.results = results;
     }
 }

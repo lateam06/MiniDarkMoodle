@@ -10,5 +10,5 @@ import java.util.Optional;
 public interface ModuleRepository extends JpaRepository<Module, Long> {
   Optional<Module> findByName(String name);
 
-  Optional<Module> findById(String name);
+  Optional<Module> findById(Long id);
 }

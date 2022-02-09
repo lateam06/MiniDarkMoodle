@@ -1,12 +1,13 @@
 package fr.uca.springbootstrap.models.modules.questions;
 
-import fr.uca.springbootstrap.models.modules.Resources;
+import fr.uca.springbootstrap.models.modules.Resource;
 
 import javax.persistence.*;
 import java.util.Set;
 
 @Entity
-public class Questionnary extends Resources {
+@DiscriminatorValue("questionnaries")
+public class Questionnary extends Resource {
 
     @OneToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "question_questionnaries",

@@ -1,15 +1,16 @@
 package fr.uca.springbootstrap.models.modules.courses;
 
-import fr.uca.springbootstrap.models.modules.Resources;
+import fr.uca.springbootstrap.models.modules.Resource;
 
 import javax.persistence.*;
 import java.util.Set;
 
 @Entity
-public class Course extends Resources {
+@DiscriminatorValue("courses")
+public class Course extends Resource {
 
     @OneToMany(fetch = FetchType.EAGER)
-    @JoinTable(name = "text_course",
+    @JoinTable(name = "text_courses",
             joinColumns = @JoinColumn(name = "course_id"),
             inverseJoinColumns = @JoinColumn(name = "text_id"))
     private Set<Text> texts;

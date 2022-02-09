@@ -5,13 +5,14 @@ import javax.validation.constraints.NotNull;
 import java.util.Set;
 
 @Entity
+@DiscriminatorValue("qcms")
 public class QCM extends Question {
 
     @NotNull
     private String response;
 
     @OneToMany(fetch = FetchType.EAGER)
-    @JoinTable(name = "response_qcm",
+    @JoinTable(name = "response_qcms",
             joinColumns = @JoinColumn(name = "qcm_id"),
             inverseJoinColumns = @JoinColumn(name = "response_id"))
     private Set<QCMResponse> responses;

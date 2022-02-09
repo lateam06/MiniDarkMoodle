@@ -1,7 +1,7 @@
 package fr.uca.springbootstrap.controllers;
 
 import fr.uca.springbootstrap.models.modules.Module;
-import fr.uca.springbootstrap.models.modules.Resources;
+import fr.uca.springbootstrap.models.modules.Resource;
 import fr.uca.springbootstrap.models.users.ERole;
 import fr.uca.springbootstrap.models.users.Role;
 import fr.uca.springbootstrap.models.users.User;
@@ -88,7 +88,7 @@ public class ModuleController {
 	@PreAuthorize("hasRole('TEACHER')")
 	public ResponseEntity<?> addCourse(Principal principal, @PathVariable long id, @PathVariable long resourcesId){
 		Optional<Module> omodule = moduleRepository.findById(id);
-		Optional<Resources> oresource = ressourcesRepository.findById(resourcesId);
+		Optional<Resource> oresource = ressourcesRepository.findById(resourcesId);
 		if (!omodule.isPresent()) {
 			return ResponseEntity
 					.badRequest()
@@ -101,13 +101,13 @@ public class ModuleController {
 		}
 
 		Module module = omodule.get();
-		Resources res  = oresource.get();
+		Resource res  = oresource.get();
 
 
 
-		Resources actorRessource = ressourcesRepository.findByName(res.getName()).get();
+		Resource actorRessource = ressourcesRepository.findByName(res.getName()).get();
 
-		Set<Resources> ressources = module.getResources();
+		Set<Resource> ressources = module.getResources();
 
 		if ((ressources.isEmpty() && actorRessource.equals(res))
 				|| ressources.contains(actorRessource)) {
@@ -129,7 +129,7 @@ public class ModuleController {
 	@PreAuthorize("hasRole('TEACHER')")
 	public ResponseEntity<?> removeRessource(Principal principal, @PathVariable long id, @PathVariable long ressourcesId){
 		Optional<Module> omodule = moduleRepository.findById(id);
-		Optional<Resources> oressource = ressourcesRepository.findById(ressourcesId);
+		Optional<Resource> oressource = ressourcesRepository.findById(ressourcesId);
 		if (!omodule.isPresent()) {
 			return ResponseEntity
 					.badRequest()
@@ -142,13 +142,13 @@ public class ModuleController {
 		}
 
 		Module module = omodule.get();
-		Resources res  = oressource.get();
+		Resource res  = oressource.get();
 
 
 
-		Resources actorRessource = ressourcesRepository.findByName(res.getName()).get();
+		Resource actorRessource = ressourcesRepository.findByName(res.getName()).get();
 
-		Set<Resources> ressources = module.getResources();
+		Set<Resource> ressources = module.getResources();
 
 		if ((ressources.isEmpty() && actorRessource.equals(res))
 				|| ressources.contains(actorRessource)) {

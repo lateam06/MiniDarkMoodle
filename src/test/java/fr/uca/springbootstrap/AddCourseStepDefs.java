@@ -2,7 +2,7 @@ package fr.uca.springbootstrap;
 
 import fr.uca.springbootstrap.controllers.AuthController;
 import fr.uca.springbootstrap.models.modules.Module;
-import fr.uca.springbootstrap.models.modules.Resources;
+import fr.uca.springbootstrap.models.modules.Resource;
 import fr.uca.springbootstrap.models.users.ERole;
 import fr.uca.springbootstrap.models.users.Role;
 import fr.uca.springbootstrap.models.users.User;
@@ -97,7 +97,7 @@ public class AddCourseStepDefs extends SpringIntegration {
 
     @Then("The course {string} is added to the module {string}")
     public void theCourseIsAddedToTheModule(String arg0, String arg1) {
-        Resources course = ressourcesRepository.findByName(arg0).get();
+        Resource course = ressourcesRepository.findByName(arg0).get();
         Module module = moduleRepository.findByName(arg1).get();
         System.out.println(module.getResources());
         assertTrue(module.getResources().contains(course));
@@ -107,7 +107,7 @@ public class AddCourseStepDefs extends SpringIntegration {
         User user = userRepository.findByUsername(arg0).get();
         String jwt = authController.generateJwt(arg0, PASSWORD);
         Module module = moduleRepository.findByName(arg2).get();
-        Resources course = ressourcesRepository.findByName(arg1).get();
+        Resource course = ressourcesRepository.findByName(arg1).get();
         executePost("http://localhost:8080/api/module/" + module.getId() + "/ressources/" + course.getId(), jwt);
     }
 
@@ -123,7 +123,7 @@ public class AddCourseStepDefs extends SpringIntegration {
         User user = userRepository.findByUsername(arg0).get();
         String jwtStudent = authController.generateJwt(arg0, PASSWORD);
         Module module = moduleRepository.findByName(arg2).get();
-        Resources course = ressourcesRepository.findByName(arg1).get();
+        Resource course = ressourcesRepository.findByName(arg1).get();
         executeDelete("http://localhost:8080/api/module/" + module.getId() + "/ressources/" + course.getId(), jwtStudent);
 
 
@@ -131,7 +131,7 @@ public class AddCourseStepDefs extends SpringIntegration {
 
     @Then("the course {string} is deleted from the module {string}")
     public void theCourseIsDeletedFromTheModule(String arg0, String arg1) {
-        Resources course = ressourcesRepository.findByName(arg0).get();
+        Resource course = ressourcesRepository.findByName(arg0).get();
         Module module = moduleRepository.findByName(arg1).get();
         assertFalse(module.getResources().contains(course));
 
@@ -142,7 +142,7 @@ public class AddCourseStepDefs extends SpringIntegration {
         User user = userRepository.findByUsername(arg0).get();
         String jwt = authController.generateJwt(arg0, PASSWORD);
         Module module = moduleRepository.findByName(arg2).get();
-        Resources course = ressourcesRepository.findByName(arg1).get();
+        Resource course = ressourcesRepository.findByName(arg1).get();
         executeDelete("http://localhost:8080/api/module/" + module.getId() + "/ressources/" + course.getId(), jwt);
 
 

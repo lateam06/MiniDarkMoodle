@@ -2,9 +2,9 @@ package fr.uca.springbootstrap.models.modules.questions;
 
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
-import javax.persistence.Table;
 
 @Entity
+@DiscriminatorValue("code_runners")
 public class CodeRunner extends Question{
 
     private String testCode;
@@ -13,8 +13,8 @@ public class CodeRunner extends Question{
 
     private String studentResponse;
 
-    public CodeRunner(String name, String desccription) {
-        super(name, desccription);
+    public CodeRunner(String name, String description) {
+        super(name, description);
     }
 
     public CodeRunner() {
