@@ -5,7 +5,7 @@ import javax.validation.constraints.NotBlank;
 import java.util.Set;
 
 @Entity
-@Table(	name = "modules")
+@Table(name = "modules")
 public class Module {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,18 +23,16 @@ public class Module {
     }
 
     @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(	name = "user_modules",
+    @JoinTable(name = "user_modules",
             joinColumns = @JoinColumn(name = "module_id"),
             inverseJoinColumns = @JoinColumn(name = "user_id"))
     private Set<User> participants;
 
     @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(name = "ressources_modules",
+    @JoinTable(name = "resources_modules",
             joinColumns = @JoinColumn(name = "module_id"),
-                inverseJoinColumns = @JoinColumn(name = "ressource_id"))
-    private Set<Ressources> ressources;
-
-
+            inverseJoinColumns = @JoinColumn(name = "ressource_id"))
+    private Set<Resources> resources;
 
 
     public Module() {
@@ -52,12 +50,12 @@ public class Module {
         this.participants = participants;
     }
 
-    public Set<Ressources> getRessources() {
-        return ressources;
+    public Set<Resources> getResources() {
+        return resources;
     }
 
-    public void setRessources(Set<Ressources> ressources) {
-        this.ressources = ressources;
+    public void setResources(Set<Resources> resources) {
+        this.resources = resources;
     }
 
     public Long getId() {

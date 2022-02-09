@@ -9,37 +9,41 @@ import java.util.Set;
 
 
 @Entity
-@Table(name = "ressources",uniqueConstraints = {
+@Table(name = "resources",uniqueConstraints = {
         @UniqueConstraint(columnNames = "name")}
 )
-
-
-public class Ressources {
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(name = "type_resource")
+@DiscriminatorValue("resource")
+public class Resources {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
+
     @NotBlank
     @Size(max = 20)
     private String name;
 
+    @Size(max = 256)
+    private String desc;
 
-    private EType type;
+    //private EType type;
 
     @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(	name = "ressources_modules",
-            joinColumns = @JoinColumn(name = "ressource_id"),
+    @JoinTable(	name = "resources_modules",
+            joinColumns = @JoinColumn(name = "resource_id"),
             inverseJoinColumns = @JoinColumn(name = "module_id"))
     private Set<Module> modules = new HashSet<>();
 
 
 
-    public Ressources() {
+    public Resources() {
     }
 
-    public Ressources(String name, EType type) {
+    public Resources(String name/*, EType type*/) {
         //TODO ajouter le text ou la question associé etc ...
         this.name = name;
-        this.type = type;
+//        this.type = type;
     }
 
     public long getId() {
@@ -56,13 +60,13 @@ public class Ressources {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Ressources ressources = (Ressources) o;
-        return id == ressources.id && name.equals(ressources.name);
+        Resources resources = (Resources) o;
+        return id == resources.id && name.equals(resources.name);
     }
 
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, type);
+        return Objects.hash(id, name/*, type*/);
     }
 }

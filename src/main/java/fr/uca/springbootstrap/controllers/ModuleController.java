@@ -5,7 +5,7 @@ import fr.uca.springbootstrap.models.Module;
 import fr.uca.springbootstrap.payload.request.SignupRequest;
 import fr.uca.springbootstrap.payload.response.MessageResponse;
 import fr.uca.springbootstrap.repository.ModuleRepository;
-import fr.uca.springbootstrap.repository.RessourcesRepository;
+import fr.uca.springbootstrap.repository.ResourcesRepository;
 import fr.uca.springbootstrap.repository.RoleRepository;
 import fr.uca.springbootstrap.repository.UserRepository;
 import fr.uca.springbootstrap.security.jwt.JwtUtils;
@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.security.Principal;
-import java.sql.SQLOutput;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
@@ -40,7 +39,7 @@ public class ModuleController {
 	ModuleRepository moduleRepository;
 
 	@Autowired
-	RessourcesRepository ressourcesRepository;
+	ResourcesRepository ressourcesRepository;
 
 	@Autowired
 	PasswordEncoder encoder;
@@ -82,30 +81,30 @@ public class ModuleController {
 	}
 
 	//TODO
-	@PostMapping("/{id}/ressources/{ressourcesId}")
+	@PostMapping("/{id}/resources/{resourcesId}")
 	@PreAuthorize("hasRole('TEACHER')")
-	public ResponseEntity<?> addCourse(Principal principal, @PathVariable long id, @PathVariable long ressourcesId){
+	public ResponseEntity<?> addCourse(Principal principal, @PathVariable long id, @PathVariable long resourcesId){
 		Optional<Module> omodule = moduleRepository.findById(id);
-		Optional<Ressources> oressource = ressourcesRepository.findById(ressourcesId);
+		Optional<Resources> oresource = ressourcesRepository.findById(resourcesId);
 		if (!omodule.isPresent()) {
 			return ResponseEntity
 					.badRequest()
 					.body(new MessageResponse("Error: No such module!"));
 		}
-		if (!oressource.isPresent()) {
+		if (!oresource.isPresent()) {
 			return ResponseEntity
 					.badRequest()
-					.body(new MessageResponse("Error: There is allready this course in this module!"));
+					.body(new MessageResponse("Error: There is already this course in this module!"));
 		}
 
 		Module module = omodule.get();
-		Ressources res  = oressource.get();
+		Resources res  = oresource.get();
 
 
 
-		Ressources actorRessource = ressourcesRepository.findByName(res.getName()).get();
+		Resources actorRessource = ressourcesRepository.findByName(res.getName()).get();
 
-		Set<Ressources> ressources = module.getRessources();
+		Set<Resources> ressources = module.getResources();
 
 		if ((ressources.isEmpty() && actorRessource.equals(res))
 				|| ressources.contains(actorRessource)) {
@@ -127,7 +126,7 @@ public class ModuleController {
 	@PreAuthorize("hasRole('TEACHER')")
 	public ResponseEntity<?> removeRessource(Principal principal, @PathVariable long id, @PathVariable long ressourcesId){
 		Optional<Module> omodule = moduleRepository.findById(id);
-		Optional<Ressources> oressource = ressourcesRepository.findById(ressourcesId);
+		Optional<Resources> oressource = ressourcesRepository.findById(ressourcesId);
 		if (!omodule.isPresent()) {
 			return ResponseEntity
 					.badRequest()
@@ -140,13 +139,13 @@ public class ModuleController {
 		}
 
 		Module module = omodule.get();
-		Ressources res  = oressource.get();
+		Resources res  = oressource.get();
 
 
 
-		Ressources actorRessource = ressourcesRepository.findByName(res.getName()).get();
+		Resources actorRessource = ressourcesRepository.findByName(res.getName()).get();
 
-		Set<Ressources> ressources = module.getRessources();
+		Set<Resources> ressources = module.getResources();
 
 		if ((ressources.isEmpty() && actorRessource.equals(res))
 				|| ressources.contains(actorRessource)) {
