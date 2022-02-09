@@ -3,7 +3,7 @@ package fr.uca.springbootstrap.models.modules.courses;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "text_course")
+@Table(name = "text")
 public class Text {
 
     @Id

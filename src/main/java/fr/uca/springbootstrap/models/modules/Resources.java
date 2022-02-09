@@ -9,12 +9,12 @@ import java.util.Set;
 
 
 @Entity
-@Table(name = "resources",uniqueConstraints = {
-        @UniqueConstraint(columnNames = "name")}
-)
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "type_resource")
 @DiscriminatorValue("resource")
+@Table(name = "resources",uniqueConstraints = {
+        @UniqueConstraint(columnNames = "name")}
+)
 public class Resources {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

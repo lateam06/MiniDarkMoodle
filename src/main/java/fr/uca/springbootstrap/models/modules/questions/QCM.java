@@ -11,7 +11,7 @@ public class QCM extends Question {
     @NotNull
     private String response;
 
-    @ManyToMany(fetch = FetchType.EAGER)
+    @OneToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "response_qcm",
             joinColumns = @JoinColumn(name = "qcm_id"),
             inverseJoinColumns = @JoinColumn(name = "response_id"))

@@ -33,7 +33,7 @@ public class Module {
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "resources_modules",
             joinColumns = @JoinColumn(name = "module_id"),
-            inverseJoinColumns = @JoinColumn(name = "ressource_id"))
+            inverseJoinColumns = @JoinColumn(name = "resource_id"))
     private Set<Resources> resources;
 
 

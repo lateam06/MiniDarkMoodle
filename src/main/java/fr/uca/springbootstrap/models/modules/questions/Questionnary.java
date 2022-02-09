@@ -9,7 +9,7 @@ import java.util.Set;
 @DiscriminatorValue("questionnary")
 public class Questionnary extends Resources {
 
-    @ManyToMany(fetch = FetchType.EAGER)
+    @OneToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "question_questionnaries",
             joinColumns = @JoinColumn(name = "questionnary_id"),
             inverseJoinColumns = @JoinColumn(name = "question_id"))

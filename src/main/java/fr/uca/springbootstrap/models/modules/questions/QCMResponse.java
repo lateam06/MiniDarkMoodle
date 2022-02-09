@@ -2,6 +2,7 @@ package fr.uca.springbootstrap.models.modules.questions;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
+import java.util.Set;
 
 @Entity
 @Table(name = "qcm_response")

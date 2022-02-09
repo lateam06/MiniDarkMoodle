@@ -4,6 +4,7 @@ package fr.uca.springbootstrap.models.modules.questions;
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
+import java.util.Set;
 
 @Entity
 @Table(name = "questions")
@@ -23,6 +24,12 @@ public class Question {
     @NotBlank
     @Size(max = 256)
     private String desc;
+
+    @OneToOne(fetch = FetchType.EAGER)
+    @JoinTable(name = "question_questionnaries",
+            joinColumns = @JoinColumn(name = "question_id"),
+            inverseJoinColumns = @JoinColumn(name = "questionnary_id"))
+    private Questionnary questionnary;
 
     public Question(String name, String desc) {
         this.name = name;
