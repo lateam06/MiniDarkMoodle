@@ -1,9 +1,9 @@
 package fr.uca.springbootstrap.repository;
 
-import fr.uca.springbootstrap.models.modules.questions.OpenQuestion;
+import fr.uca.springbootstrap.models.modules.courses.Text;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface OpenQuestionRepository extends JpaRepository<OpenQuestion,Long> {
+public interface TextRepository extends JpaRepository<Text, Long> {
 }

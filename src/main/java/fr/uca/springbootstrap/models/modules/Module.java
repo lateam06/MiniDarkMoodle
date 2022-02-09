@@ -1,4 +1,6 @@
-package fr.uca.springbootstrap.models;
+package fr.uca.springbootstrap.models.modules;
+
+import fr.uca.springbootstrap.models.users.User;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;

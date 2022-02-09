@@ -1,11 +1,11 @@
-package fr.uca.springbootstrap.models;
+package fr.uca.springbootstrap.models.modules.questions;
 
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.validation.constraints.Size;
 
 @Entity
-@DiscriminatorValue("open_question")
+@DiscriminatorValue("open")
 public class OpenQuestion extends Question {
 
     @Size(max = 512)

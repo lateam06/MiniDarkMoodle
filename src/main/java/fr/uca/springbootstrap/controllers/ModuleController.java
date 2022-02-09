@@ -1,7 +1,10 @@
 package fr.uca.springbootstrap.controllers;
 
-import fr.uca.springbootstrap.models.*;
-import fr.uca.springbootstrap.models.Module;
+import fr.uca.springbootstrap.models.modules.Module;
+import fr.uca.springbootstrap.models.modules.Resources;
+import fr.uca.springbootstrap.models.users.ERole;
+import fr.uca.springbootstrap.models.users.Role;
+import fr.uca.springbootstrap.models.users.User;
 import fr.uca.springbootstrap.payload.request.SignupRequest;
 import fr.uca.springbootstrap.payload.response.MessageResponse;
 import fr.uca.springbootstrap.repository.ModuleRepository;

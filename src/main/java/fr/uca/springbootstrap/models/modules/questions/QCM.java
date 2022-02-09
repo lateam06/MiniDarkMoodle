@@ -1,11 +1,11 @@
-package fr.uca.springbootstrap.models;
+package fr.uca.springbootstrap.models.modules.questions;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.util.Set;
 
 @Entity
-@DiscriminatorValue("qcm_question")
+@DiscriminatorValue("qcm")
 public class QCM extends Question {
 
     @NotNull
@@ -14,7 +14,7 @@ public class QCM extends Question {
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "response_qcm",
             joinColumns = @JoinColumn(name = "qcm_id"),
-            inverseJoinColumns = @JoinColumn(name = "string_id"))
+            inverseJoinColumns = @JoinColumn(name = "response_id"))
     private Set<QCMResponse> responses;
 
     public QCM(String name, String desc, String response) {

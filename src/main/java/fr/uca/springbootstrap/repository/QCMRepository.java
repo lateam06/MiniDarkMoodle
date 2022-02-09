@@ -1,7 +1,6 @@
 package fr.uca.springbootstrap.repository;
 
-import fr.uca.springbootstrap.models.QCM;
-import fr.uca.springbootstrap.models.Resources;
+import fr.uca.springbootstrap.models.modules.questions.QCM;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
