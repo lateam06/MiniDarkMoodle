@@ -7,9 +7,9 @@ import java.util.stream.Collectors;
 
 import javax.validation.Valid;
 
-import fr.uca.springbootstrap.models.ERole;
-import fr.uca.springbootstrap.models.Role;
-import fr.uca.springbootstrap.models.User;
+import fr.uca.springbootstrap.models.users.ERole;
+import fr.uca.springbootstrap.models.users.Role;
+import fr.uca.springbootstrap.models.users.User;
 import fr.uca.springbootstrap.payload.request.LoginRequest;
 import fr.uca.springbootstrap.payload.request.SignupRequest;
 import fr.uca.springbootstrap.payload.response.JwtResponse;

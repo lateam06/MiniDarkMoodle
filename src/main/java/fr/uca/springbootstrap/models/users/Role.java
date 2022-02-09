@@ -1,4 +1,4 @@
-package fr.uca.springbootstrap.models;
+package fr.uca.springbootstrap.models.users;
 
 import javax.persistence.*;
 

@@ -1,4 +1,6 @@
-package fr.uca.springbootstrap.models;
+package fr.uca.springbootstrap.models.users;
+
+import fr.uca.springbootstrap.models.modules.Module;
 
 import java.util.HashSet;
 import java.util.Objects;
