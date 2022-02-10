@@ -110,6 +110,9 @@ public class GetCourseStepdefs extends SpringIntegration  {
         System.out.println("status : " + resp.getStatusCode());
         System.out.println("id : " + resp.getBody().getId());
         System.out.println(resp.getBody().getName());
+
+
+        assertEquals(arg3.compareTo(resp.getBody().getDescription()), 0);
     }
 
     @And("the teacher {string} is connected")

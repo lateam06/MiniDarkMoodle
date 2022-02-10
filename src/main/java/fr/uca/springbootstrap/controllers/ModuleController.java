@@ -60,8 +60,7 @@ public class ModuleController {
         Optional<Resource> oresource = resourcesRepository.findById(resourcesId);
         if (!omodule.isPresent()) {
             return ResponseEntity
-                    .badRequest()
-                    .body("PAS BON");
+                    .notFound().build();
         }
         if (!oresource.isPresent()) {
             return ResponseEntity
@@ -91,7 +90,7 @@ public class ModuleController {
 
         User us = ouser.get();
         ObjectMapper Obj = new ObjectMapper();
-        return ResponseEntity.ok(us.listmod());
+        return ResponseEntity.ok(us);
 
 
     }
@@ -131,7 +130,6 @@ public class ModuleController {
     }
 
 
-    //TODO
     @PostMapping("/{id}/resources/{resourcesId}")
     @PreAuthorize("hasRole('TEACHER')")
     public ResponseEntity<?> addResource(Principal principal, @PathVariable long id, @PathVariable long resourcesId) {
