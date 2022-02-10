@@ -96,6 +96,11 @@ public class ModuleController {
 
     }
 
+    @PostMapping("/test")
+    @PreAuthorize("hasRole('TEACHER')")
+    void testPrincipal(Principal principal) {
+        System.out.println(principal.getName());
+    }
 
     @PostMapping("/{id}/participants/{userid}")
     @PreAuthorize("hasRole('TEACHER')")
