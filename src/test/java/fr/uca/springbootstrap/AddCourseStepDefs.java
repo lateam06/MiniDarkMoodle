@@ -45,7 +45,6 @@ public class AddCourseStepDefs extends SpringIntegration {
     CourseRepository courseRepository;
 
 
-    private String jwt;
 
     @Given("a teacher named {string} with ID {int}")
     public void aTeacherNamedWithID(String arg0, int arg1) {
@@ -95,7 +94,7 @@ public class AddCourseStepDefs extends SpringIntegration {
     public void isTheTeacherRegisteredToTheModule(String arg0, String arg1) throws IOException {
         Module module = moduleRepository.findByName(arg1).get();
         User user = userRepository.findByUsername(arg0).get();
-        jwt = authController.generateJwt(arg0, PASSWORD);
+        String jwt = authController.generateJwt(arg0, PASSWORD);
         executePost("http://localhost:8080/api/module/" + module.getId() + "/participants/" + user.getId(), jwt);
 //        System.out.println("ajout du prof , debug " + latestHttpResponse.getStatusLine().getStatusCode());
     }
@@ -161,6 +160,8 @@ public class AddCourseStepDefs extends SpringIntegration {
     public void theCourseIsNotDeletedAndTheReturnStatusOfTheRequestIs(int status) {
         assertEquals(status, latestHttpResponse.getStatusLine().getStatusCode());
     }
+
+
 
 //    @And("a course {string} has already been added by {string} in the module {string}")
 //    public void aCourseHasAlreadyBeenAddedByInTheModule(String courseName, String teacherName, String moduleName) throws IOException {
