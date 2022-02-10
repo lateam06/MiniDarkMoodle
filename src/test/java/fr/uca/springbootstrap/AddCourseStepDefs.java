@@ -20,6 +20,8 @@ import org.apache.http.util.EntityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import javax.persistence.DiscriminatorValue;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.IOException;
@@ -169,15 +171,28 @@ public class AddCourseStepDefs extends SpringIntegration {
 
 
 
-    @When("{string} adds the course object to the post request to the module {string}")
-    public void addsTheCourseObjectToThePostRequestToTheModule(String arg0, String arg1) throws IOException {
+    @When("{string} adds the course {string} to the post request to the module {string}")
+    public void addsTheCourseObjectToThePostRequestToTheModule(String arg0,String courseName ,String arg1) throws IOException {
         String jwt = authController.generateJwt(arg0, PASSWORD);
         Module mod = moduleRepository.findByName(arg1).get();
-        Course course = new Course("un cours fun");
-        ResourceRequest re = new ResourceRequest(course.getName(),"wooa",true);
-        executePost("http://localhost:8080/api/module/"+mod.getId()+"/resources/",course,jwt);
+        Course course = new Course(courseName);
+        String disc = course.getClass().getAnnotation(DiscriminatorValue.class).value();
+        ResourceRequest re = new ResourceRequest(course.getName(),disc,"",true,null,null);
+        executePost("http://localhost:8080/api/module/"+mod.getId()+"/resources/",re,jwt);
 //        MessageResponse message =  ObjMapper.readValue(latestJson,MessageResponse.class);
 //        System.out.println(latestJson);
+
+    }
+
+    @Then("{string} check that the {string} course has been added correcty in {string}")
+    public void checkThatTheCourseHasBeenAddedCorrectyIn(String arg0, String arg1, String arg2) {
+
+        String jwt = authController.generateJwt(arg0, PASSWORD);
+        Module mod = moduleRepository.findByName(arg2).get();
+        Course course = courseRepository.findByName(arg1).get();
+        assertTrue(mod.getResources().contains(course));
+
+
 
     }
 
