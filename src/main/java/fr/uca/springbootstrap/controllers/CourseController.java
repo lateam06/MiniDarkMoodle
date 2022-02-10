@@ -67,7 +67,7 @@ public class CourseController {
         }
 
         String discr = ocourse.get().getClass().getAnnotation(DiscriminatorValue.class).value();
-        if (discr.compareTo("course") != 0) {
+        if (discr.compareTo("courses") != 0) {
             return ResponseEntity
                     .badRequest()
                     .body(new MessageResponse("Error : You can ony add texts to a course."));
