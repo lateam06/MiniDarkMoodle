@@ -25,29 +25,13 @@ public class SpringIntegration {
     static ResponseResults latestResponse = null;
     private final CloseableHttpClient httpClient = HttpClients.createDefault();
     protected HttpResponse latestHttpResponse;
-    ObjectMapper ObjMapper = new ObjectMapper();
-
+    protected ObjectMapper ObjMapper = new ObjectMapper();
     @Autowired
     RestTemplate restTemplate;
 
-    void executeGetdeprecated(String url, String jwt) throws IOException {
-        HttpGet request = new HttpGet(url);
-        request.addHeader("Accept", "application/json");
-        if (jwt != null) {
-            request.addHeader("Authorization", "Bearer " + jwt);
-        }
-        latestHttpResponse = httpClient.execute(request);
-    }
-
-    ResponseEntity<?> executeGet(String url, String jwt, Class specified){
-        return restTemplate.exchange(url,
-                HttpMethod.GET,
-                buildHeaderFromToken(jwt),
-                specified);
-    }
-
     protected String latestJson;
-    void executeGet2(String url,  String jwt) throws IOException {
+
+    void executeGet(String url,  String jwt) throws IOException {
         HttpGet request = new HttpGet(url);
         request.addHeader("Accept", "application/json");
         if (jwt != null) {
@@ -57,7 +41,9 @@ public class SpringIntegration {
 
         latestHttpResponse = httpClient.execute(request);
         latestJson = EntityUtils.toString(latestHttpResponse.getEntity());
+
     }
+
 
 
     void executePost(String url, String jwt) throws IOException {
@@ -77,9 +63,7 @@ public class SpringIntegration {
             request.addHeader("Authorization", "Bearer " + jwt);
         }
 
-        var writed = ObjMapper.writeValueAsString(obj);
-
-        request.setEntity(new StringEntity(writed));
+        request.setEntity(new StringEntity(ObjMapper.writeValueAsString(obj)));
         latestHttpResponse = httpClient.execute(request);
     }
 

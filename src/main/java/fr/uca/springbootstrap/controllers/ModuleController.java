@@ -9,6 +9,7 @@ import fr.uca.springbootstrap.models.modules.questions.Questionnary;
 import fr.uca.springbootstrap.models.users.ERole;
 import fr.uca.springbootstrap.models.users.Role;
 import fr.uca.springbootstrap.models.users.User;
+import fr.uca.springbootstrap.payload.request.ResourceRequest;
 import fr.uca.springbootstrap.payload.request.SignupRequest;
 import fr.uca.springbootstrap.payload.response.MessageResponse;
 import fr.uca.springbootstrap.repository.*;
@@ -24,6 +25,7 @@ import javax.persistence.DiscriminatorValue;
 import javax.validation.Valid;
 import java.security.Principal;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -101,7 +103,7 @@ public class ModuleController {
 
 
     @GetMapping("/users/{userId}")
-    public ResponseEntity<?> getusers(@PathVariable long userId) throws JsonProcessingException {
+    public ResponseEntity<?> getUsers(@PathVariable long userId) throws JsonProcessingException {
         Optional<User> ouser = userRepository.findById(userId);
 
         User us = ouser.get();
@@ -109,6 +111,57 @@ public class ModuleController {
         return ResponseEntity.ok(us);
 
 
+    }
+
+    @GetMapping("/{moduleId}/participants/{userid}/getSingleUser")
+    @PreAuthorize("hasRole('TEACHER')")
+    public ResponseEntity<?> getSingleModuleUser(@PathVariable long moduleId, @PathVariable long userid) throws  JsonProcessingException {
+        Optional<Module> omodule = moduleRepository.findById(moduleId);
+        Optional<User> ouser = userRepository.findById(userid);
+
+        if (!omodule.isPresent()) {
+            return ResponseEntity
+                    .badRequest()
+                    .body(new MessageResponse("Error: No such module!"));
+        }
+        if (!ouser.isPresent()) {
+            return ResponseEntity
+                    .badRequest()
+                    .body(new MessageResponse("Error: No such user!"));
+        }
+
+        Module module = omodule.get();
+        User user = ouser.get();
+        Set<User> participants = module.getParticipants();
+        if ((! participants.contains(user))) {
+            return ResponseEntity
+                    .badRequest()
+                    .body(new MessageResponse("Error: No such user in this module"));
+        }
+        return ResponseEntity.ok(user);
+    }
+
+    @GetMapping("/{moduleId}/participants/getAllUsers")
+    @PreAuthorize("hasRole('TEACHER')")
+    public ResponseEntity<?> getAllModuleUsers(Principal principal, @PathVariable long moduleId) throws JsonProcessingException {
+        Optional<Module> omodule = moduleRepository.findById(moduleId);
+
+        if (!omodule.isPresent()) {
+            return ResponseEntity
+                    .badRequest()
+                    .body(new MessageResponse("Error: No such module!"));
+        }
+
+        Module module = omodule.get();
+        User actor = userRepository.findByUsername(principal.getName()).get();
+        Set<User> participants = module.getParticipants();
+        if (!participants.contains(actor)) {
+            return ResponseEntity
+                    .badRequest()
+                    .body(new MessageResponse("Error: Not allowed to get information about this module"));
+        }
+
+        return ResponseEntity.ok(module.getParticipants());
     }
 
 
@@ -183,6 +236,50 @@ public class ModuleController {
     }
 
 
+    @PostMapping("/{id}/resources/")
+    @PreAuthorize("hasRole('TEACHER')")
+    public ResponseEntity<?> addRessourceToModule(Principal principal,@PathVariable long id, @RequestBody ResourceRequest body){
+        Optional<Module> omodule = moduleRepository.findById(id);
+        if(omodule.isEmpty()){
+            return ResponseEntity.notFound().build();
+        }
+
+
+        else{
+            Module m = omodule.get();
+            System.out.println(body.getType());
+            if(body.getType().compareTo("courses") == 0 ){
+                Course c = new Course();
+                c.setName(body.getName());
+                c.setVisibility(body.getVisibility());
+                c.setDescription(body.getDescription());
+                c.setTexts(body.getTexts());
+                m.getResources().add(c);
+                courseRepository.save(c);
+
+
+            }
+            else if (body.getType().compareTo("questionnaries") == 0 ){
+                Questionnary q = new Questionnary();
+                q.setName(body.getName());
+                q.setVisibility(body.getVisibility());
+                q.setDescription(body.getDescription());
+                q.setQuestionSet(body.getQuestionSet());
+                m.getResources().add(q);
+                questionnaryRepository.save(q);
+
+            }
+            return ResponseEntity.accepted().build();
+
+
+
+        }
+
+    }
+
+
+
+
     @DeleteMapping("/{id}/resources/{resourcesId}")
     @PreAuthorize("hasRole('TEACHER')")
     public ResponseEntity<?> removeresource(Principal principal, @PathVariable long id, @PathVariable long resourcesId) {
@@ -197,6 +294,8 @@ public class ModuleController {
             return ResponseEntity
                     .badRequest()
                     .body(new MessageResponse("Error: not a course in this module!"));
+
+
         }
 
         Module module = omodule.get();
@@ -220,6 +319,79 @@ public class ModuleController {
 
     }
 
+    @DeleteMapping("/{moduleId}/participants/{userId}/deleteUser")
+    @PreAuthorize("hasRole('TEACHER')")
+    public ResponseEntity<?> removeUser(Principal principal, @PathVariable long moduleId, @PathVariable long userId) {
+        Optional<Module> omodule = moduleRepository.findById(moduleId);
+        Optional<User> ouser = userRepository.findById(userId);
+        if (!omodule.isPresent()) {
+            return ResponseEntity
+                    .badRequest()
+                    .body(new MessageResponse("Error: No such module"));
+        }
+        if (!ouser.isPresent()) {
+            return ResponseEntity
+                    .badRequest()
+                    .body(new MessageResponse("Error: not such user"));
+        }
+
+        Module module = omodule.get();
+        User user = ouser.get();
+        User actor = userRepository.findByUsername(principal.getName()).get();
+
+        Set<User> participants = module.getParticipants();
+        if ((participants.isEmpty() && actor.equals(user))
+                || participants.contains(actor)) {
+            participants.remove(user);
+        } else {
+            return ResponseEntity
+                    .badRequest()
+                    .body(new MessageResponse("Error: Not allowed to remove user!"));
+        }
+        moduleRepository.save(module);
+        return ResponseEntity.ok((new MessageResponse("User successfully remove from module")));
+    }
+
+    @DeleteMapping("/{moduleId}/deleteModule")
+    @PreAuthorize("hasRole('TEACHER')")
+    public ResponseEntity<?> removeModule(Principal principal, @PathVariable long moduleId) {
+        Optional<Module> omodule = moduleRepository.findById(moduleId);
+
+        if (!omodule.isPresent()) {
+            return ResponseEntity
+                    .badRequest()
+                    .body(new MessageResponse("Error: No such module"));
+        }
+
+        Module module = omodule.get();
+        User actor = userRepository.findByUsername(principal.getName()).get();
+        Set<User> participants = module.getParticipants();
+
+        if (participants.contains(actor)) {
+            moduleRepository.delete(module);
+        } else {
+            return ResponseEntity
+                    .badRequest()
+                    .body(new MessageResponse("Error : not allowed to remove module"));
+        }
+        return ResponseEntity.ok(new MessageResponse("Module successfully remove"));
+    }
+
+    @GetMapping("/{moduleId}/getModule")
+    @PreAuthorize("hasRole('TEACHER')")
+    public ResponseEntity<?> getModuleInformation(@PathVariable long moduleId) throws JsonProcessingException {
+        Optional<Module> omodule = moduleRepository.findById(moduleId);
+
+        if (!omodule.isPresent()) {
+            return ResponseEntity
+                    .badRequest()
+                    .body(new MessageResponse("Error: No such module!"));
+        }
+
+        Module module = omodule.get();
+        ObjectMapper obj = new ObjectMapper();
+        return ResponseEntity.ok(module);
+    }
 
     User createUser(String userName, String email, String password, Set<String> strRoles) {
         User user = new User(userName, email, password);

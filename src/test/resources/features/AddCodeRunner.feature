@@ -11,7 +11,7 @@
 #
 #
 #
-#  Scenario: the teacher add the Strudent tot the module, add the Questionnary and the question
+#  Scenario: the teacher add the Student tot the module, add the Questionnary and the question
 #    Given "Marcel" is the teacher registered to the module "le C pour les nuls"
 #    When "Marcel" wants to add the questionnaire "questionnaire" to the module "le C pour les nuls"
 #    And "Marcel" wants to add a CodeRunner "factoriel en python" to the questionnaire "questionnaire" from the module "le C pour les nuls"

@@ -20,6 +20,16 @@ public class Result {
     @NotNull
     private Integer rate;
 
+    public Boolean getValidated() {
+        return validated;
+    }
+
+    public void setValidated(Boolean validated) {
+        this.validated = validated;
+    }
+
+    private Boolean validated = false;
+
     public Result() {
     }
 

@@ -30,6 +30,17 @@ public class Questionnary extends Resource {
         this.questionSet = questionSet;
     }
 
+    public int getStudentGrade(long studentId) {
+        for (Question question : questionSet) {
+            for (Result result : question.getResults()) {
+                if(result.getUserId() == studentId && result.getValidated()) {
+                    return result.getRate();
+                }
+            }
+        }
+        return -1;
+    }
+
     public static String generateUrl(Long moduleId, Long questionnaryId) {
         return "http://localhost:8080/api/module/" + moduleId + "/resources/" + questionnaryId;
     }

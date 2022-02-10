@@ -14,6 +14,8 @@ import java.util.Set;
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "resource_type")
 @DiscriminatorValue("resource")
+@Table(name = "resources",
+        uniqueConstraints = @UniqueConstraint(columnNames = "name"))
 public class Resource {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

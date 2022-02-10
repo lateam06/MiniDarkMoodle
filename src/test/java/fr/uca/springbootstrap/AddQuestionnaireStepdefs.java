@@ -2,23 +2,14 @@ package fr.uca.springbootstrap;
 
 import fr.uca.springbootstrap.controllers.AuthController;
 import fr.uca.springbootstrap.models.modules.Module;
-import fr.uca.springbootstrap.models.modules.Resource;
-import fr.uca.springbootstrap.models.modules.courses.Course;
 import fr.uca.springbootstrap.models.modules.questions.Questionnary;
-import fr.uca.springbootstrap.models.users.ERole;
-import fr.uca.springbootstrap.models.users.Role;
 import fr.uca.springbootstrap.models.users.User;
 import fr.uca.springbootstrap.repository.*;
 import io.cucumber.java.en.And;
-import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
-import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.http.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
 
@@ -87,15 +78,16 @@ public class AddQuestionnaireStepdefs extends  SpringIntegration {
 
 
     @Then("{string} checks if the questionnaire {string} from {string} has a description according to {string} with a get")
-    public void checksIfTheQuestionnaireFromHasADescriptionAccordingToWithAGet(String arg0, String arg1, String arg2, String arg3) {
+    public void checksIfTheQuestionnaireFromHasADescriptionAccordingToWithAGet(String arg0, String arg1, String arg2, String arg3) throws IOException {
         Questionnary questionnary = questionnaryRepository.findByName(arg1).get();
         Module module = moduleRepository.findByName(arg2).get();
         String jwt = authController.generateJwt(arg0, PASSWORD);
         String url = "http://localhost:8080/api/module/" + module.getId() + "/resources/" + questionnary.getId();
 
+        executeGet(url,jwt);
+        Questionnary resp = ObjMapper.readValue(latestJson,Questionnary.class);
 
-        ResponseEntity<Resource> resp = (ResponseEntity<Resource>) executeGet(url,jwt,Resource.class);
-        assertEquals(arg3.compareTo(resp.getBody().getDescription()), 0);
+        assertEquals(arg3.compareTo(resp.getDescription()), 0);
     }
 
     @And("a CodeRunner Question {string}")
