@@ -233,8 +233,6 @@ public class ModuleController {
         }
         moduleRepository.save(module);
         return ResponseEntity.ok(new MessageResponse("resource successfully added to module!"));
-
-
     }
 
 

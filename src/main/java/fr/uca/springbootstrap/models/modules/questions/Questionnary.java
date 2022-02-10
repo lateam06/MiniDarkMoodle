@@ -40,4 +40,8 @@ public class Questionnary extends Resource {
         }
         return -1;
     }
+
+    public static String generateUrl(Long moduleId, Long questionnaryId) {
+        return "http://localhost:8080/api/module/" + moduleId + "/resources/" + questionnaryId;
+    }
 }
