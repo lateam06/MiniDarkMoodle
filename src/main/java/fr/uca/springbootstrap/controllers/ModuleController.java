@@ -320,6 +320,22 @@ public class ModuleController {
         return ResponseEntity.ok(new MessageResponse("Module successfully remove"));
     }
 
+    @GetMapping("/{id}")
+    @PreAuthorize("hasRole('TEACHER')")
+    public ResponseEntity<?> getModuleInformation(@PathVariable long id) throws JsonProcessingException {
+        Optional<Module> omodule = moduleRepository.findById(id);
+
+        if (!omodule.isPresent()) {
+            return ResponseEntity
+                    .badRequest()
+                    .body(new MessageResponse("Error: No such module!"));
+        }
+
+        Module module = omodule.get();
+        ObjectMapper obj = new ObjectMapper();
+        return ResponseEntity.ok(module);
+    }
+
     User createUser(String userName, String email, String password, Set<String> strRoles) {
         User user = new User(userName, email, password);
         Set<Role> roles = new HashSet<>();
