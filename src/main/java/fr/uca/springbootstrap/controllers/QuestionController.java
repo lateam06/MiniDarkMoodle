@@ -20,7 +20,6 @@ import fr.uca.springbootstrap.payload.request.CreateNewOpenRequest;
 import fr.uca.springbootstrap.payload.request.CreateNewQCMRequest;
 import fr.uca.springbootstrap.payload.response.MessageResponse;
 import fr.uca.springbootstrap.repository.*;
-import fr.uca.springbootstrap.security.jwt.JwtUtils;
 import org.apache.coyote.Response;
 import fr.uca.springbootstrap.security.services.jwt.JwtUtils;
 import org.springframework.beans.factory.annotation.Autowired;
