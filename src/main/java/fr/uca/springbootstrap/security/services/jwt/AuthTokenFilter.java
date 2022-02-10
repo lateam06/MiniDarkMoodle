@@ -1,4 +1,4 @@
-package fr.uca.springbootstrap.security.jwt;
+package fr.uca.springbootstrap.security.services.jwt;
 
 import java.io.IOException;
 

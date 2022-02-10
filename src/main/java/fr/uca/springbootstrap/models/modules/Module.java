@@ -8,7 +8,10 @@ import java.util.Objects;
 import java.util.Set;
 
 @Entity
-@Table(name = "modules")
+@Table(name = "modules",
+        uniqueConstraints = {
+                @UniqueConstraint(columnNames = "name")
+        })
 public class Module {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
