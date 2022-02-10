@@ -96,6 +96,29 @@ public class ModuleController {
 
     }
 
+    @GetMapping("/{id}/participants/")
+    @PreAuthorize("hasRole('TEACHER')")
+    public ResponseEntity<?> getSingleModuleUser(@PathVariable long id, @PathVariable long userid) throws  JsonProcessingException {
+        Optional<Module> omodule = moduleRepository.findById(id);
+        Optional<User> ouser = userRepository.findById(userid);
+
+        if (!omodule.isPresent()) {
+            return ResponseEntity
+                    .badRequest()
+                    .body(new MessageResponse("Error: No such module!"));
+        }
+        if (!ouser.isPresent()) {
+            return ResponseEntity
+                    .badRequest()
+                    .body(new MessageResponse("Error: No such user!"));
+        }
+
+        Module module = omodule.get();
+        User user = ouser.get();
+        ObjectMapper obj = new ObjectMapper();
+        return ResponseEntity.ok(user.listmod());
+    }
+
 
     @PostMapping("/{id}/participants/{userid}")
     @PreAuthorize("hasRole('TEACHER')")
