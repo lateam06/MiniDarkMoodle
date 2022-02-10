@@ -79,7 +79,7 @@ public class ModuleController {
 		}
 		else{
 			ObjectMapper Obj = new ObjectMapper();
-			return ResponseEntity.ok(Obj.writeValueAsString(res));
+			return ResponseEntity.ok(res);
 		}
 
 	}

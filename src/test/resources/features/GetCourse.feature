@@ -3,6 +3,7 @@ Feature: Get Course
   # Enter feature description here
   Background:
     Given a teacher named "Marcel" with ID 123456
+    And the teacher "Marcel" is connected
     And a Student named "Louis"
     And a module with ID "le C pour les nuls"
     And a course with name "introduction" with a descritpion "cours d'introduction au c très facile"
