@@ -27,13 +27,20 @@ public class SpringIntegration {
     @Autowired
     RestTemplate restTemplate;
 
-    void executeGet(String url, String jwt) throws IOException {
+    void executeGetdeprecated(String url, String jwt) throws IOException {
         HttpGet request = new HttpGet(url);
         request.addHeader("Accept", "application/json");
         if (jwt != null) {
             request.addHeader("Authorization", "Bearer " + jwt);
         }
         latestHttpResponse = httpClient.execute(request);
+    }
+
+    ResponseEntity<?> executeGet(String url, String jwt, Class specified){
+        return restTemplate.exchange(url,
+                HttpMethod.GET,
+                buildHeaderFromToken(jwt),
+                specified);
     }
 
 

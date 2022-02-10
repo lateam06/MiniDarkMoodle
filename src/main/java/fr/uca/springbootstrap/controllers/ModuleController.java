@@ -58,7 +58,6 @@ public class ModuleController {
     public ResponseEntity<?> getressource(@PathVariable long id, @PathVariable long resourcesId) throws JsonProcessingException {
         Optional<Module> omodule = moduleRepository.findById(id);
         Optional<Resource> oresource = resourcesRepository.findById(resourcesId);
-        System.out.println("laaa");
         if (!omodule.isPresent()) {
             return ResponseEntity
                     .badRequest()
