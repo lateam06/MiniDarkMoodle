@@ -130,13 +130,20 @@ public class ModuleController {
                     .body(new MessageResponse("Error: No such user!"));
         }
 
+        Module module = omodule.get();
         User user = ouser.get();
+        Set<User> participants = module.getParticipants();
+        if ((! participants.contains(user))) {
+            return ResponseEntity
+                    .badRequest()
+                    .body(new MessageResponse("Error: No such user in this module"));
+        }
         return ResponseEntity.ok(user);
     }
 
     @GetMapping("/{moduleId}/participants/getAllUsers")
     @PreAuthorize("hasRole('TEACHER')")
-    public ResponseEntity<?> getAllModuleUsers(@PathVariable long moduleId) throws JsonProcessingException {
+    public ResponseEntity<?> getAllModuleUsers(Principal principal, @PathVariable long moduleId) throws JsonProcessingException {
         Optional<Module> omodule = moduleRepository.findById(moduleId);
 
         if (!omodule.isPresent()) {
@@ -146,6 +153,14 @@ public class ModuleController {
         }
 
         Module module = omodule.get();
+        User actor = userRepository.findByUsername(principal.getName()).get();
+        Set<User> participants = module.getParticipants();
+        if (!participants.contains(actor)) {
+            return ResponseEntity
+                    .badRequest()
+                    .body(new MessageResponse("Error: Not allowed to get information about this module"));
+        }
+
         return ResponseEntity.ok(module.getParticipants());
     }
 
