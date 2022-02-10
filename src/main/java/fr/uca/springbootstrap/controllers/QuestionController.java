@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @CrossOrigin(origins = "*", maxAge = 3600)
-@RequestMapping("/api/question")
+@RequestMapping("/api/modules/resource/question")
 public class QuestionController {
     @Autowired
     AuthenticationManager authenticationManager;
@@ -36,5 +36,6 @@ public class QuestionController {
 
     @Autowired
     CourseRepository courseRepository;
+
 
 }

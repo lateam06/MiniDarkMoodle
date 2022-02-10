@@ -12,6 +12,7 @@ import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
+import org.apache.http.util.EntityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -37,15 +38,6 @@ public class RegisterStudentStepDefs  extends  SpringIntegration{
     @Autowired
     PasswordEncoder encoder;
 
-    @Given("a new teacher with login {string}")
-    public void aTeacherWithLogin(String arg0) {
-        User user = userRepository.findByUsername(arg0).
-                orElse(new User(arg0, arg0 + "@test.fr", encoder.encode(PASSWORD)));
-        user.setRoles(new HashSet<Role>(){{ add(roleRepository.findByName(ERole.ROLE_TEACHER).
-                orElseThrow(() -> new RuntimeException("Error: Role is not found"))); }});
-        userRepository.save(user);
-    }
-
     @And("a student with login {string}")
     public void aStudentWithLogin(String arg0) {
         User user = userRepository.findByUsername(arg0).
@@ -53,13 +45,6 @@ public class RegisterStudentStepDefs  extends  SpringIntegration{
         user.setRoles(new HashSet<Role>(){{ add(roleRepository.findByName(ERole.ROLE_STUDENT).
                 orElseThrow(() -> new RuntimeException("Error: Role is not found"))); }});
         userRepository.save(user);
-    }
-
-    @And("with a module named {string}")
-    public void aModuleNamed(String arg0) {
-        Module module = moduleRepository.findByName(arg0).orElse(new Module(arg0));
-        module.setParticipants(new HashSet<>());
-        moduleRepository.save(module);
     }
 
 
@@ -70,24 +55,15 @@ public class RegisterStudentStepDefs  extends  SpringIntegration{
         User student = userRepository.findByUsername(arg1).get();
         String jwt = authController.generateJwt(arg0, PASSWORD);
 
-        System.out.println("http://localhost:8080/api/module"+module.getId()+"/participants/"+teacher.getId());
-        System.out.println("http://localhost:8080/api/module"+module.getId()+"/participants/"+student.getId());
         executePost("http://localhost:8080/api/module/"+module.getId()+"/participants/"+teacher.getId(), jwt);
+        EntityUtils.consume(latestHttpResponse.getEntity());
         executePost("http://localhost:8080/api/module/"+module.getId()+"/participants/"+student.getId(), jwt);
     }
 
-    @Then("the last valid request status is {int}")
-    public void isRegisteredToModule(int status) {
-        assertEquals(status, latestHttpResponse.getStatusLine().getStatusCode());
+    @Then("the last request status is {int}")
+    public void isRegistered(int arg0) {
+        assertEquals(arg0, latestHttpResponse.getStatusLine().getStatusCode());
     }
-
-    @And("{string} is registered to module {string} as a student")
-    public void isRegisteredToModule(String arg0, String arg1) {
-        Module module = moduleRepository.findByName(arg1).get();
-        User user = userRepository.findByUsername(arg0).get();
-        assertTrue(module.getParticipants().contains(user));
-    }
-
 
     @When("{string} tries to register himself to the module {string}")
     public void triesToRegisterHimselfToTheModule(String arg0, String arg1) throws Exception{
@@ -98,15 +74,4 @@ public class RegisterStudentStepDefs  extends  SpringIntegration{
         executePost("http://localhost:8080/api/module/"+module.getId()+"/participants/"+user.getId(), jwt);
     }
 
-    @Then("the last invalid request status is {int}")
-    public void isNotRegisteredToModule(int status) {
-        assertEquals(status, latestHttpResponse.getStatusLine().getStatusCode());
-    }
-
-    @And("{string} is not registered to the module {string}")
-    public void isNotRegisteredToTheModule(String arg0, String arg1) {
-        Module module = moduleRepository.findByName(arg1).get();
-        User user = userRepository.findByUsername(arg0).get();
-        assertFalse(module.getParticipants().contains(user));
-    }
 }
