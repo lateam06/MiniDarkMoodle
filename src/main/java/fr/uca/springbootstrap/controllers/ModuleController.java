@@ -102,7 +102,7 @@ public class ModuleController {
 
 
     @GetMapping("/users/{userId}")
-    public ResponseEntity<?> getusers(@PathVariable long userId) throws JsonProcessingException {
+    public ResponseEntity<?> getUsers(@PathVariable long userId) throws JsonProcessingException {
         Optional<User> ouser = userRepository.findById(userId);
 
         User us = ouser.get();
@@ -112,10 +112,10 @@ public class ModuleController {
 
     }
 
-    @GetMapping("/{id}/participants/{userid}")
+    @GetMapping("/{moduleId}/participants/{userid}/getSingleUser")
     @PreAuthorize("hasRole('TEACHER')")
-    public ResponseEntity<?> getSingleModuleUser(@PathVariable long id, @PathVariable long userid) throws  JsonProcessingException {
-        Optional<Module> omodule = moduleRepository.findById(id);
+    public ResponseEntity<?> getSingleModuleUser(@PathVariable long moduleId, @PathVariable long userid) throws  JsonProcessingException {
+        Optional<Module> omodule = moduleRepository.findById(moduleId);
         Optional<User> ouser = userRepository.findById(userid);
 
         if (!omodule.isPresent()) {
@@ -129,16 +129,14 @@ public class ModuleController {
                     .body(new MessageResponse("Error: No such user!"));
         }
 
-        Module module = omodule.get();
         User user = ouser.get();
-        ObjectMapper obj = new ObjectMapper();
         return ResponseEntity.ok(user);
     }
 
-    @GetMapping("/{id}/participants/")
+    @GetMapping("/{moduleId}/participants/getAllUsers")
     @PreAuthorize("hasRole('TEACHER')")
-    public ResponseEntity<?> getAllModuleUsers(@PathVariable long id) throws JsonProcessingException {
-        Optional<Module> omodule = moduleRepository.findById(id);
+    public ResponseEntity<?> getAllModuleUsers(@PathVariable long moduleId) throws JsonProcessingException {
+        Optional<Module> omodule = moduleRepository.findById(moduleId);
 
         if (!omodule.isPresent()) {
             return ResponseEntity
@@ -147,7 +145,6 @@ public class ModuleController {
         }
 
         Module module = omodule.get();
-        ObjectMapper obj = new ObjectMapper();
         return ResponseEntity.ok(module.getParticipants());
     }
 
@@ -262,11 +259,11 @@ public class ModuleController {
 
     }
 
-    @DeleteMapping("/{id}/participants/{userid}")
+    @DeleteMapping("/{moduleId}/participants/{userId}/deleteUser")
     @PreAuthorize("hasRole('TEACHER')")
-    public ResponseEntity<?> removeUser(Principal principal, @PathVariable long id, @PathVariable long userid) {
-        Optional<Module> omodule = moduleRepository.findById(id);
-        Optional<User> ouser = userRepository.findById(userid);
+    public ResponseEntity<?> removeUser(Principal principal, @PathVariable long moduleId, @PathVariable long userId) {
+        Optional<Module> omodule = moduleRepository.findById(moduleId);
+        Optional<User> ouser = userRepository.findById(userId);
         if (!omodule.isPresent()) {
             return ResponseEntity
                     .badRequest()
@@ -295,10 +292,10 @@ public class ModuleController {
         return ResponseEntity.ok((new MessageResponse("User successfully remove from module")));
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/{moduleId}/deleteModule")
     @PreAuthorize("hasRole('TEACHER')")
-    public ResponseEntity<?> removeModule(Principal principal, @PathVariable long id) {
-        Optional<Module> omodule = moduleRepository.findById(id);
+    public ResponseEntity<?> removeModule(Principal principal, @PathVariable long moduleId) {
+        Optional<Module> omodule = moduleRepository.findById(moduleId);
 
         if (!omodule.isPresent()) {
             return ResponseEntity
@@ -320,10 +317,10 @@ public class ModuleController {
         return ResponseEntity.ok(new MessageResponse("Module successfully remove"));
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/{moduleId}/getModule")
     @PreAuthorize("hasRole('TEACHER')")
-    public ResponseEntity<?> getModuleInformation(@PathVariable long id) throws JsonProcessingException {
-        Optional<Module> omodule = moduleRepository.findById(id);
+    public ResponseEntity<?> getModuleInformation(@PathVariable long moduleId) throws JsonProcessingException {
+        Optional<Module> omodule = moduleRepository.findById(moduleId);
 
         if (!omodule.isPresent()) {
             return ResponseEntity
