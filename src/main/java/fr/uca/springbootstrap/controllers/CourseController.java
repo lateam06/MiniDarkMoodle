@@ -1,7 +1,7 @@
 package fr.uca.springbootstrap.controllers;
 
 import fr.uca.springbootstrap.repository.*;
-import fr.uca.springbootstrap.security.jwt.JwtUtils;
+import fr.uca.springbootstrap.security.services.jwt.JwtUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.crypto.password.PasswordEncoder;

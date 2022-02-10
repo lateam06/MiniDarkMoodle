@@ -26,7 +26,6 @@ public class Resource {
     @Size(max = 256)
     private String description;
 
-
     private boolean visibility = false;
 
     public Resource() {
@@ -36,7 +35,6 @@ public class Resource {
         //TODO ajouter le text ou la question associé etc ...
         this.name = name;
     }
-
 
     public void setId(long id) {
         this.id = id;

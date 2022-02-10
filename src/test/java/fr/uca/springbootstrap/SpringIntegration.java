@@ -2,6 +2,7 @@ package fr.uca.springbootstrap;
 
 import java.io.IOException;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.uca.springbootstrap.models.modules.Resource;
 import io.cucumber.spring.CucumberContextConfiguration;
 import org.apache.http.HttpResponse;
@@ -23,7 +24,7 @@ public class SpringIntegration {
     static ResponseResults latestResponse = null;
     private final CloseableHttpClient httpClient = HttpClients.createDefault();
     protected HttpResponse latestHttpResponse;
-
+    private ObjectMapper ObjMapper = new ObjectMapper();
     @Autowired
     RestTemplate restTemplate;
 
@@ -51,6 +52,17 @@ public class SpringIntegration {
             request.addHeader("Authorization", "Bearer " + jwt);
         }
         request.setEntity(new StringEntity("{}"));
+        latestHttpResponse = httpClient.execute(request);
+    }
+
+    void executePost(String url, Object obj ,String jwt) throws IOException {
+        HttpPost request = new HttpPost(url);
+        request.addHeader("content-type", "application/json");
+        if (jwt != null) {
+            request.addHeader("Authorization", "Bearer " + jwt);
+        }
+
+        request.setEntity(new StringEntity(ObjMapper.writeValueAsString(obj)));
         latestHttpResponse = httpClient.execute(request);
     }
 

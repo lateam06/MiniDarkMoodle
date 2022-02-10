@@ -1,18 +1,15 @@
 package fr.uca.springbootstrap.controllers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.uca.springbootstrap.models.modules.Module;
 import fr.uca.springbootstrap.models.modules.Resource;
 import fr.uca.springbootstrap.models.modules.courses.Course;
 import fr.uca.springbootstrap.models.modules.questions.Questionnary;
-import fr.uca.springbootstrap.models.users.ERole;
-import fr.uca.springbootstrap.models.users.Role;
 import fr.uca.springbootstrap.models.users.User;
-import fr.uca.springbootstrap.payload.request.SignupRequest;
+import fr.uca.springbootstrap.payload.request.CreateModuleRequest;
 import fr.uca.springbootstrap.payload.response.MessageResponse;
 import fr.uca.springbootstrap.repository.*;
-import fr.uca.springbootstrap.security.jwt.JwtUtils;
+import fr.uca.springbootstrap.security.services.jwt.JwtUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -23,7 +20,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.persistence.DiscriminatorValue;
 import javax.validation.Valid;
 import java.security.Principal;
-import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
@@ -99,19 +95,6 @@ public class ModuleController {
 
     }
 
-
-    @GetMapping("/users/{userId}")
-    public ResponseEntity<?> getusers(@PathVariable long userId) throws JsonProcessingException {
-        Optional<User> ouser = userRepository.findById(userId);
-
-        User us = ouser.get();
-        ObjectMapper Obj = new ObjectMapper();
-        return ResponseEntity.ok(us);
-
-
-    }
-
-
     @PostMapping("/{id}/participants/{userid}")
     @PreAuthorize("hasRole('TEACHER')")
     public ResponseEntity<?> addUserToModule(Principal principal, @PathVariable long id, @PathVariable long userid) {
@@ -145,29 +128,21 @@ public class ModuleController {
         return ResponseEntity.ok(new MessageResponse("User successfully added to module!"));
     }
 
-    @GetMapping("/{id}/users")
+    @PostMapping("/createModule")
     @PreAuthorize("hasRole('TEACHER')")
-    public ResponseEntity<?> getAllStudentFromModule(Principal principal, @PathVariable long id) {
-        Optional<Module> omodule = moduleRepository.findById(id);
+    public ResponseEntity<?> createNewModule(@Valid @RequestBody CreateModuleRequest moduleRequest) {
+        Optional<Module> omodule = moduleRepository.findByName(moduleRequest.getName());
 
-        if (omodule.isEmpty()) {
-            return ResponseEntity
-                    .notFound()
-                    .build();
-        }
-
-        Module module = omodule.get();
-        User actor = userRepository.findByUsername(principal.getName()).get();
-
-        if (module.getParticipants().contains(actor)) {
-            return ResponseEntity
-                    .ok(module.getParticipants());
-        }
-        else {
+        if (omodule.isPresent()) {
             return ResponseEntity
                     .badRequest()
-                    .body(new MessageResponse("Error : You are not allowed to see this."));
+                    .body(new MessageResponse("Error : This module already exists."));
         }
+
+        Module module = new Module(moduleRequest.getName());
+        moduleRepository.save(module);
+
+        return ResponseEntity.accepted().body(new MessageResponse("Module successfully created"));
     }
 
     @PostMapping("/{id}/resources/{resourcesId}")
