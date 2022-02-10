@@ -30,10 +30,10 @@ public class Module {
             inverseJoinColumns = @JoinColumn(name = "user_id"))
     private Set<User> participants;
 
-    @ManyToMany(fetch = FetchType.EAGER)
+    @OneToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "resource_modules",
-            joinColumns = @JoinColumn(name = "module_id"),
-            inverseJoinColumns = @JoinColumn(name = "resource_id"))
+            joinColumns = @JoinColumn(name = "resource_id"),
+            inverseJoinColumns = @JoinColumn(name = "module_id"))
     private Set<Resource> resources;
 
     public Module() {
@@ -66,4 +66,7 @@ public class Module {
     public void setId(Long id) {
         this.id = id;
     }
+
+
+
 }

@@ -1,5 +1,7 @@
 package fr.uca.springbootstrap.models.modules;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
@@ -24,12 +26,6 @@ public class Resource {
     @Size(max = 256)
     private String description;
 
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(name = "resource_modules",
-            joinColumns = @JoinColumn(name = "resource_id"),
-            inverseJoinColumns = @JoinColumn(name = "module_id"))
-    private Set<Module> modules = new HashSet<>();
-
     public Resource() {
     }
 
@@ -48,14 +44,6 @@ public class Resource {
 
     public void setDescription(String desc) {
         this.description = desc;
-    }
-
-    public Set<Module> getModules() {
-        return modules;
-    }
-
-    public void setModules(Set<Module> modules) {
-        this.modules = modules;
     }
 
     public long getId() {

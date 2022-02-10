@@ -2,9 +2,7 @@ package fr.uca.springbootstrap.models.users;
 
 import fr.uca.springbootstrap.models.modules.Module;
 
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 import javax.persistence.*;
 import javax.validation.constraints.Email;
@@ -47,6 +45,12 @@ public class User {
 			inverseJoinColumns = @JoinColumn(name = "module_id"))
 	private Set<Module> modules = new HashSet<>();
 
+	public List<Module> listmod(){
+		return	new ArrayList<>(modules);
+
+
+	}
+
 	public User() {
 	}
 
@@ -55,6 +59,7 @@ public class User {
 		this.email = email;
 		this.password = password;
 	}
+
 
 	public Long getId() {
 		return id;
