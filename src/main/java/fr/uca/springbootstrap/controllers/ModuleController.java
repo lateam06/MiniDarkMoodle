@@ -9,6 +9,7 @@ import fr.uca.springbootstrap.models.modules.questions.Questionnary;
 import fr.uca.springbootstrap.models.users.ERole;
 import fr.uca.springbootstrap.models.users.Role;
 import fr.uca.springbootstrap.models.users.User;
+import fr.uca.springbootstrap.payload.request.ResourceRequest;
 import fr.uca.springbootstrap.payload.request.SignupRequest;
 import fr.uca.springbootstrap.payload.response.MessageResponse;
 import fr.uca.springbootstrap.repository.*;
@@ -222,6 +223,50 @@ public class ModuleController {
     }
 
 
+    @PostMapping("/{id}/resources/")
+    @PreAuthorize("hasRole('TEACHER')")
+    public ResponseEntity<?> addRessourceToModule(Principal principal,@PathVariable long id, @RequestBody ResourceRequest body){
+        Optional<Module> omodule = moduleRepository.findById(id);
+        if(omodule.isEmpty()){
+            return ResponseEntity.notFound().build();
+        }
+
+
+        else{
+            Module m = omodule.get();
+            System.out.println(body.getType());
+            if(body.getType().compareTo("courses") == 0 ){
+                Course c = new Course();
+                c.setName(body.getName());
+                c.setVisibility(body.getVisibility());
+                c.setDescription(body.getDescription());
+                c.setTexts(body.getTexts());
+                m.getResources().add(c);
+                courseRepository.save(c);
+
+
+            }
+            else if (body.getType().compareTo("questionnaries") == 0 ){
+                Questionnary q = new Questionnary();
+                q.setName(body.getName());
+                q.setVisibility(body.getVisibility());
+                q.setDescription(body.getDescription());
+                q.setQuestionSet(body.getQuestionSet());
+                m.getResources().add(q);
+                questionnaryRepository.save(q);
+
+            }
+            return ResponseEntity.accepted().build();
+
+
+
+        }
+
+    }
+
+
+
+
     @DeleteMapping("/{id}/resources/{resourcesId}")
     @PreAuthorize("hasRole('TEACHER')")
     public ResponseEntity<?> removeresource(Principal principal, @PathVariable long id, @PathVariable long resourcesId) {
@@ -236,6 +281,8 @@ public class ModuleController {
             return ResponseEntity
                     .badRequest()
                     .body(new MessageResponse("Error: not a course in this module!"));
+
+
         }
 
         Module module = omodule.get();

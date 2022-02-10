@@ -1,5 +1,7 @@
 package fr.uca.springbootstrap;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.uca.springbootstrap.controllers.AuthController;
 import fr.uca.springbootstrap.models.modules.Module;
 import fr.uca.springbootstrap.models.modules.Resource;
@@ -7,18 +9,24 @@ import fr.uca.springbootstrap.models.modules.courses.Course;
 import fr.uca.springbootstrap.models.users.ERole;
 import fr.uca.springbootstrap.models.users.Role;
 import fr.uca.springbootstrap.models.users.User;
+import fr.uca.springbootstrap.payload.request.ResourceRequest;
+import fr.uca.springbootstrap.payload.response.MessageResponse;
 import fr.uca.springbootstrap.repository.*;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
+import org.apache.http.util.EntityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
+
+import javax.persistence.DiscriminatorValue;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.IOException;
 import java.util.HashSet;
+import java.util.Optional;
 
 public class AddCourseStepDefs extends SpringIntegration {
     private static final String PASSWORD = "password";
@@ -161,6 +169,32 @@ public class AddCourseStepDefs extends SpringIntegration {
         assertEquals(status, latestHttpResponse.getStatusLine().getStatusCode());
     }
 
+
+
+    @When("{string} adds the course {string} to the post request to the module {string}")
+    public void addsTheCourseObjectToThePostRequestToTheModule(String arg0,String courseName ,String arg1) throws IOException {
+        String jwt = authController.generateJwt(arg0, PASSWORD);
+        Module mod = moduleRepository.findByName(arg1).get();
+        Course course = new Course(courseName);
+        String disc = course.getClass().getAnnotation(DiscriminatorValue.class).value();
+        ResourceRequest re = new ResourceRequest(course.getName(),disc,"",true,null,null);
+        executePost("http://localhost:8080/api/module/"+mod.getId()+"/resources/",re,jwt);
+//        MessageResponse message =  ObjMapper.readValue(latestJson,MessageResponse.class);
+//        System.out.println(latestJson);
+
+    }
+
+    @Then("{string} check that the {string} course has been added correcty in {string}")
+    public void checkThatTheCourseHasBeenAddedCorrectyIn(String arg0, String arg1, String arg2) {
+
+        String jwt = authController.generateJwt(arg0, PASSWORD);
+        Module mod = moduleRepository.findByName(arg2).get();
+        Course course = courseRepository.findByName(arg1).get();
+        assertTrue(mod.getResources().contains(course));
+
+
+
+    }
 
 
 //    @And("a course {string} has already been added by {string} in the module {string}")

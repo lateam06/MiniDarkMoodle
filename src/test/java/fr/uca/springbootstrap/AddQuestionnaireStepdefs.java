@@ -89,15 +89,17 @@ public class AddQuestionnaireStepdefs extends  SpringIntegration {
 
 
     @Then("{string} checks if the Questionnary {string} from {string} has a description according to {string} with a get")
-    public void checksIfTheQuestionnaryFromHasADescriptionAccordingToWithAGet(String arg0, String arg1, String arg2, String arg3) {
+    public void checksIfTheQuestionnaryFromHasADescriptionAccordingToWithAGet(String arg0, String arg1, String arg2, String arg3) throws IOException {
         Questionnary questionnary = questionnaryRepository.findByName(arg1).get();
         Module module = moduleRepository.findByName(arg2).get();
         String jwt = authController.generateJwt(arg0, PASSWORD);
         String url = "http://localhost:8080/api/module/" + module.getId() + "/resources/" + questionnary.getId();
 
+        executeGet(url,jwt);
+        Questionnary resp = ObjMapper.readValue(latestJson,Questionnary.class);
 
-        ResponseEntity<Resource> resp = (ResponseEntity<Resource>) executeGet(url,jwt,Resource.class);
-        assertEquals(arg3.compareTo(resp.getBody().getDescription()), 0);
+//        ResponseEntity<Resource> resp = (ResponseEntity<Resource>)
+        assertEquals(arg3.compareTo(resp.getDescription()), 0);
     }
 
     @And("a CodeRunner Question {string}")
