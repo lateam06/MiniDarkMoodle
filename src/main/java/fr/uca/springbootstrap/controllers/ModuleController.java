@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.uca.springbootstrap.models.modules.Module;
 import fr.uca.springbootstrap.models.modules.Resource;
-import fr.uca.springbootstrap.models.modules.courses.Course;
 import fr.uca.springbootstrap.models.users.ERole;
 import fr.uca.springbootstrap.models.users.Role;
 import fr.uca.springbootstrap.models.users.User;
@@ -55,7 +54,7 @@ public class ModuleController {
 
 
     @GetMapping("/{id}/resources/{resourcesId}")
-    public ResponseEntity<?> getressource(@PathVariable long id, @PathVariable long resourcesId) throws JsonProcessingException {
+    public ResponseEntity<?> getResourceByModule(@PathVariable long id, @PathVariable long resourcesId) throws JsonProcessingException {
         Optional<Module> omodule = moduleRepository.findById(id);
         Optional<Resource> oresource = resourcesRepository.findById(resourcesId);
         if (!omodule.isPresent()) {
@@ -85,21 +84,9 @@ public class ModuleController {
     }
 
 
-    @GetMapping("/users/{userId}")
-    public ResponseEntity<?> getusers(@PathVariable long userId) throws JsonProcessingException {
-        Optional<User> ouser = userRepository.findById(userId);
-
-        User us = ouser.get();
-        ObjectMapper Obj = new ObjectMapper();
-        return ResponseEntity.ok(us.listmod());
-
-
-    }
-
-
     @PostMapping("/{id}/participants/{userid}")
     @PreAuthorize("hasRole('TEACHER')")
-    public ResponseEntity<?> addUser(Principal principal, @PathVariable long id, @PathVariable long userid) {
+    public ResponseEntity<?> addUserToModule(Principal principal, @PathVariable long id, @PathVariable long userid) {
         Optional<Module> omodule = moduleRepository.findById(id);
         Optional<User> ouser = userRepository.findById(userid);
         if (!omodule.isPresent()) {
@@ -130,11 +117,35 @@ public class ModuleController {
         return ResponseEntity.ok(new MessageResponse("User successfully added to module!"));
     }
 
+    @GetMapping("/{id}/users")
+    @PreAuthorize("hasRole('TEACHER')")
+    public ResponseEntity<?> getAllStudentFromModule(Principal principal, @PathVariable long id) {
+        Optional<Module> omodule = moduleRepository.findById(id);
+
+        if (omodule.isEmpty()) {
+            return ResponseEntity
+                    .notFound()
+                    .build();
+        }
+
+        Module module = omodule.get();
+        User actor = userRepository.findByUsername(principal.getName()).get();
+
+        if (module.getParticipants().contains(actor)) {
+            return ResponseEntity
+                    .ok(module.getParticipants());
+        }
+        else {
+            return ResponseEntity
+                    .badRequest()
+                    .body(new MessageResponse("Error : You are not allowed to see this."));
+        }
+    }
 
     //TODO
     @PostMapping("/{id}/resources/{resourcesId}")
     @PreAuthorize("hasRole('TEACHER')")
-    public ResponseEntity<?> addResource(Principal principal, @PathVariable long id, @PathVariable long resourcesId) {
+    public ResponseEntity<?> addResourceToModule(Principal principal, @PathVariable long id, @PathVariable long resourcesId) {
         Optional<Module> omodule = moduleRepository.findById(id);
         Optional<Resource> oresource = resourcesRepository.findById(resourcesId);
         if (!omodule.isPresent()) {
@@ -173,7 +184,7 @@ public class ModuleController {
 
     @DeleteMapping("/{id}/resources/{resourcesId}")
     @PreAuthorize("hasRole('TEACHER')")
-    public ResponseEntity<?> removeresource(Principal principal, @PathVariable long id, @PathVariable long resourcesId) {
+    public ResponseEntity<?> removeResourceFromModule(Principal principal, @PathVariable long id, @PathVariable long resourcesId) {
         Optional<Module> omodule = moduleRepository.findById(id);
         Optional<Resource> oresource = resourcesRepository.findById(resourcesId);
         if (!omodule.isPresent()) {
@@ -206,62 +217,5 @@ public class ModuleController {
         moduleRepository.save(module);
         return ResponseEntity.ok(new MessageResponse("resource successfully added to module!"));
 
-    }
-
-
-    User createUser(String userName, String email, String password, Set<String> strRoles) {
-        User user = new User(userName, email, password);
-        Set<Role> roles = new HashSet<>();
-
-        if (strRoles == null) {
-            Role userRole = roleRepository.findByName(ERole.ROLE_STUDENT)
-                    .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
-            roles.add(userRole);
-        } else {
-            strRoles.forEach(role -> {
-                switch (role) {
-                    case "admin":
-                        Role adminRole = roleRepository.findByName(ERole.ROLE_ADMIN)
-                                .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
-                        roles.add(adminRole);
-
-                        break;
-                    case "mod":
-                        Role modRole = roleRepository.findByName(ERole.ROLE_TEACHER)
-                                .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
-                        roles.add(modRole);
-
-                        break;
-                    default:
-                        Role userRole = roleRepository.findByName(ERole.ROLE_STUDENT)
-                                .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
-                        roles.add(userRole);
-                }
-            });
-        }
-        user.setRoles(roles);
-        return user;
-    }
-
-    @PostMapping("/signup")
-    public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest signUpRequest) {
-        if (userRepository.existsByUsername(signUpRequest.getUsername())) {
-            return ResponseEntity
-                    .badRequest()
-                    .body(new MessageResponse("Error: Username is already taken!"));
-        }
-
-        if (userRepository.existsByEmail(signUpRequest.getEmail())) {
-            return ResponseEntity
-                    .badRequest()
-                    .body(new MessageResponse("Error: Email is already in use!"));
-        }
-
-        // Create new user's account
-        User user = createUser(signUpRequest.getUsername(),
-                signUpRequest.getEmail(),
-                encoder.encode(signUpRequest.getPassword()), signUpRequest.getRole());
-        userRepository.save(user);
-        return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
     }
 }
