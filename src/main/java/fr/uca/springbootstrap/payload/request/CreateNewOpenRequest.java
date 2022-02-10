@@ -1,12 +1,9 @@
 package fr.uca.springbootstrap.payload.request;
 
-import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-import java.io.Serializable;
 
-public class CreateNewQCMRequest {
+public class CreateNewOpenRequest {
 
     @NotBlank
     @Size(max = 20)
@@ -16,14 +13,14 @@ public class CreateNewQCMRequest {
     @Size(max = 256)
     private String description;
 
-    @NotNull
+    @Size(max = 512)
     private String response;
 
-    public CreateNewQCMRequest() {
+    public CreateNewOpenRequest() {
 
     }
 
-    public CreateNewQCMRequest(String name, String description, String response) {
+    public CreateNewOpenRequest(String name, String description, String response) {
         this.name = name;
         this.description = description;
         this.response = response;

@@ -79,7 +79,7 @@ public class AddCourseStepDefs extends SpringIntegration {
         moduleRepository.save(module);
     }
 
-    @And("a course with name {string} with a descritpion {string}")
+    @And("a course with name {string} with a description {string}")
     public void aCourseWithName(String arg0,String arg1) throws IOException {
         Course course = courseRepository.findByName(arg0).orElse(new Course(arg0));
         course.setDescription(arg1);
@@ -161,6 +161,18 @@ public class AddCourseStepDefs extends SpringIntegration {
         assertEquals(status, latestHttpResponse.getStatusLine().getStatusCode());
     }
 
+    @And("{string} is not the teacher registered to the module {string}")
+    public void isNotTheTeacherRegisteredToTheModule(String teacherName, String moduleName) {
+
+    }
+
+    @And("{string} is not a teacher registered to the module {string}")
+    public void isNotATeacherRegisteredToTheModule(String teacherName, String moduleName) {
+        User teacher = userRepository.findByUsername(teacherName).get();
+        Module module = moduleRepository.findByName(moduleName).get();
+
+        assertFalse(module.getParticipants().contains(teacher));
+    }
 
 
 //    @And("a course {string} has already been added by {string} in the module {string}")

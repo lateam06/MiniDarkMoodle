@@ -6,7 +6,7 @@ Feature: Get Course
     And the teacher "Marcel" is connected
     And a Student named "Louis"
     And a module with ID "le C pour les nuls"
-    And a course with name "introduction" with a descritpion "cours d'introduction au c très facile"
+    And a course with name "introduction" with a description "cours d'introduction au c très facile"
     And the course "introduction" has been added by "Marcel" into "le C pour les nuls"
 
 #    this scenario is here because we needed a similar background that was incompatible with addCourse.feature
@@ -16,7 +16,7 @@ Feature: Get Course
     When "Marcel" wants to add the course a second time "introduction" to the module "le C pour les nuls"
     Then the course is not added and the return status of the request is 400
 
-  Scenario: Teacher consult a course too see the descritpion
+  Scenario: Teacher consult a course too see the description
     Given "Marcel" is the teacher registered to the module "le C pour les nuls"
     And "Marcel" wants to get the course "introduction" from "le C pour les nuls" and make sure the description is "cours d'introduction au c très facile"
 

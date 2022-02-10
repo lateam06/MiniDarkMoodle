@@ -71,7 +71,7 @@ public class AuthController {
 												 roles));
 	}
 
-	User createUser(String userName, String email, String password, Set<String> strRoles) {
+	public User createUser(String userName, String email, String password, Set<String> strRoles) {
 		User user = new User(userName, email, password);
 		Set<Role> roles = new HashSet<>();
 

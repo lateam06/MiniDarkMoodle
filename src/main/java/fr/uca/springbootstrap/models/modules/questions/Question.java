@@ -5,11 +5,13 @@ import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 import java.util.List;
+import java.util.Objects;
 
 @Entity
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "question_type")
 @DiscriminatorValue("question")
+@Table(name = "questions", uniqueConstraints = @UniqueConstraint(columnNames = "name"))
 public class Question {
 
     @Id
@@ -81,5 +83,18 @@ public class Question {
 
     public void setResults(List<Result> results) {
         this.results = results;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Question question = (Question) o;
+        return Objects.equals(id, question.id) && Objects.equals(name, question.name);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name);
     }
 }

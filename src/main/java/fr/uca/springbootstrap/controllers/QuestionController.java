@@ -1,14 +1,17 @@
 package fr.uca.springbootstrap.controllers;
 
 import fr.uca.springbootstrap.models.modules.Module;
+import fr.uca.springbootstrap.models.modules.questions.OpenQuestion;
 import fr.uca.springbootstrap.models.modules.questions.QCM;
 import fr.uca.springbootstrap.models.modules.questions.Question;
 import fr.uca.springbootstrap.models.modules.questions.Questionnary;
 import fr.uca.springbootstrap.models.users.User;
+import fr.uca.springbootstrap.payload.request.CreateNewOpenRequest;
 import fr.uca.springbootstrap.payload.request.CreateNewQCMRequest;
 import fr.uca.springbootstrap.payload.response.MessageResponse;
 import fr.uca.springbootstrap.repository.*;
 import fr.uca.springbootstrap.security.jwt.JwtUtils;
+import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -80,7 +83,7 @@ public class QuestionController {
         }
 
         Optional<User> optionalUser = userRepository.findByUsername(principal.getName());
-        if (optionalUser.isPresent()) {
+        if (!optionalUser.isPresent()) {
             return ResponseEntity.badRequest().body(new MessageResponse("Error: You're not on the user database."));
         }
         User user = optionalUser.get();
@@ -99,9 +102,42 @@ public class QuestionController {
         if (responseCheck != null)
             return responseCheck;
 
-        QCM qcm = new QCM(cnqRequest.getName(), cnqRequest.getDescription(), cnqRequest.getResponse());
+        Questionnary questionnary = questionnaryRepository.findById(resourcesId).get();
+        QCM qcm = qcmRepository.findByName(cnqRequest.getName()).orElse(new QCM(cnqRequest.getName(), cnqRequest.getDescription(), cnqRequest.getResponse()));
+
+        if(questionnary.getQuestionSet().contains(qcm)) {
+            return ResponseEntity.badRequest().body("Error: this qcm is already on the questionnaire");
+        }
+
+        questionnary.getQuestionSet().add(qcm);
         qcmRepository.save(qcm);
+        questionnaryRepository.save(questionnary);
         return ResponseEntity.ok(new MessageResponse("QCM added succesfully!"));
+    }
+
+    @PostMapping("/{moduleId}/resources/{resourcesId}/newOpen")
+    @PreAuthorize("hasRole('TEACHER')")
+    public ResponseEntity<?> createNewOpen(Principal principal, @PathVariable long moduleId, @PathVariable long resourcesId, @Valid @RequestBody CreateNewOpenRequest cnoRequest) {
+        var responseCheck = checkModuleQuestionnaryUser(principal, moduleId, resourcesId);
+        if (responseCheck != null)
+            return responseCheck;
+
+        Questionnary questionnary = questionnaryRepository.findById(resourcesId).get();
+        Optional<OpenQuestion> optionalOpenQuestion = openQuestionRepository.findByName(cnoRequest.getName());
+        if (!optionalOpenQuestion.isPresent() && resourcesRepository.findByName(cnoRequest.getName()).isPresent()) {
+            return ResponseEntity.badRequest().body("Error: a question has already on this name");
+        }
+
+        OpenQuestion open = optionalOpenQuestion.orElse(new OpenQuestion(cnoRequest.getName(), cnoRequest.getDescription(), cnoRequest.getResponse()));
+
+        if(questionnary.getQuestionSet().contains(open)) {
+            return ResponseEntity.badRequest().body("Error: this open question is already on the questionnaire");
+        }
+
+        questionnary.getQuestionSet().add(open);
+        openQuestionRepository.save(open);
+        questionnaryRepository.save(questionnary);
+        return ResponseEntity.ok(new MessageResponse("OpenQuestion added succesfully!"));
     }
 
     @GetMapping("/{moduleId}/resources/{resourcesId}/{questionId}")
@@ -117,7 +153,7 @@ public class QuestionController {
         }
         Question question = optionalQuestion.get();
 
-        if (question.getQuestionnary().getId() != questionnary.getId()) {
+        if (!questionnary.getQuestionSet().contains(question)) {
             return ResponseEntity.badRequest().body("Error: this question isn't in this module.");
         }
 
@@ -125,13 +161,38 @@ public class QuestionController {
 
         switch (discriminator) {
             case "qcms":
-                return ResponseEntity.ok(qcmRepository.findById(question.getId()));
+                QCM qcm = qcmRepository.findById(question.getId()).get();
+                var qcmr = new CreateNewQCMRequest(qcm.getName(), qcm.getDescription(), qcm.getResponse());
+                return ResponseEntity.ok(qcmr);
             case "open_questions":
-                return ResponseEntity.ok(openQuestionRepository.findById(question.getId()));
+                OpenQuestion op = openQuestionRepository.findById(question.getId()).get();
+                var opr = new CreateNewOpenRequest(op.getName(), op.getDescription(), op.getResponse());
+                return ResponseEntity.ok(opr);
             default:
                 return ResponseEntity.ok(question);
         }
     }
 
+    @DeleteMapping("/{moduleId}/resources/{resourcesId}/{questionId}")
+    @PreAuthorize("hasRole('TEACHER')")
+    public ResponseEntity<?> deleteQuestion(Principal principal, @PathVariable long moduleId, @PathVariable long resourcesId, @PathVariable long questionId) {
+        var responseCheck = checkModuleQuestionnaryUser(principal, moduleId, resourcesId);
+        if (responseCheck != null)
+            return responseCheck;
+
+        Questionnary questionnary = questionnaryRepository.findById(resourcesId).get();
+        Optional<Question> optionalQuestion = questionRepository.findById(questionId);
+        if (!optionalQuestion.isPresent()) {
+            return ResponseEntity.badRequest().body("Error: the question doesn't exists.");
+        }
+        Question question = optionalQuestion.get();
+
+        if (!questionnary.getQuestionSet().contains(question)) {
+            return ResponseEntity.badRequest().body("Error: this question isn't in this module.");
+        }
+
+        questionRepository.deleteById(question.getId());
+        return ResponseEntity.ok("Question deleted.");
+    }
 
 }

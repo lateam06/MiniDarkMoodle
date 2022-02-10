@@ -51,9 +51,7 @@ public class AddQuestionnaireStepdefs extends  SpringIntegration {
     @Autowired
     QuestionnaryRepository questionnaryRepository;
 
-
-
-    @And("a Questionnaire with name {string}")
+    @And("a questionnaire with name {string}")
     public void aQuestionnaireWithName(String arg0) {
         Questionnary questionnary = questionnaryRepository.findByName(arg0).orElse(new Questionnary(arg0));
         resourcesRepository.save(questionnary);
@@ -80,16 +78,16 @@ public class AddQuestionnaireStepdefs extends  SpringIntegration {
 
     }
 
-    @And("another Questionnaire with name {string} and descritpion {string}")
-    public void anotherQuestionnaireWithNameAndDescritpion(String arg0, String arg1) {
+    @And("another questionnaire with name {string} and description {string}")
+    public void anotherQuestionnaireWithNameAndDescription(String arg0, String arg1) {
         Questionnary questionnary = questionnaryRepository.findByName(arg0).orElse(new Questionnary(arg0));
         questionnary.setDescription(arg1);
         resourcesRepository.save(questionnary);
     }
 
 
-    @Then("{string} checks if the Questionnary {string} from {string} has a description according to {string} with a get")
-    public void checksIfTheQuestionnaryFromHasADescriptionAccordingToWithAGet(String arg0, String arg1, String arg2, String arg3) {
+    @Then("{string} checks if the questionnaire {string} from {string} has a description according to {string} with a get")
+    public void checksIfTheQuestionnaireFromHasADescriptionAccordingToWithAGet(String arg0, String arg1, String arg2, String arg3) {
         Questionnary questionnary = questionnaryRepository.findByName(arg1).get();
         Module module = moduleRepository.findByName(arg2).get();
         String jwt = authController.generateJwt(arg0, PASSWORD);

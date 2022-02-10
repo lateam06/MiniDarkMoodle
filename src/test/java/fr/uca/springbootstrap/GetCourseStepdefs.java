@@ -55,7 +55,6 @@ public class GetCourseStepdefs extends SpringIntegration  {
     public void aCourseWithName(String arg0) throws IOException {
         Course course = courseRepository.findByName(arg0).orElse(new Course(arg0));
         courseRepository.save(course);
-
     }
 
 
