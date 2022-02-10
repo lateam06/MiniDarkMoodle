@@ -56,7 +56,7 @@ public class AddQuestionnaireStepdefs extends  SpringIntegration {
     @And("a Questionnaire with name {string}")
     public void aQuestionnaireWithName(String arg0) {
         Questionnary questionnary = questionnaryRepository.findByName(arg0).orElse(new Questionnary(arg0));
-        questionnaryRepository.save(questionnary);
+        resourcesRepository.save(questionnary);
     }
 
 
@@ -67,15 +67,41 @@ public class AddQuestionnaireStepdefs extends  SpringIntegration {
         Module module = moduleRepository.findByName(arg2).get();
         Questionnary questionnary = questionnaryRepository.findByName(arg1).get();
         executePost("http://localhost:8080/api/module/" + module.getId() + "/resources/" + questionnary.getId(), jwt);
-        System.out.println(latestHttpResponse);
+    }
 
+    @Then("The questionnaire {string} is added to the module {string}")
+    public void theQuestionnaireIsAddedToTheModule(String arg0, String arg1) {
 
+        Questionnary questionnary = questionnaryRepository.findByName(arg0).get();
+        Module module = moduleRepository.findByName(arg1).get();
+        assertTrue(module.getResources().contains(questionnary));
 
 
 
     }
 
-    @Then("The questionnaire {string} is added to the module {string}")
-    public void theQuestionnaireIsAddedToTheModule(String arg0, String arg1) {
+    @And("another Questionnaire with name {string} and descritpion {string}")
+    public void anotherQuestionnaireWithNameAndDescritpion(String arg0, String arg1) {
+        Questionnary questionnary = questionnaryRepository.findByName(arg0).orElse(new Questionnary(arg0));
+        questionnary.setDescription(arg1);
+        resourcesRepository.save(questionnary);
+    }
+
+
+    @Then("{string} checks if the Questionnary {string} from {string} has a description according to {string} with a get")
+    public void checksIfTheQuestionnaryFromHasADescriptionAccordingToWithAGet(String arg0, String arg1, String arg2, String arg3) {
+        Questionnary questionnary = questionnaryRepository.findByName(arg1).get();
+        Module module = moduleRepository.findByName(arg2).get();
+        String jwt = authController.generateJwt(arg0, PASSWORD);
+        String url = "http://localhost:8080/api/module/" + module.getId() + "/resources/" + questionnary.getId();
+
+
+        ResponseEntity<Resource> resp = (ResponseEntity<Resource>) executeGet(url,jwt,Resource.class);
+        assertEquals(arg3.compareTo(resp.getBody().getDescription()), 0);
+    }
+
+    @And("a CodeRunner Question {string}")
+    public void aCodeRunnerQuestion(String arg0) {
+
     }
 }

@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.uca.springbootstrap.models.modules.Module;
 import fr.uca.springbootstrap.models.modules.Resource;
 import fr.uca.springbootstrap.models.modules.courses.Course;
+import fr.uca.springbootstrap.models.modules.questions.Questionnary;
 import fr.uca.springbootstrap.models.users.ERole;
 import fr.uca.springbootstrap.models.users.Role;
 import fr.uca.springbootstrap.models.users.User;
@@ -19,6 +20,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import javax.persistence.DiscriminatorValue;
 import javax.validation.Valid;
 import java.security.Principal;
 import java.util.HashSet;
@@ -29,6 +31,7 @@ import java.util.Set;
 @RestController
 @RequestMapping("/api/module")
 public class ModuleController {
+
     @Autowired
     AuthenticationManager authenticationManager;
 
@@ -52,6 +55,9 @@ public class ModuleController {
 
     @Autowired
     CourseRepository courseRepository;
+
+    @Autowired
+    QuestionnaryRepository questionnaryRepository;
 
 
     @GetMapping("/{id}/resources/{resourcesId}")
@@ -77,8 +83,18 @@ public class ModuleController {
                     .notFound().build();
 
         } else {
-            ObjectMapper Obj = new ObjectMapper();
-            return ResponseEntity.ok(res);
+            String discriminator  =res.getClass().getAnnotation(DiscriminatorValue.class).value();
+            if (discriminator.compareTo("courses") == 0 ){
+                Course cours = courseRepository.findById(res.getId()).orElseThrow();
+                return ResponseEntity.ok(cours);
+            }
+            else if (discriminator.compareTo("questionnaries") == 0 ){
+                Questionnary questionnary = questionnaryRepository.findById(res.getId()).orElseThrow();
+                return ResponseEntity.ok(questionnary);
+            }
+            else{
+                return ResponseEntity.ok(res);
+            }
         }
 
     }
@@ -145,12 +161,12 @@ public class ModuleController {
                     .badRequest()
                     .body(new MessageResponse("Error: there is no course registered in database"));
         }
-
         Module module = omodule.get();
         Resource res = oresource.get();
 
 
-        Resource actorresource = courseRepository.findByName(res.getName()).get();
+
+        Resource actorresource = resourcesRepository.findByName(res.getName()).get();
 
         Set<Resource> resources = module.getResources();
 

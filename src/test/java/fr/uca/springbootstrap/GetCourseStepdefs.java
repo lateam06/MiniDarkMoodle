@@ -122,4 +122,39 @@ public class GetCourseStepdefs extends SpringIntegration  {
 
 
     }
+    Course cours;
+    @And("{string} wants to get the course {string} from {string}")
+    public void wantsToGetTheCourseFrom(String arg0, String arg1, String arg2) {
+        Course course = courseRepository.findByName(arg1).get();
+        Module module = moduleRepository.findByName(arg2).get();
+        String jwt = authController.generateJwt(arg0, PASSWORD);
+        String url = "http://localhost:8080/api/module/" + module.getId() + "/resources/" + course.getId();
+
+        ResponseEntity<Course> resp = (ResponseEntity<Course>) executeGet(url,jwt,Course.class);
+        System.out.println("visibility : "+ course.isVisibility());
+        cours = resp.getBody();
+    }
+
+
+    @And("{string} wants to change the visibility fo the course {string} of {string} to true")
+    public void wantsToChangeTheVisibilityFoTheCourseOfToTrue(String arg0, String arg1, String arg2) throws IOException {
+        cours.setVisibility(true);
+        String jwt = authController.generateJwt(arg0, PASSWORD);
+        Module module = moduleRepository.findByName(arg2).get();
+        courseRepository.save(cours);
+        executePost("http://localhost:8080/api/module/" + module.getId() + "/resources/" + cours.getId(),jwt);
+    }
+
+
+    @And("{string} gets the course {string} of {string} and make sur the visibility is to true")
+    public void getsTheCourseOfAndMakeSurTheVisibilityIsToTrue(String arg0, String arg1, String arg2) {
+        Course course = courseRepository.findByName(arg1).get();
+        Module module = moduleRepository.findByName(arg2).get();
+        String jwt = authController.generateJwt(arg0, PASSWORD);
+        String url = "http://localhost:8080/api/module/" + module.getId() + "/resources/" + course.getId();
+
+        ResponseEntity<Resource> resp = (ResponseEntity<Resource>) executeGet(url,jwt,Resource.class);
+        assertTrue(resp.getBody().isVisibility());
+
+    }
 }
