@@ -45,12 +45,6 @@ public class SpringIntegration {
 
     }
 
-    ResponseEntity<?> executeGet(String url, String jwt, Class specified){
-        return restTemplate.exchange(url,
-                HttpMethod.GET,
-                buildHeaderFromToken(jwt),
-                specified);
-    }
 
 
     void executePost(String url, String jwt) throws IOException {
