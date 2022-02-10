@@ -7,6 +7,8 @@ import fr.uca.springbootstrap.models.modules.courses.Course;
 import fr.uca.springbootstrap.models.modules.questions.Questionnary;
 import fr.uca.springbootstrap.models.users.User;
 import fr.uca.springbootstrap.payload.request.CreateModuleRequest;
+import fr.uca.springbootstrap.payload.request.ResourceRequest;
+import fr.uca.springbootstrap.payload.request.SignupRequest;
 import fr.uca.springbootstrap.payload.response.MessageResponse;
 import fr.uca.springbootstrap.repository.*;
 import fr.uca.springbootstrap.security.services.jwt.JwtUtils;
@@ -182,6 +184,26 @@ public class ModuleController {
 
 
     }
+
+
+    @PostMapping("/{id}/resources/")
+    @PreAuthorize("hasRole('TEACHER')")
+    public ResponseEntity<?> addRessourceToModule(Principal principal,@PathVariable long id, @RequestBody ResourceRequest body){
+        Optional<Module> omodule = moduleRepository.findById(id);
+        if(omodule.isEmpty()){
+            return ResponseEntity.notFound().build();
+        }
+        else{
+            System.out.println();
+            System.out.println(body.getName());
+
+            return ResponseEntity.ok("");
+
+        }
+
+    }
+
+
 
 
     @DeleteMapping("/{id}/resources/{resourcesId}")
