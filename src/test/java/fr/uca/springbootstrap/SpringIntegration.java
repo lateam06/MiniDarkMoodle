@@ -20,10 +20,17 @@ public class SpringIntegration {
     private final CloseableHttpClient httpClient = HttpClients.createDefault();
     protected HttpResponse latestHttpResponse;
 
-    void executeGet(String url) throws IOException {
+    void executeGet(String url, String jwt) throws IOException {
         HttpGet request = new HttpGet(url);
         request.addHeader("Accept", "application/json");
+        if (jwt != null) {
+            request.addHeader("Authorization", "Bearer " + jwt);
+        }
+
         latestHttpResponse = httpClient.execute(request);
+
+        System.out.println("in execute get ");
+        System.out.println(latestHttpResponse.toString());
     }
 
     void executePost(String url, String jwt) throws IOException {

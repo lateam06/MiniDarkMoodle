@@ -58,10 +58,11 @@ public class ModuleController {
 	public ResponseEntity<?> getressource( @PathVariable long id, @PathVariable long resourcesId) throws JsonProcessingException {
 		Optional<Module> omodule = moduleRepository.findById(id);
 		Optional<Resource> oresource = resourcesRepository.findById(resourcesId);
+		System.out.println("laaa");
 		if (!omodule.isPresent()) {
 			return ResponseEntity
 					.badRequest()
-					.body(new MessageResponse("Error: No such module!"));
+					.body("PAS BON");
 		}
 		if (!oresource.isPresent()) {
 			return ResponseEntity
@@ -79,7 +80,7 @@ public class ModuleController {
 		}
 		else{
 			ObjectMapper Obj = new ObjectMapper();
-			return ResponseEntity.ok(res);
+			return ResponseEntity.ok().body("empty");
 		}
 
 	}

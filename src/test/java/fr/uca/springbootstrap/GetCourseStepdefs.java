@@ -45,7 +45,7 @@ public class GetCourseStepdefs extends SpringIntegration  {
     CourseRepository courseRepository;
 
 
-    @And("a course with name {string} ")
+    @And("a course with name {string}")
     public void aCourseWithName(String arg0) throws IOException {
         Course course = courseRepository.findByName(arg0).orElse(new Course(arg0));
         courseRepository.save(course);
@@ -95,9 +95,10 @@ public class GetCourseStepdefs extends SpringIntegration  {
         String jwt = authController.generateJwt(arg0, PASSWORD);
 
 
-        executeGet("http://localhost:8080/api/module/" + module.getId() + "/resources/" + course.getId());
+        //executeGet("http://localhost:8080/api/module/" + module.getId() + "/resources/" + course.getId(),jwt);
+        executeGet("http://localhost:8080/api/module/9999/resources/0000",jwt);
 
-        System.out.println(latestHttpResponse);
+        System.out.println(latestHttpResponse.toString());
 
 
 
@@ -106,9 +107,7 @@ public class GetCourseStepdefs extends SpringIntegration  {
     @And("the teacher {string} is connected")
     public void theTeacherIsConnected(String arg0) throws IOException {
         String jwt = authController.generateJwt(arg0, PASSWORD);
-        executePost("http://localhost:8080/api/auth",jwt);
-
-
+        //executePost("http://localhost:8080/api/auth",jwt);
 
 
     }
