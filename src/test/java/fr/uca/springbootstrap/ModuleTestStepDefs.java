@@ -14,7 +14,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Optional;
+
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -58,15 +58,14 @@ public class ModuleTestStepDefs extends SpringIntegration {
 
         executePost("http://localhost:8080/api/module/createModule", createModuleRequest, jwt);
 
+        assertTrue(moduleRepository.findByName(arg1).isPresent());
     }
 
     @Then("The module {string} is created")
     public void theModuleIsCreated(String arg0) {
-
-
-
     }
 
     @But("{string}Yann{string}Un super module d'enfer\"")
-    public void yannUnSuperModuleDEnfer(String arg0, String arg1) throws Throwable {    // Write code here that turns the phrase above into concrete actions    throw new cucumber.api.PendingException();}
+    public void yannUnSuperModuleDEnfer(String arg0, String arg1) throws Throwable {
     }
+}

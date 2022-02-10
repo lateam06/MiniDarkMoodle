@@ -8,6 +8,9 @@ public class CreateModuleRequest {
         this.name = name;
     }
 
+    public CreateModuleRequest() {
+    }
+
     @NotBlank
     private String name;
 
