@@ -79,9 +79,6 @@ public class ModuleController {
                     .notFound().build();
 
         } else {
-            System.out.println(res);
-
-
             ObjectMapper Obj = new ObjectMapper();
             return ResponseEntity.ok(res);
         }
@@ -92,15 +89,10 @@ public class ModuleController {
     @GetMapping("/users/{userId}")
     public ResponseEntity<?> getusers(@PathVariable long userId) throws JsonProcessingException {
         Optional<User> ouser = userRepository.findById(userId);
-        System.out.println("laaa");
-
 
         User us = ouser.get();
-
-
-
-            ObjectMapper Obj = new ObjectMapper();
-            return ResponseEntity.ok(us.listmod());
+        ObjectMapper Obj = new ObjectMapper();
+        return ResponseEntity.ok(us.listmod());
 
 
     }

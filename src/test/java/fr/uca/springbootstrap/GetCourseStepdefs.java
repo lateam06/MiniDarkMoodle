@@ -12,8 +12,12 @@ import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
+import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.http.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.client.RestTemplate;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -44,6 +48,8 @@ public class GetCourseStepdefs extends SpringIntegration  {
     @Autowired
     CourseRepository courseRepository;
 
+    @Autowired
+    RestTemplate restTemplate;
 
     @And("a course with name {string}")
     public void aCourseWithName(String arg0) throws IOException {
@@ -94,14 +100,16 @@ public class GetCourseStepdefs extends SpringIntegration  {
         Module module = moduleRepository.findByName(arg2).get();
         String jwt = authController.generateJwt(arg0, PASSWORD);
 
+        String url = "http://localhost:8080/api/module/" + module.getId() + "/resources/" + course.getId();
 
-        executeGet("http://localhost:8080/api/module/" + module.getId() + "/resources/" + course.getId(),jwt);
-        //executeGet("http://localhost:8080/api/module/9999/resources/0000",jwt);
+        ResponseEntity<Resource> resp = restTemplate.exchange("http://localhost:8080/api/module/" + module.getId() + "/resources/" + course.getId(),
+                HttpMethod.GET,
+                buildHeaderFromToken(jwt),
+                Resource.class);
 
-        System.out.println(latestHttpResponse.toString());
-
-
-
+        System.out.println("status : " + resp.getStatusCode());
+        System.out.println("id : " + resp.getBody().getId());
+        System.out.println(resp.getBody().getName());
     }
 
     @And("the teacher {string} is connected")
