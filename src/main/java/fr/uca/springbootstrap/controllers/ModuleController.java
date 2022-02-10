@@ -80,7 +80,7 @@ public class ModuleController {
 		}
 		else{
 			ObjectMapper Obj = new ObjectMapper();
-			return ResponseEntity.ok().body("empty");
+			return ResponseEntity.ok().body(res);
 		}
 
 	}
