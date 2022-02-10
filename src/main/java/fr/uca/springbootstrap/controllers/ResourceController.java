@@ -37,6 +37,4 @@ public class ResourceController {
     CourseRepository courseRepository;
 
 
-
-
 }

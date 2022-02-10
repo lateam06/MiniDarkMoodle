@@ -2,11 +2,11 @@
 Feature: Get Course
   # Enter feature description here
   Background:
-    Given a teacher named "Marcel" with ID 123456
+    Given a teacher named "Marcel"
     And the teacher "Marcel" is connected
-    And a Student named "Louis"
-    And a module with ID "le C pour les nuls"
-    And a course with name "introduction" with a description "cours d'introduction au c très facile"
+    And a student named "Louis"
+    And a module named "le C pour les nuls"
+    And a course named "introduction" with a description "cours d'introduction au c très facile"
     And the course "introduction" has been added by "Marcel" into "le C pour les nuls"
 
 #    this scenario is here because we needed a similar background that was incompatible with addCourse.feature

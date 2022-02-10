@@ -1,7 +1,7 @@
 Feature: AddCourse
 
   Background:
-    Given a teacher named "Marcel" with ID 123456
+    Given a teacher named "Marcel"
     And a module with ID 123
     And a course with ID 246
 

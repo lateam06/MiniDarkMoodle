@@ -5,14 +5,12 @@ import fr.uca.springbootstrap.models.modules.Module;
 import fr.uca.springbootstrap.models.users.User;
 import fr.uca.springbootstrap.payload.request.CreateModuleRequest;
 import fr.uca.springbootstrap.repository.*;
-import io.cucumber.java.en.But;
-import io.cucumber.java.en.Given;
-import io.cucumber.java.en.Then;
-import io.cucumber.java.en.When;
+import io.cucumber.java.en.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.List;
 
 
@@ -51,6 +49,14 @@ public class ModuleTestStepDefs extends SpringIntegration {
         assertTrue(modules.isEmpty());
     }
 
+    @Given("{string} is the teacher registered to the module {string}")
+    public void isTheTeacherRegisteredToTheModule(String arg0, String arg1) throws IOException {
+        Module module = moduleRepository.findByName(arg1).get();
+        User user = userRepository.findByUsername(arg0).get();
+        String jwt = authController.generateJwt(arg0, PASSWORD);
+        executePost("http://localhost:8080/api/module/" + module.getId() + "/participants/" + user.getId(), jwt);
+    }
+
     @When("{string} wants to create a new Module {string}")
     public void wantsToCreateANewModule(String arg0, String arg1) throws IOException {
         CreateModuleRequest createModuleRequest = new CreateModuleRequest(arg1);
@@ -61,11 +67,4 @@ public class ModuleTestStepDefs extends SpringIntegration {
         assertTrue(moduleRepository.findByName(arg1).isPresent());
     }
 
-    @Then("The module {string} is created")
-    public void theModuleIsCreated(String arg0) {
-    }
-
-    @But("{string}Yann{string}Un super module d'enfer\"")
-    public void yannUnSuperModuleDEnfer(String arg0, String arg1) throws Throwable {
-    }
 }

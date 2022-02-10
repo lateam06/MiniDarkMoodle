@@ -46,7 +46,7 @@ public class UserController {
 
     @GetMapping("/user/{userId}")
     @PreAuthorize("hasAnyRole('ADMIN')")
-    public ResponseEntity<?> getUsersModule(@PathVariable long userId) throws JsonProcessingException {
+    public ResponseEntity<?> getUsersModule(@PathVariable long userId) {
         Optional<User> ouser = userRepository.findById(userId);
 
         if (ouser.isEmpty()) {
@@ -77,8 +77,7 @@ public class UserController {
         if (module.getParticipants().contains(actor)) {
             return ResponseEntity
                     .ok(module.getParticipants());
-        }
-        else {
+        } else {
             return ResponseEntity
                     .badRequest()
                     .body(new MessageResponse("Error : You are not allowed to see this."));

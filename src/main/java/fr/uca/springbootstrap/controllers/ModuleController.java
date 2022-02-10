@@ -26,7 +26,6 @@ import javax.persistence.DiscriminatorValue;
 import javax.validation.Valid;
 import java.security.Principal;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -64,14 +63,14 @@ public class ModuleController {
 
 
     @GetMapping("/{id}/resources/{resourcesId}")
-    public ResponseEntity<?> getResourceByModule(@PathVariable long id, @PathVariable long resourcesId) throws JsonProcessingException {
+    public ResponseEntity<?> getResourceByModule(@PathVariable long id, @PathVariable long resourcesId) {
         Optional<Module> omodule = moduleRepository.findById(id);
         Optional<Resource> oresource = resourcesRepository.findById(resourcesId);
-        if (!omodule.isPresent()) {
+        if (omodule.isEmpty()) {
             return ResponseEntity
                     .notFound().build();
         }
-        if (!oresource.isPresent()) {
+        if (oresource.isEmpty()) {
             return ResponseEntity
                     .badRequest()
                     .body(new MessageResponse("Error: there is no course registered in database"));
@@ -86,16 +85,14 @@ public class ModuleController {
                     .notFound().build();
 
         } else {
-            String discriminator  =res.getClass().getAnnotation(DiscriminatorValue.class).value();
-            if (discriminator.compareTo("courses") == 0 ){
+            String discriminator = res.getClass().getAnnotation(DiscriminatorValue.class).value();
+            if (discriminator.compareTo("courses") == 0) {
                 Course cours = courseRepository.findById(res.getId()).orElseThrow();
                 return ResponseEntity.ok(cours);
-            }
-            else if (discriminator.compareTo("questionnaries") == 0 ){
+            } else if (discriminator.compareTo("questionnaries") == 0) {
                 Questionnary questionnary = questionnaryRepository.findById(res.getId()).orElseThrow();
                 return ResponseEntity.ok(questionnary);
-            }
-            else{
+            } else {
                 return ResponseEntity.ok(res);
             }
         }
@@ -104,7 +101,7 @@ public class ModuleController {
 
 
     @GetMapping("/users/{userId}")
-    public ResponseEntity<?> getUsers(@PathVariable long userId) throws JsonProcessingException {
+    public ResponseEntity<?> getUsers(@PathVariable long userId) {
         Optional<User> ouser = userRepository.findById(userId);
 
         User us = ouser.get();
@@ -116,16 +113,16 @@ public class ModuleController {
 
     @GetMapping("/{moduleId}/participants/{userid}/getSingleUser")
     @PreAuthorize("hasRole('TEACHER')")
-    public ResponseEntity<?> getSingleModuleUser(@PathVariable long moduleId, @PathVariable long userid) throws  JsonProcessingException {
+    public ResponseEntity<?> getSingleModuleUser(@PathVariable long moduleId, @PathVariable long userid) {
         Optional<Module> omodule = moduleRepository.findById(moduleId);
         Optional<User> ouser = userRepository.findById(userid);
 
-        if (!omodule.isPresent()) {
+        if (omodule.isEmpty()) {
             return ResponseEntity
                     .badRequest()
                     .body(new MessageResponse("Error: No such module!"));
         }
-        if (!ouser.isPresent()) {
+        if (ouser.isEmpty()) {
             return ResponseEntity
                     .badRequest()
                     .body(new MessageResponse("Error: No such user!"));
@@ -134,7 +131,7 @@ public class ModuleController {
         Module module = omodule.get();
         User user = ouser.get();
         Set<User> participants = module.getParticipants();
-        if ((! participants.contains(user))) {
+        if ((!participants.contains(user))) {
             return ResponseEntity
                     .badRequest()
                     .body(new MessageResponse("Error: No such user in this module"));
@@ -144,10 +141,10 @@ public class ModuleController {
 
     @GetMapping("/{moduleId}/participants/getAllUsers")
     @PreAuthorize("hasRole('TEACHER')")
-    public ResponseEntity<?> getAllModuleUsers(Principal principal, @PathVariable long moduleId) throws JsonProcessingException {
+    public ResponseEntity<?> getAllModuleUsers(Principal principal, @PathVariable long moduleId) {
         Optional<Module> omodule = moduleRepository.findById(moduleId);
 
-        if (!omodule.isPresent()) {
+        if (omodule.isEmpty()) {
             return ResponseEntity
                     .badRequest()
                     .body(new MessageResponse("Error: No such module!"));
@@ -171,12 +168,12 @@ public class ModuleController {
     public ResponseEntity<?> addUserToModule(Principal principal, @PathVariable long id, @PathVariable long userid) {
         Optional<Module> omodule = moduleRepository.findById(id);
         Optional<User> ouser = userRepository.findById(userid);
-        if (!omodule.isPresent()) {
+        if (omodule.isEmpty()) {
             return ResponseEntity
                     .badRequest()
                     .body(new MessageResponse("Error: No such module!"));
         }
-        if (!ouser.isPresent()) {
+        if (ouser.isEmpty()) {
             return ResponseEntity
                     .badRequest()
                     .body(new MessageResponse("Error: No such user!"));
@@ -221,12 +218,12 @@ public class ModuleController {
     public ResponseEntity<?> addResourceToModule(Principal principal, @PathVariable long id, @PathVariable long resourcesId) {
         Optional<Module> omodule = moduleRepository.findById(id);
         Optional<Resource> oresource = resourcesRepository.findById(resourcesId);
-        if (!omodule.isPresent()) {
+        if (omodule.isEmpty()) {
             return ResponseEntity
                     .badRequest()
                     .body(new MessageResponse("Error: No such module!"));
         }
-        if (!oresource.isPresent()) {
+        if (oresource.isEmpty()) {
             return ResponseEntity
                     .badRequest()
                     .body(new MessageResponse("Error: there is no course registered in database"));
@@ -235,13 +232,12 @@ public class ModuleController {
         Resource res = oresource.get();
 
 
-
-        Resource actorresource = resourcesRepository.findByName(res.getName()).get();
+        Resource actorResource = resourcesRepository.findByName(res.getName()).get();
 
         Set<Resource> resources = module.getResources();
 
-        if ((resources.isEmpty() && actorresource.equals(res))
-                || !resources.contains(actorresource)) {
+        if ((resources.isEmpty() && actorResource.equals(res))
+                || !resources.contains(actorResource)) {
             resources.add(res);
         } else {
             return ResponseEntity
@@ -255,17 +251,14 @@ public class ModuleController {
 
     @PostMapping("/{id}/resources/")
     @PreAuthorize("hasRole('TEACHER')")
-    public ResponseEntity<?> addRessourceToModule(Principal principal,@PathVariable long id, @RequestBody ResourceRequest body){
+    public ResponseEntity<?> addResourceToModule(@PathVariable long id, @RequestBody ResourceRequest body) {
         Optional<Module> omodule = moduleRepository.findById(id);
-        if(omodule.isEmpty()){
+        if (omodule.isEmpty()) {
             return ResponseEntity.notFound().build();
-        }
-
-
-        else{
+        } else {
             Module m = omodule.get();
             System.out.println(body.getType());
-            if(body.getType().compareTo("courses") == 0 ){
+            if (body.getType().compareTo("courses") == 0) {
                 Course c = new Course();
                 c.setName(body.getName());
                 c.setVisibility(body.getVisibility());
@@ -275,8 +268,7 @@ public class ModuleController {
                 courseRepository.save(c);
 
 
-            }
-            else if (body.getType().compareTo("questionnaries") == 0 ){
+            } else if (body.getType().compareTo("questionnaries") == 0) {
                 Questionnary q = new Questionnary();
                 q.setName(body.getName());
                 q.setVisibility(body.getVisibility());
@@ -287,44 +279,37 @@ public class ModuleController {
 
             }
             return ResponseEntity.accepted().build();
-
-
-
         }
 
     }
 
 
-
-
     @DeleteMapping("/{id}/resources/{resourcesId}")
     @PreAuthorize("hasRole('TEACHER')")
-    public ResponseEntity<?> removeResourceFromModule(Principal principal, @PathVariable long id, @PathVariable long resourcesId) {
+    public ResponseEntity<?> removeResourceFromModule(@PathVariable long id, @PathVariable long resourcesId) {
         Optional<Module> omodule = moduleRepository.findById(id);
         Optional<Resource> oresource = resourcesRepository.findById(resourcesId);
-        if (!omodule.isPresent()) {
+        if (omodule.isEmpty()) {
             return ResponseEntity
                     .badRequest()
                     .body(new MessageResponse("Error: No such module!"));
         }
-        if (!oresource.isPresent()) {
+        if (oresource.isEmpty()) {
             return ResponseEntity
                     .badRequest()
                     .body(new MessageResponse("Error: not a course in this module!"));
-
-
         }
 
         Module module = omodule.get();
         Resource res = oresource.get();
 
 
-        Resource actorresource = resourcesRepository.findByName(res.getName()).get();
+        Resource actorResource = resourcesRepository.findByName(res.getName()).get();
 
         Set<Resource> resources = module.getResources();
 
-        if ((resources.isEmpty() && actorresource.equals(res))
-                || resources.contains(actorresource)) {
+        if ((resources.isEmpty() && actorResource.equals(res))
+                || resources.contains(actorResource)) {
             resources.remove(res);
         } else {
             return ResponseEntity
@@ -341,12 +326,12 @@ public class ModuleController {
     public ResponseEntity<?> removeUser(Principal principal, @PathVariable long moduleId, @PathVariable long userId) {
         Optional<Module> omodule = moduleRepository.findById(moduleId);
         Optional<User> ouser = userRepository.findById(userId);
-        if (!omodule.isPresent()) {
+        if (omodule.isEmpty()) {
             return ResponseEntity
                     .badRequest()
                     .body(new MessageResponse("Error: No such module"));
         }
-        if (!ouser.isPresent()) {
+        if (ouser.isEmpty()) {
             return ResponseEntity
                     .badRequest()
                     .body(new MessageResponse("Error: not such user"));
@@ -374,7 +359,7 @@ public class ModuleController {
     public ResponseEntity<?> removeModule(Principal principal, @PathVariable long moduleId) {
         Optional<Module> omodule = moduleRepository.findById(moduleId);
 
-        if (!omodule.isPresent()) {
+        if (omodule.isEmpty()) {
             return ResponseEntity
                     .badRequest()
                     .body(new MessageResponse("Error: No such module"));
@@ -396,10 +381,10 @@ public class ModuleController {
 
     @GetMapping("/{moduleId}/getModule")
     @PreAuthorize("hasRole('TEACHER')")
-    public ResponseEntity<?> getModuleInformation(@PathVariable long moduleId) throws JsonProcessingException {
+    public ResponseEntity<?> getModuleInformation(@PathVariable long moduleId) {
         Optional<Module> omodule = moduleRepository.findById(moduleId);
 
-        if (!omodule.isPresent()) {
+        if (omodule.isEmpty()) {
             return ResponseEntity
                     .badRequest()
                     .body(new MessageResponse("Error: No such module!"));

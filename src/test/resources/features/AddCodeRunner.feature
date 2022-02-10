@@ -2,8 +2,8 @@
 #Feature: CodeRunner
 #  # Enter feature description here
 #  Background:
-#    Given a teacher named "Marcel" with ID 123456
-#    And a Student named "Louis"
+#    Given a teacher named "Marcel"
+#    And a student named "Louis"
 #    And a module with ID "le C pour les nuls"
 #    And a Questionnaire with name "questionnaire"
 #    And another Questionnaire with name "autre questionnaire" and descritpion "QCM facile"
