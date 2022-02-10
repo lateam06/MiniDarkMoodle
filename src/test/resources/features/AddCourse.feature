@@ -28,6 +28,12 @@ Feature: AddCourse
         Then the course is not deleted and the return status of the request is 403
 
 
+Scenario: Teacher add a Course to the module
+  Given "Marcel" is the teacher registered to the module "le C pour les nuls"
+  When "Marcel" adds the course "Cours 2" to the post request to the module "le C pour les nuls"
+  Then "Marcel" check that the "Cours 2" course has been added correcty in "le C pour les nuls"
+
+
 
 
 

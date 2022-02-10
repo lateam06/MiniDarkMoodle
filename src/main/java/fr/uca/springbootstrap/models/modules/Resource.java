@@ -14,6 +14,8 @@ import java.util.Set;
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "resource_type")
 @DiscriminatorValue("resource")
+@Table(name = "resources",
+        uniqueConstraints = @UniqueConstraint(columnNames = "name"))
 public class Resource {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,6 +28,9 @@ public class Resource {
     @Size(max = 256)
     private String description;
 
+
+    private boolean visibility = false;
+
     public Resource() {
     }
 
@@ -33,6 +38,7 @@ public class Resource {
         //TODO ajouter le text ou la question associé etc ...
         this.name = name;
     }
+
 
     public void setId(long id) {
         this.id = id;
@@ -56,6 +62,14 @@ public class Resource {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public boolean isVisibility() {
+        return visibility;
+    }
+
+    public void setVisibility(boolean visibility) {
+        this.visibility = visibility;
     }
 
     @Override
