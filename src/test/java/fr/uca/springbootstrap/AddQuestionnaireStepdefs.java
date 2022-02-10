@@ -2,23 +2,14 @@ package fr.uca.springbootstrap;
 
 import fr.uca.springbootstrap.controllers.AuthController;
 import fr.uca.springbootstrap.models.modules.Module;
-import fr.uca.springbootstrap.models.modules.Resource;
-import fr.uca.springbootstrap.models.modules.courses.Course;
 import fr.uca.springbootstrap.models.modules.questions.Questionnary;
-import fr.uca.springbootstrap.models.users.ERole;
-import fr.uca.springbootstrap.models.users.Role;
 import fr.uca.springbootstrap.models.users.User;
 import fr.uca.springbootstrap.repository.*;
 import io.cucumber.java.en.And;
-import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
-import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.http.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
 
@@ -51,9 +42,7 @@ public class AddQuestionnaireStepdefs extends  SpringIntegration {
     @Autowired
     QuestionnaryRepository questionnaryRepository;
 
-
-
-    @And("a Questionnaire with name {string}")
+    @And("a questionnaire with name {string}")
     public void aQuestionnaireWithName(String arg0) {
         Questionnary questionnary = questionnaryRepository.findByName(arg0).orElse(new Questionnary(arg0));
         resourcesRepository.save(questionnary);
@@ -80,16 +69,16 @@ public class AddQuestionnaireStepdefs extends  SpringIntegration {
 
     }
 
-    @And("another Questionnaire with name {string} and descritpion {string}")
-    public void anotherQuestionnaireWithNameAndDescritpion(String arg0, String arg1) {
+    @And("another questionnaire with name {string} and description {string}")
+    public void anotherQuestionnaireWithNameAndDescription(String arg0, String arg1) {
         Questionnary questionnary = questionnaryRepository.findByName(arg0).orElse(new Questionnary(arg0));
         questionnary.setDescription(arg1);
         resourcesRepository.save(questionnary);
     }
 
 
-    @Then("{string} checks if the Questionnary {string} from {string} has a description according to {string} with a get")
-    public void checksIfTheQuestionnaryFromHasADescriptionAccordingToWithAGet(String arg0, String arg1, String arg2, String arg3) throws IOException {
+    @Then("{string} checks if the questionnaire {string} from {string} has a description according to {string} with a get")
+    public void checksIfTheQuestionnaireFromHasADescriptionAccordingToWithAGet(String arg0, String arg1, String arg2, String arg3) throws IOException {
         Questionnary questionnary = questionnaryRepository.findByName(arg1).get();
         Module module = moduleRepository.findByName(arg2).get();
         String jwt = authController.generateJwt(arg0, PASSWORD);
@@ -98,7 +87,6 @@ public class AddQuestionnaireStepdefs extends  SpringIntegration {
         executeGet(url,jwt);
         Questionnary resp = ObjMapper.readValue(latestJson,Questionnary.class);
 
-//        ResponseEntity<Resource> resp = (ResponseEntity<Resource>)
         assertEquals(arg3.compareTo(resp.getDescription()), 0);
     }
 

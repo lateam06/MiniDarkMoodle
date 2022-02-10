@@ -11,6 +11,7 @@ import java.util.Objects;
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "question_type")
 @DiscriminatorValue("question")
+@Table(name = "questions", uniqueConstraints = @UniqueConstraint(columnNames = "name"))
 public class Question {
 
     @Id

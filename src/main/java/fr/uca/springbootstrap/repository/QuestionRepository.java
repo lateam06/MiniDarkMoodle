@@ -10,4 +10,6 @@ import java.util.Optional;
 public interface QuestionRepository extends JpaRepository<Question,Long> {
     @Override
     Optional<Question> findById(Long aLong);
+
+    Optional<Question> findByName(String name);
 }
