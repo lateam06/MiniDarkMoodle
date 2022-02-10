@@ -2,6 +2,8 @@ package fr.uca.springbootstrap.models.modules.questions;
 
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
 
 @Entity
 @DiscriminatorValue("code_runners")
@@ -43,4 +45,7 @@ public class CodeRunner extends Question{
     public void setStudentResponse(String studentResponse) {
         this.studentResponse = studentResponse;
     }
+
+
+
 }
