@@ -24,6 +24,7 @@ import javax.persistence.DiscriminatorValue;
 import javax.validation.Valid;
 import java.security.Principal;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -292,6 +293,31 @@ public class ModuleController {
         }
         moduleRepository.save(module);
         return ResponseEntity.ok((new MessageResponse("User successfully remove from module")));
+    }
+
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('TEACHER')")
+    public ResponseEntity<?> removeModule(Principal principal, @PathVariable long id) {
+        Optional<Module> omodule = moduleRepository.findById(id);
+
+        if (!omodule.isPresent()) {
+            return ResponseEntity
+                    .badRequest()
+                    .body(new MessageResponse("Error: No such module"));
+        }
+
+        Module module = omodule.get();
+        User actor = userRepository.findByUsername(principal.getName()).get();
+        Set<User> participants = module.getParticipants();
+
+        if (participants.contains(actor)) {
+            moduleRepository.delete(module);
+        } else {
+            return ResponseEntity
+                    .badRequest()
+                    .body(new MessageResponse("Error : not allowed to remove module"));
+        }
+        return ResponseEntity.ok(new MessageResponse("Module successfully remove"));
     }
 
     User createUser(String userName, String email, String password, Set<String> strRoles) {
