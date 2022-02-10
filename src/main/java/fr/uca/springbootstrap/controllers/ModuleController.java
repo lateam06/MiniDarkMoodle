@@ -134,6 +134,22 @@ public class ModuleController {
         return ResponseEntity.ok(user);
     }
 
+    @GetMapping("/{id}/participants/")
+    @PreAuthorize("hasRole('TEACHER')")
+    public ResponseEntity<?> getAllModuleUsers(@PathVariable long id) throws JsonProcessingException {
+        Optional<Module> omodule = moduleRepository.findById(id);
+
+        if (!omodule.isPresent()) {
+            return ResponseEntity
+                    .badRequest()
+                    .body(new MessageResponse("Error: No such module!"));
+        }
+
+        Module module = omodule.get();
+        ObjectMapper obj = new ObjectMapper();
+        return ResponseEntity.ok(module.getParticipants());
+    }
+
 
     @PostMapping("/{id}/participants/{userid}")
     @PreAuthorize("hasRole('TEACHER')")
