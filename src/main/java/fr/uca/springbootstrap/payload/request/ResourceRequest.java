@@ -26,12 +26,13 @@ public class ResourceRequest {
     private Set<Question> questionSet;
 
 
-
-
-    public ResourceRequest(String name, String description, Boolean visibility) {
+    public ResourceRequest(String name, String type, String description, Boolean visibility, Set<Text> texts, Set<Question> questionSet) {
         this.name = name;
+        this.type = type;
         this.description = description;
         this.visibility = visibility;
+        this.texts = texts;
+        this.questionSet = questionSet;
     }
 
     public String getName() {
@@ -56,5 +57,18 @@ public class ResourceRequest {
 
     public void setVisibility(Boolean visibility) {
         this.visibility = visibility;
+    }
+
+
+    public String getType() {
+        return type;
+    }
+
+    public Set<Text> getTexts() {
+        return texts;
+    }
+
+    public Set<Question> getQuestionSet() {
+        return questionSet;
     }
 }

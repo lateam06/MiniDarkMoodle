@@ -193,11 +193,35 @@ public class ModuleController {
         if(omodule.isEmpty()){
             return ResponseEntity.notFound().build();
         }
-        else{
-            System.out.println();
-            System.out.println(body.getName());
 
-            return ResponseEntity.ok("");
+
+        else{
+            Module m = omodule.get();
+            System.out.println(body.getType());
+            if(body.getType().compareTo("courses") == 0 ){
+                Course c = new Course();
+                c.setName(body.getName());
+                c.setVisibility(body.getVisibility());
+                c.setDescription(body.getDescription());
+                c.setTexts(body.getTexts());
+                m.getResources().add(c);
+                courseRepository.save(c);
+
+
+            }
+            else if (body.getType().compareTo("questionnaries") == 0 ){
+                Questionnary q = new Questionnary();
+                q.setName(body.getName());
+                q.setVisibility(body.getVisibility());
+                q.setDescription(body.getDescription());
+                q.setQuestionSet(body.getQuestionSet());
+                m.getResources().add(q);
+                questionnaryRepository.save(q);
+
+            }
+            return ResponseEntity.accepted().build();
+
+
 
         }
 
@@ -220,6 +244,8 @@ public class ModuleController {
             return ResponseEntity
                     .badRequest()
                     .body(new MessageResponse("Error: not a course in this module!"));
+
+
         }
 
         Module module = omodule.get();

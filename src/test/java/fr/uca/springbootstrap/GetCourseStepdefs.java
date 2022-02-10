@@ -1,5 +1,6 @@
 package fr.uca.springbootstrap;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import fr.uca.springbootstrap.controllers.AuthController;
 import fr.uca.springbootstrap.models.modules.Module;
 import fr.uca.springbootstrap.models.modules.Resource;
@@ -13,6 +14,7 @@ import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import org.apache.coyote.Response;
+import org.apache.http.util.EntityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.*;
@@ -103,16 +105,13 @@ public class GetCourseStepdefs extends SpringIntegration  {
         String url = "http://localhost:8080/api/module/" + module.getId() + "/resources/" + course.getId();
 
 
-
-        ResponseEntity<Resource> resp = (ResponseEntity<Resource>) executeGet(url,jwt,Resource.class);
-
-
-        System.out.println("status : " + resp.getStatusCode());
-        System.out.println("id : " + resp.getBody().getId());
-        System.out.println(resp.getBody().getName());
+        executeGet(url,jwt);
+        Course resp = ObjMapper.readValue(latestJson,Course.class);
 
 
-        assertEquals(arg3.compareTo(resp.getBody().getDescription()), 0);
+
+
+        assertEquals(arg3.compareTo(resp.getDescription()), 0);
     }
 
     @And("the teacher {string} is connected")
@@ -124,15 +123,16 @@ public class GetCourseStepdefs extends SpringIntegration  {
     }
     Course cours;
     @And("{string} wants to get the course {string} from {string}")
-    public void wantsToGetTheCourseFrom(String arg0, String arg1, String arg2) {
+    public void wantsToGetTheCourseFrom(String arg0, String arg1, String arg2) throws IOException {
         Course course = courseRepository.findByName(arg1).get();
         Module module = moduleRepository.findByName(arg2).get();
         String jwt = authController.generateJwt(arg0, PASSWORD);
         String url = "http://localhost:8080/api/module/" + module.getId() + "/resources/" + course.getId();
 
-        ResponseEntity<Course> resp = (ResponseEntity<Course>) executeGet(url,jwt,Course.class);
-        System.out.println("visibility : "+ course.isVisibility());
-        cours = resp.getBody();
+        executeGet(url,jwt);
+        Course resp = ObjMapper.readValue(latestJson,Course.class);
+
+        cours = resp;
     }
 
 
@@ -147,14 +147,16 @@ public class GetCourseStepdefs extends SpringIntegration  {
 
 
     @And("{string} gets the course {string} of {string} and make sur the visibility is to true")
-    public void getsTheCourseOfAndMakeSurTheVisibilityIsToTrue(String arg0, String arg1, String arg2) {
+    public void getsTheCourseOfAndMakeSurTheVisibilityIsToTrue(String arg0, String arg1, String arg2) throws IOException {
         Course course = courseRepository.findByName(arg1).get();
         Module module = moduleRepository.findByName(arg2).get();
         String jwt = authController.generateJwt(arg0, PASSWORD);
         String url = "http://localhost:8080/api/module/" + module.getId() + "/resources/" + course.getId();
+        EntityUtils.consume(latestHttpResponse.getEntity());
+        executeGet(url,jwt);
+        Course resp = ObjMapper.readValue(latestJson,Course.class);
 
-        ResponseEntity<Resource> resp = (ResponseEntity<Resource>) executeGet(url,jwt,Resource.class);
-        assertTrue(resp.getBody().isVisibility());
+        assertTrue(resp.isVisibility());
 
     }
 }

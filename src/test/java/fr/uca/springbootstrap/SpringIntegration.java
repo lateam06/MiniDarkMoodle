@@ -39,18 +39,11 @@ public class SpringIntegration {
         }
 
 
-
         latestHttpResponse = httpClient.execute(request);
         latestJson = EntityUtils.toString(latestHttpResponse.getEntity());
 
     }
 
-    ResponseEntity<?> executeGet(String url, String jwt, Class specified){
-        return restTemplate.exchange(url,
-                HttpMethod.GET,
-                buildHeaderFromToken(jwt),
-                specified);
-    }
 
 
     void executePost(String url, String jwt) throws IOException {
@@ -69,8 +62,6 @@ public class SpringIntegration {
         if (jwt != null) {
             request.addHeader("Authorization", "Bearer " + jwt);
         }
-
-        System.out.println(ObjMapper.writeValueAsString(obj));
 
         request.setEntity(new StringEntity(ObjMapper.writeValueAsString(obj)));
         latestHttpResponse = httpClient.execute(request);
