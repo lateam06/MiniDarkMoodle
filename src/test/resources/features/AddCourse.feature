@@ -14,7 +14,7 @@ Feature: AddCourse
     Scenario: Student wants to add a course
       Given "Marcel" is the teacher registered to the module "le C pour les nuls"
       When  "Louis" wants to add the course "introduction" to the module "le C pour les nuls"
-      Then the course is not added and the return status of the request is 403
+      Then the course is not added and the return status of the request is 403 forbidden
 
 
       Scenario: Teacher deletes course in his module
@@ -27,11 +27,9 @@ Feature: AddCourse
         When  "Louis" wants to delete the course "introduction" to the module "le C pour les nuls"
         Then the course is not deleted and the return status of the request is 403
 
-  Scenario: Teacher add the same course two times in his module
-    Given "Marcel" is the teacher registered to the module "le C pour les nuls"
-    And a course "introduction" has already been added by "Marcel" in the module "le C pour les nuls"
-    When "Marcel" wants to add the course "introduction" to the module "le C pour les nuls"
-    Then the course is not added and the return status of the request is 403
+
+
+
 
 
 

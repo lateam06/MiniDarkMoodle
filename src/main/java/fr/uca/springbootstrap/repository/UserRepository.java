@@ -1,5 +1,6 @@
 package fr.uca.springbootstrap.repository;
 
+import java.util.List;
 import java.util.Optional;
 
 import fr.uca.springbootstrap.models.users.User;
@@ -13,5 +14,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
   Boolean existsByUsername(String username);
 
   Boolean existsByEmail(String email);
+
 
 }
