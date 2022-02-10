@@ -33,22 +33,9 @@ public class SpringIntegration {
         if (jwt != null) {
             request.addHeader("Authorization", "Bearer " + jwt);
         }
-
         latestHttpResponse = httpClient.execute(request);
-
-        System.out.println("in execute get ");
-        System.out.println(latestHttpResponse.toString());
     }
 
-    void executeGet(String url) throws IOException {
-        HttpGet request = new HttpGet(url);
-        request.addHeader("Accept", "application/json");
-
-        latestHttpResponse = httpClient.execute(request);
-
-        System.out.println("in execute get ");
-        System.out.println(latestHttpResponse.toString());
-    }
 
     void executePost(String url, String jwt) throws IOException {
         HttpPost request = new HttpPost(url);

@@ -102,7 +102,7 @@ public class GetCourseStepdefs extends SpringIntegration  {
 
         String url = "http://localhost:8080/api/module/" + module.getId() + "/resources/" + course.getId();
 
-        ResponseEntity<Resource> resp = restTemplate.exchange("http://localhost:8080/api/module/" + module.getId() + "/resources/" + course.getId(),
+        ResponseEntity<Resource> resp = restTemplate.exchange(url,
                 HttpMethod.GET,
                 buildHeaderFromToken(jwt),
                 Resource.class);
