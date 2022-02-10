@@ -96,7 +96,7 @@ public class ModuleController {
 
     }
 
-    @GetMapping("/{id}/participants/")
+    @GetMapping("/{id}/participants/{userid}")
     @PreAuthorize("hasRole('TEACHER')")
     public ResponseEntity<?> getSingleModuleUser(@PathVariable long id, @PathVariable long userid) throws  JsonProcessingException {
         Optional<Module> omodule = moduleRepository.findById(id);
@@ -116,7 +116,7 @@ public class ModuleController {
         Module module = omodule.get();
         User user = ouser.get();
         ObjectMapper obj = new ObjectMapper();
-        return ResponseEntity.ok(user.listmod());
+        return ResponseEntity.ok(user);
     }
 
 
