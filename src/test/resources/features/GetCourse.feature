@@ -19,3 +19,11 @@ Feature: Get Course
   Scenario: Teacher consult a course too see the descritpion
     Given "Marcel" is the teacher registered to the module "le C pour les nuls"
     And "Marcel" wants to get the course "introduction" from "le C pour les nuls" and make sure the description is "cours d'introduction au c très facile"
+
+
+
+  Scenario: Teacher want to change his course visibility
+    Given "Marcel" is the teacher registered to the module "le C pour les nuls"
+    And "Marcel" wants to get the course "introduction" from "le C pour les nuls"
+    And "Marcel" wants to change the visibility fo the course "introduction" of "le C pour les nuls" to true
+    And "Marcel" gets the course "introduction" of "le C pour les nuls" and make sur the visibility is to true

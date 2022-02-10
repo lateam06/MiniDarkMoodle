@@ -33,6 +33,8 @@ Feature: AddCourse
 
 
 
+
+
 #
 #  Scenario: One other teacher already registered in the module
 #    Given the module has a teacher already registered to the module "le C pour les nuls"
