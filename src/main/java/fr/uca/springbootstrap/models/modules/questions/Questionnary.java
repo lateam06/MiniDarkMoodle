@@ -29,4 +29,8 @@ public class Questionnary extends Resource {
     public void setQuestionSet(Set<Question> questionSet) {
         this.questionSet = questionSet;
     }
+
+    public static String generateUrl(Long moduleId, Long questionnaryId) {
+        return "http://localhost:8080/api/module/" + moduleId + "/resources/" + questionnaryId;
+    }
 }
