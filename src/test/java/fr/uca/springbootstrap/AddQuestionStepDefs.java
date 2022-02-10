@@ -146,7 +146,7 @@ public class AddQuestionStepDefs extends SpringIntegration {
 
         String url = "http://localhost:8080/api/module/" + module.getId() + "/resources/" + questionnary.getId() + "/" + qcm.getId();
         String token = authController.generateJwt(userName, PASSWORD);
-        executeGet2(url, token);
+        executeGet(url, token);
         EntityUtils.consume(latestHttpResponse.getEntity());
     }
 
@@ -165,7 +165,7 @@ public class AddQuestionStepDefs extends SpringIntegration {
 
         String url = "http://localhost:8080/api/module/" + module.getId() + "/resources/" + questionnary.getId() + "/" + open.getId();
         String token = authController.generateJwt(userName, PASSWORD);
-        executeGet2(url, token);
+        executeGet(url, token);
         EntityUtils.consume(latestHttpResponse.getEntity());
     }
 
