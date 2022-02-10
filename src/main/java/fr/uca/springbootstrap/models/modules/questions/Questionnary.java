@@ -29,4 +29,15 @@ public class Questionnary extends Resource {
     public void setQuestionSet(Set<Question> questionSet) {
         this.questionSet = questionSet;
     }
+
+    public int getStudentGrade(long studentId) {
+        for (Question question : questionSet) {
+            for (Result result : question.getResults()) {
+                if(result.getUserId() == studentId && result.getValidated()) {
+                    return result.getRate();
+                }
+            }
+        }
+        return -1;
+    }
 }

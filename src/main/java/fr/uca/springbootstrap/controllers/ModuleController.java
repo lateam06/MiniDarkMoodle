@@ -25,6 +25,7 @@ import javax.persistence.DiscriminatorValue;
 import javax.validation.Valid;
 import java.security.Principal;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -102,7 +103,7 @@ public class ModuleController {
 
 
     @GetMapping("/users/{userId}")
-    public ResponseEntity<?> getusers(@PathVariable long userId) throws JsonProcessingException {
+    public ResponseEntity<?> getUsers(@PathVariable long userId) throws JsonProcessingException {
         Optional<User> ouser = userRepository.findById(userId);
 
         User us = ouser.get();
@@ -110,6 +111,57 @@ public class ModuleController {
         return ResponseEntity.ok(us);
 
 
+    }
+
+    @GetMapping("/{moduleId}/participants/{userid}/getSingleUser")
+    @PreAuthorize("hasRole('TEACHER')")
+    public ResponseEntity<?> getSingleModuleUser(@PathVariable long moduleId, @PathVariable long userid) throws  JsonProcessingException {
+        Optional<Module> omodule = moduleRepository.findById(moduleId);
+        Optional<User> ouser = userRepository.findById(userid);
+
+        if (!omodule.isPresent()) {
+            return ResponseEntity
+                    .badRequest()
+                    .body(new MessageResponse("Error: No such module!"));
+        }
+        if (!ouser.isPresent()) {
+            return ResponseEntity
+                    .badRequest()
+                    .body(new MessageResponse("Error: No such user!"));
+        }
+
+        Module module = omodule.get();
+        User user = ouser.get();
+        Set<User> participants = module.getParticipants();
+        if ((! participants.contains(user))) {
+            return ResponseEntity
+                    .badRequest()
+                    .body(new MessageResponse("Error: No such user in this module"));
+        }
+        return ResponseEntity.ok(user);
+    }
+
+    @GetMapping("/{moduleId}/participants/getAllUsers")
+    @PreAuthorize("hasRole('TEACHER')")
+    public ResponseEntity<?> getAllModuleUsers(Principal principal, @PathVariable long moduleId) throws JsonProcessingException {
+        Optional<Module> omodule = moduleRepository.findById(moduleId);
+
+        if (!omodule.isPresent()) {
+            return ResponseEntity
+                    .badRequest()
+                    .body(new MessageResponse("Error: No such module!"));
+        }
+
+        Module module = omodule.get();
+        User actor = userRepository.findByUsername(principal.getName()).get();
+        Set<User> participants = module.getParticipants();
+        if (!participants.contains(actor)) {
+            return ResponseEntity
+                    .badRequest()
+                    .body(new MessageResponse("Error: Not allowed to get information about this module"));
+        }
+
+        return ResponseEntity.ok(module.getParticipants());
     }
 
 
@@ -269,6 +321,79 @@ public class ModuleController {
 
     }
 
+    @DeleteMapping("/{moduleId}/participants/{userId}/deleteUser")
+    @PreAuthorize("hasRole('TEACHER')")
+    public ResponseEntity<?> removeUser(Principal principal, @PathVariable long moduleId, @PathVariable long userId) {
+        Optional<Module> omodule = moduleRepository.findById(moduleId);
+        Optional<User> ouser = userRepository.findById(userId);
+        if (!omodule.isPresent()) {
+            return ResponseEntity
+                    .badRequest()
+                    .body(new MessageResponse("Error: No such module"));
+        }
+        if (!ouser.isPresent()) {
+            return ResponseEntity
+                    .badRequest()
+                    .body(new MessageResponse("Error: not such user"));
+        }
+
+        Module module = omodule.get();
+        User user = ouser.get();
+        User actor = userRepository.findByUsername(principal.getName()).get();
+
+        Set<User> participants = module.getParticipants();
+        if ((participants.isEmpty() && actor.equals(user))
+                || participants.contains(actor)) {
+            participants.remove(user);
+        } else {
+            return ResponseEntity
+                    .badRequest()
+                    .body(new MessageResponse("Error: Not allowed to remove user!"));
+        }
+        moduleRepository.save(module);
+        return ResponseEntity.ok((new MessageResponse("User successfully remove from module")));
+    }
+
+    @DeleteMapping("/{moduleId}/deleteModule")
+    @PreAuthorize("hasRole('TEACHER')")
+    public ResponseEntity<?> removeModule(Principal principal, @PathVariable long moduleId) {
+        Optional<Module> omodule = moduleRepository.findById(moduleId);
+
+        if (!omodule.isPresent()) {
+            return ResponseEntity
+                    .badRequest()
+                    .body(new MessageResponse("Error: No such module"));
+        }
+
+        Module module = omodule.get();
+        User actor = userRepository.findByUsername(principal.getName()).get();
+        Set<User> participants = module.getParticipants();
+
+        if (participants.contains(actor)) {
+            moduleRepository.delete(module);
+        } else {
+            return ResponseEntity
+                    .badRequest()
+                    .body(new MessageResponse("Error : not allowed to remove module"));
+        }
+        return ResponseEntity.ok(new MessageResponse("Module successfully remove"));
+    }
+
+    @GetMapping("/{moduleId}/getModule")
+    @PreAuthorize("hasRole('TEACHER')")
+    public ResponseEntity<?> getModuleInformation(@PathVariable long moduleId) throws JsonProcessingException {
+        Optional<Module> omodule = moduleRepository.findById(moduleId);
+
+        if (!omodule.isPresent()) {
+            return ResponseEntity
+                    .badRequest()
+                    .body(new MessageResponse("Error: No such module!"));
+        }
+
+        Module module = omodule.get();
+        ObjectMapper obj = new ObjectMapper();
+        return ResponseEntity.ok(module);
+    }
 
     User createUser(String userName, String email, String password, Set<String> strRoles) {
         User user = new User(userName, email, password);
