@@ -19,6 +19,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import javax.swing.text.html.Option;
 import javax.validation.Valid;
 import java.security.Principal;
 import java.util.HashSet;
@@ -162,6 +163,39 @@ public class ModuleController {
 		return ResponseEntity.ok(new MessageResponse("Ressource successfully added to module!"));
 
 
+	}
+
+	@DeleteMapping("/{id}participants/{userid}")
+	@PreAuthorize("hasRole('TEACHER')")
+	public ResponseEntity<?> removeUser(Principal principal, @PathVariable long id, @PathVariable long userid) {
+		Optional<Module> omodule = moduleRepository.findById(id);
+		Optional<User> ouser = userRepository.findById(userid);
+		if (!omodule.isPresent()) {
+			return ResponseEntity
+					.badRequest()
+					.body(new MessageResponse("Error: No such module"));
+		}
+		if (!ouser.isPresent()) {
+			return ResponseEntity
+					.badRequest()
+					.body(new MessageResponse("Error: not such user"));
+		}
+
+		Module module = omodule.get();
+		User user = ouser.get();
+		User actor = userRepository.findByUsername(principal.getName()).get();
+
+		Set<User> participants = module.getParticipants();
+		if ((participants.isEmpty() && actor.equals(user))
+				|| participants.contains(actor)) {
+			participants.remove(user);
+		} else {
+			return ResponseEntity
+					.badRequest()
+					.body(new MessageResponse("Error: Not allowed to remove user!"));
+		}
+		moduleRepository.save(module);
+		return ResponseEntity.ok((new MessageResponse("User successfully remove from module")));
 	}
 
 
