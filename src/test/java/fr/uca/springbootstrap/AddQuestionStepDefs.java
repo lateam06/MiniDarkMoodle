@@ -128,15 +128,6 @@ public class AddQuestionStepDefs extends SpringIntegration {
         assertTrue(questionnary.getQuestionSet().contains(open));
     }
 
-    @And("{string} is a student registered to the module {string}")
-    public void isAStudentRegisteredToTheModule(String userName, String moduleName) throws IOException {
-        Module module = moduleRepository.findByName(moduleName).get();
-        User user = userRepository.findByUsername(userName).get();
-        String jwt = authController.generateJwt(userName, PASSWORD);
-        executePost("http://localhost:8080/api/module/" + module.getId() + "/participants/" + user.getId(), jwt);
-        EntityUtils.consume(latestHttpResponse.getEntity());
-    }
-
     @Then("the Open {string} is not added to the questionnaire {string} and the return status of the request is error")
     public void theOpenIsNotAddedToTheQuestionnaireAndTheReturnStatusOfTheRequestIsError(String arg0, String arg1) {
         assertTrue(latestHttpResponse.getStatusLine().getStatusCode() >= 400);
@@ -250,6 +241,11 @@ public class AddQuestionStepDefs extends SpringIntegration {
         Questionnary questionnary = questionnaryRepository.findByName(questionnaireName).get();
         Module module = moduleRepository.findByName(moduleName).get();
         assertTrue(questionRepository.findByName(questionName).isPresent());
+        assertTrue(latestHttpResponse.getStatusLine().getStatusCode() >= 400);
+    }
+
+    @Then("{string} can not get the QCM {string} from the questionnaire {string} of the module {string}")
+    public void canNotGetTheQCMFromTheQuestionnaireOfTheModule(String userName, String qcmName, String questionnaireName, String moduleName) {
         assertTrue(latestHttpResponse.getStatusLine().getStatusCode() >= 400);
     }
 }
