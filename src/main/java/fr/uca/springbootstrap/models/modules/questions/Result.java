@@ -1,6 +1,7 @@
 package fr.uca.springbootstrap.models.modules.questions;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 @Entity
@@ -48,8 +49,8 @@ public class Result {
         return userId;
     }
 
-    public void setUserId(Long user_id) {
-        this.userId = user_id;
+    public void setUserId(Long userId) {
+        this.userId = userId;
     }
 
     public Integer getRate() {
