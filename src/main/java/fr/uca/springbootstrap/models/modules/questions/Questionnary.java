@@ -16,7 +16,7 @@ public class Questionnary extends Resource {
             inverseJoinColumns = @JoinColumn(name = "question_id"))
     private Set<Question> questionSet;
 
-    @OneToMany(targetEntity = Result.class, mappedBy = "userId", fetch = FetchType.LAZY)
+    @OneToMany(targetEntity = Result.class, mappedBy = "questionnaryId", fetch = FetchType.LAZY)
     private List<Result> results;
 
     public Questionnary(String name) {
