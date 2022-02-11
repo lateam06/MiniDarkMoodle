@@ -1,30 +1,20 @@
 package fr.uca.springbootstrap;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import fr.uca.springbootstrap.controllers.AuthController;
 import fr.uca.springbootstrap.models.modules.Module;
-import fr.uca.springbootstrap.models.modules.Resource;
 import fr.uca.springbootstrap.models.modules.courses.Course;
-import fr.uca.springbootstrap.models.users.ERole;
-import fr.uca.springbootstrap.models.users.Role;
 import fr.uca.springbootstrap.models.users.User;
 import fr.uca.springbootstrap.repository.*;
 import io.cucumber.java.en.And;
-import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
-import org.apache.coyote.Response;
 import org.apache.http.util.EntityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.http.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.client.RestTemplate;
-
 import static org.junit.jupiter.api.Assertions.*;
-
 import java.io.IOException;
-import java.util.HashSet;
+
 
 public class GetCourseStepdefs extends SpringIntegration  {
     private static final String PASSWORD = "password";

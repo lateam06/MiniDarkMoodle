@@ -25,9 +25,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.persistence.DiscriminatorValue;
 import javax.validation.Valid;
 import java.security.Principal;
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
@@ -393,6 +391,39 @@ public class ModuleController {
         Module module = omodule.get();
         ObjectMapper obj = new ObjectMapper();
         return ResponseEntity.ok(module);
+    }
+
+    @GetMapping("/{moduleId}/getTeacher")
+    @PreAuthorize("hasRole('STUDENT')")
+    public ResponseEntity<?> getModuleTeacher(Principal principal, @PathVariable long moduleId) {
+        Optional<Module> omodule = moduleRepository.findById(moduleId);
+
+        if (omodule.isEmpty()) {
+            return ResponseEntity
+                    .badRequest()
+                    .body(new MessageResponse("Error: no such module"));
+        }
+
+        Module module = omodule.get();
+        User actor = userRepository.findByUsername(principal.getName()).get();
+        Set<User> participants = module.getParticipants();
+
+        if (!participants.contains(actor)) {
+            return ResponseEntity
+                    .badRequest()
+                    .body(new MessageResponse("Error: not allowed to get these information"));
+        }
+
+        List<User> teachers = new ArrayList<>();
+        for (User participant : participants) {
+            for (Role r : participant.getRoles()) {
+                if (r.getName().compareTo(ERole.ROLE_TEACHER) == 0) {
+                    teachers.add(participant);
+                }
+            }
+        }
+
+        return ResponseEntity.ok(teachers);
     }
 
     User createUser(String userName, String email, String password, Set<String> strRoles) {
