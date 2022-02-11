@@ -6,7 +6,7 @@ Feature: Register Student
     And a module named "Gestion de projet"
 
   Scenario: Register Student
-    When "Steve" registers "Bruce" as a student to module "Gestion de projet"
+    When "Steve" has registered "Bruce" on the module "Gestion de projet"
     Then the last request status is 200
     And "Bruce" is registered to module "Gestion de projet"
 

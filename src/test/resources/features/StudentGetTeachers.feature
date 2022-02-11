@@ -7,11 +7,11 @@ Feature: Student get teachers
     And a module named "le C pour les nuls"
     And "Marcel" is the teacher registered to the module "le C pour les nuls"
 
-  Scenario:
-    Given "Marcel" registers "Louis" as a student to module "le C pour les nuls"
+  Scenario: student access to module's teacher
+    Given "Marcel" has registered "Louis" on the module "le C pour les nuls"
     When "Louis" wants to access the teacher of the module "le C pour les nuls"
-    Then the list of teachers is send and the return status of the request is 200
+    Then "Louis" sees that the teacher is "Marcel"
 
-  Scenario:
+  Scenario: student can't access module's teacher
     When "Louis" wants to access the teacher of the module "le C pour les nuls"
-    Then his request is rejected and the return status of the request is 403
+    Then the list of teacher is not send and the return status of the request is error

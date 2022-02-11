@@ -40,17 +40,7 @@ public class RegisterStudentStepDefs  extends  SpringIntegration{
 
 
 
-    @When("{string} registers {string} as a student to module {string}")
-    public void registersStudentToModule(String arg0, String arg1, String arg2) throws Exception {
-        Module module = moduleRepository.findByName(arg2).get();
-        User teacher = userRepository.findByUsername(arg0).get();
-        User student = userRepository.findByUsername(arg1).get();
-        String jwt = authController.generateJwt(arg0, PASSWORD);
 
-        executePost("http://localhost:8080/api/module/"+module.getId()+"/participants/"+teacher.getId(), jwt);
-        EntityUtils.consume(latestHttpResponse.getEntity());
-        executePost("http://localhost:8080/api/module/"+module.getId()+"/participants/"+student.getId(), jwt);
-    }
 
     @Then("the last request status is {int}")
     public void isRegistered(int arg0) {
@@ -64,6 +54,7 @@ public class RegisterStudentStepDefs  extends  SpringIntegration{
         String jwt = authController.generateJwt(arg0, PASSWORD);
 
         executePost("http://localhost:8080/api/module/"+module.getId()+"/participants/"+user.getId(), jwt);
+        EntityUtils.consume(latestHttpResponse.getEntity());
     }
 
 }
