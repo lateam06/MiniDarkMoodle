@@ -171,14 +171,6 @@ public class AddQuestionStepDefs extends SpringIntegration {
         assertTrue(open.getName().equalsIgnoreCase(arg1));
     }
 
-    @And("{string} has registered {string} on the module {string}")
-    public void hasRegisteredOnTheModule(String teacherName, String userName, String moduleName) throws IOException {
-        Module module = moduleRepository.findByName(moduleName).get();
-        User user = userRepository.findByUsername(userName).get();
-        String jwt = authController.generateJwt(teacherName, PASSWORD);
-        executePost("http://localhost:8080/api/module/" + module.getId() + "/participants/" + user.getId(), jwt);
-    }
-
     @When("{string} wants to delete a Question {string} from the questionnaire {string} of the module {string}")
     public void wantsToDeleteAQuestionFromTheQuestionnaireOfTheModule(String userName, String questionName, String questionnaireName, String moduleName) throws IOException {
         User user = userRepository.findByUsername(userName).get();
