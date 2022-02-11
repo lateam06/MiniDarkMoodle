@@ -148,7 +148,9 @@ public class CourseController {
         }
     }
 
-    @PostMapping("{module_id}/course/{course_id}/createText")
+    //TODO DELETE TEXT
+
+    @PostMapping("{module_id}/course/{course_id}/text")
     @PreAuthorize("hasRole('TEACHER')")
     public ResponseEntity<?> createNewText(Principal principal, @PathVariable long module_id, @PathVariable long course_id, @Valid @RequestBody CreateTextRequest re) {
         var resp = verifyCourseInfo(principal, module_id, course_id);
