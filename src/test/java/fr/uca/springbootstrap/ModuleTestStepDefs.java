@@ -6,6 +6,7 @@ import fr.uca.springbootstrap.models.users.User;
 import fr.uca.springbootstrap.payload.request.CreateModuleRequest;
 import fr.uca.springbootstrap.repository.*;
 import io.cucumber.java.en.*;
+import org.apache.http.util.EntityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -55,6 +56,7 @@ public class ModuleTestStepDefs extends SpringIntegration {
         User user = userRepository.findByUsername(arg0).get();
         String jwt = authController.generateJwt(arg0, PASSWORD);
         executePost("http://localhost:8080/api/module/" + module.getId() + "/participants/" + user.getId(), jwt);
+        EntityUtils.consume(latestHttpResponse.getEntity());
     }
 
     @When("{string} wants to create a new Module {string}")
@@ -63,8 +65,17 @@ public class ModuleTestStepDefs extends SpringIntegration {
         String jwt = authController.generateJwt(arg0, PASSWORD);
 
         executePost("http://localhost:8080/api/module/createModule", createModuleRequest, jwt);
-
+        EntityUtils.consume(latestHttpResponse.getEntity());
         assertTrue(moduleRepository.findByName(arg1).isPresent());
+    }
+
+    @And("{string} has registered {string} on the module {string}")
+    public void hasRegisteredOnTheModule(String teacherName, String userName, String moduleName) throws IOException {
+        Module module = moduleRepository.findByName(moduleName).get();
+        User user = userRepository.findByUsername(userName).get();
+        String jwt = authController.generateJwt(teacherName, PASSWORD);
+        executePost("http://localhost:8080/api/module/" + module.getId() + "/participants/" + user.getId(), jwt);
+        EntityUtils.consume(latestHttpResponse.getEntity());
     }
 
 }
