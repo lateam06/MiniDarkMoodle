@@ -26,8 +26,8 @@ public class Question {
     @Size(max = 256)
     private String description;
 
-    @OneToMany(targetEntity = Result.class, mappedBy = "userId", fetch = FetchType.EAGER)
-    private List<Result> results;
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "userId")
+    private List<Attempt> attempts = new java.util.ArrayList<>();
 
     @OneToOne(fetch = FetchType.EAGER)
     @JoinTable(name = "question_questionnary",
@@ -35,6 +35,14 @@ public class Question {
             inverseJoinColumns = @JoinColumn(name = "questionnary_id")
         )
     private Questionnary questionnary;
+
+    public void setAttempts(List<Attempt> attempts) {
+        this.attempts = attempts;
+    }
+
+    public List<Attempt> getAttempts() {
+        return attempts;
+    }
 
     public Question(String name, String description) {
         this.name = name;
@@ -75,14 +83,6 @@ public class Question {
 
     public void setDescription(String desc) {
         this.description = desc;
-    }
-
-    public List<Result> getResults() {
-        return results;
-    }
-
-    public void setResults(List<Result> results) {
-        this.results = results;
     }
 
     @Override

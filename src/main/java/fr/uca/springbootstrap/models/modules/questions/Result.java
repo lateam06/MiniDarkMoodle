@@ -15,36 +15,25 @@ public class Result {
     private Long userId;
 
     @NotNull
-    private Long questionId;
+    private Long questionnaryId;
 
-    @NotNull
     private Integer rate;
-
-    public Boolean getValidated() {
-        return validated;
-    }
-
-    public void setValidated(Boolean validated) {
-        this.validated = validated;
-    }
-
-    private Boolean validated = false;
 
     public Result() {
     }
 
-    public Result(Long userId, Long questionId, Integer rate) {
+    public Result(Long userId, Long questionnaryId, Integer rate) {
         this.userId = userId;
-        this.questionId = questionId;
+        this.questionnaryId = questionnaryId;
         this.rate = rate;
     }
 
-    public Long getQuestionId() {
-        return questionId;
+    public Long getQuestionnaryId() {
+        return questionnaryId;
     }
 
-    public void setQuestionId(Long question_id) {
-        this.questionId = question_id;
+    public void setQuestionnaryId(Long questionnaryId) {
+        this.questionnaryId = questionnaryId;
     }
 
     public Long getId() {

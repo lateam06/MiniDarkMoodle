@@ -2,17 +2,11 @@ package fr.uca.springbootstrap.controllers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import fr.uca.springbootstrap.models.modules.Module;
-import fr.uca.springbootstrap.models.modules.questions.Questionnary;
+import fr.uca.springbootstrap.models.modules.questions.*;
 import fr.uca.springbootstrap.models.users.User;
 import fr.uca.springbootstrap.payload.response.MessageResponse;
 
-import fr.uca.springbootstrap.models.modules.questions.CodeRunner;
-
 import fr.uca.springbootstrap.payload.request.CodeRequest;
-
-import fr.uca.springbootstrap.models.modules.questions.OpenQuestion;
-import fr.uca.springbootstrap.models.modules.questions.QCM;
-import fr.uca.springbootstrap.models.modules.questions.Question;
 
 import fr.uca.springbootstrap.payload.request.CreateNewOpenRequest;
 import fr.uca.springbootstrap.payload.request.CreateNewQCMRequest;
@@ -263,7 +257,32 @@ public class QuestionController {
         }
 
         Questionnary questionnary = oquestionnary.get();
-        int grade = questionnary.getStudentGrade(userid);
-        return ResponseEntity.ok(new MessageResponse(String.format("student grade is %d", grade)));
+//        int grade = questionnary.getStudentGrade(userid);
+//        return ResponseEntity.ok(new MessageResponse(String.format("student grade is %d", grade)));
+        return ResponseEntity.ok(new MessageResponse("student grade is ???"));
     }
+
+//    public void validateQuestionnary(Long studentId) {
+//        int rate = 0;
+//        for (Question question : questionSet) {
+//            for (Attempt attempt : question.getAttempts()) {
+//                if (attempt.computeResult())
+//                    rate ++;
+//            }
+//        }
+//        Result result = new Result(studentId, rate);
+//    }
+//
+//    public int getStudentGrade(long studentId) {
+//        // TODO parcourir les attempts de toutes les questions.
+//        // TODO Stocker le résultat dans results.
+////        for (Question question : questionSet) {
+////            for (Result result : results) {
+////                if(result.getUserId() == studentId && result.getValidated()) {
+////                    return result.getRate();
+////                }
+////            }
+////        }
+//        return -1;
+//    }
 }

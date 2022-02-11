@@ -3,6 +3,7 @@ package fr.uca.springbootstrap.models.modules.questions;
 import fr.uca.springbootstrap.models.modules.Resource;
 
 import javax.persistence.*;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -14,6 +15,9 @@ public class Questionnary extends Resource {
             joinColumns = @JoinColumn(name = "questionnary_id"),
             inverseJoinColumns = @JoinColumn(name = "question_id"))
     private Set<Question> questionSet;
+
+    @OneToMany(targetEntity = Result.class, mappedBy = "userId", fetch = FetchType.LAZY)
+    private List<Result> results;
 
     public Questionnary(String name) {
         super(name);
@@ -30,15 +34,12 @@ public class Questionnary extends Resource {
         this.questionSet = questionSet;
     }
 
-    public int getStudentGrade(long studentId) {
-        for (Question question : questionSet) {
-            for (Result result : question.getResults()) {
-                if(result.getUserId() == studentId && result.getValidated()) {
-                    return result.getRate();
-                }
-            }
-        }
-        return -1;
+    public List<Result> getResults() {
+        return results;
+    }
+
+    public void setResults(List<Result> results) {
+        this.results = results;
     }
 
     public static String generateUrl(Long moduleId, Long questionnaryId) {

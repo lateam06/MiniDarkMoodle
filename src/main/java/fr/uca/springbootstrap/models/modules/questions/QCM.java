@@ -17,6 +17,7 @@ public class QCM extends Question {
             inverseJoinColumns = @JoinColumn(name = "response_id"))
     private Set<QCMResponse> responses;
 
+
     public QCM(String name, String description, String response) {
         super(name, description);
         this.response = response;
