@@ -218,12 +218,14 @@ public class AddQuestionStepDefs extends SpringIntegration {
         Questionnary questionnary = questionnaryRepository.findByName(questionnaireName).get();
         Module module = moduleRepository.findByName(moduleName).get();
 
-        CreateNewQCMRequest qcm = new CreateNewQCMRequest(qcmName, "description du cours", "reponse a la question");
-        String url = "http://localhost:8080/api/module/" + module.getId() + "/resources/" + questionnary.getId() + "/newQcm";
-        String token = authController.generateJwt(user.getUsername(), PASSWORD);
-        executePost(url, qcm, token);
-        System.out.println("http already : "+  EntityUtils.toString(latestHttpResponse.getEntity()));
-        EntityUtils.consume(latestHttpResponse.getEntity());
+        if(questionRepository.findByName(qcmName).isEmpty()) {
+            CreateNewQCMRequest qcm = new CreateNewQCMRequest(qcmName, "description du cours", "reponse a la question");
+            String url = "http://localhost:8080/api/module/" + module.getId() + "/resources/" + questionnary.getId() + "/newQcm";
+            String token = authController.generateJwt(user.getUsername(), PASSWORD);
+            executePost(url, qcm, token);
+            System.out.println("http already : " + EntityUtils.toString(latestHttpResponse.getEntity()));
+            EntityUtils.consume(latestHttpResponse.getEntity());
+        }
     }
 
     @And("{string} has already registered an Open {string} to the questionnaire {string} of the module {string}")
@@ -232,11 +234,22 @@ public class AddQuestionStepDefs extends SpringIntegration {
         Questionnary questionnary = questionnaryRepository.findByName(questionnaireName).get();
         Module module = moduleRepository.findByName(moduleName).get();
 
-        CreateNewOpenRequest openRequest = new CreateNewOpenRequest(openName, "description du cours", "reponse a la question");
-        String url = "http://localhost:8080/api/module/" + module.getId() + "/resources/" + questionnary.getId() + "/newOpen";
-        String token = authController.generateJwt(user.getUsername(), PASSWORD);
-        executePost(url, openRequest, token);
-        System.out.println("http already : "+  EntityUtils.toString(latestHttpResponse.getEntity()));
-        EntityUtils.consume(latestHttpResponse.getEntity());
+        if(questionRepository.findByName(openName).isEmpty()) {
+            CreateNewOpenRequest openRequest = new CreateNewOpenRequest(openName, "description du cours", "reponse a la question");
+            String url = "http://localhost:8080/api/module/" + module.getId() + "/resources/" + questionnary.getId() + "/newOpen";
+            String token = authController.generateJwt(user.getUsername(), PASSWORD);
+            executePost(url, openRequest, token);
+            System.out.println("http already : " + EntityUtils.toString(latestHttpResponse.getEntity()));
+            EntityUtils.consume(latestHttpResponse.getEntity());
+        }
+    }
+
+    @Then("the Question {string} is not deleted from the questionnaire {string} of the module {string}")
+    public void theQuestionIsNotDeletedFromTheQuestionnaireOfTheModule(String questionName, String questionnaireName, String moduleName) {
+        Optional<Question> questionOptional = questionRepository.findByName(questionName);
+        Questionnary questionnary = questionnaryRepository.findByName(questionnaireName).get();
+        Module module = moduleRepository.findByName(moduleName).get();
+        assertTrue(questionRepository.findByName(questionName).isPresent());
+        assertTrue(latestHttpResponse.getStatusLine().getStatusCode() >= 400);
     }
 }

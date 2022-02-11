@@ -49,13 +49,20 @@ Feature: AddQuestion
     Scenario: Teacher want to delete an Open on a questionnaire of his module
       Given "Marcel" has registered the questionnaire "Examens Pointeurs" to the module "le C pour les nuls"
       And "Marcel" has already registered an Open "Integer Size" to the questionnaire "Examens Pointeurs" of the module "le C pour les nuls"
-      When "Marcel" wants to delete a Question "Integer size" from the questionnaire "Examens Pointeurs" of the module "le C pour les nuls"
-      Then the Question "Integer size" is deleted from the questionnaire "Examens Pointeurs" of the module "le C pour les nuls"
+      When "Marcel" wants to delete a Question "Integer Size" from the questionnaire "Examens Pointeurs" of the module "le C pour les nuls"
+      Then the Question "Integer Size" is deleted from the questionnaire "Examens Pointeurs" of the module "le C pour les nuls"
 
     Scenario: Student want to delete a QCM on a questionnaire of his module
+      Given "Marcel" has registered the questionnaire "Examens Pointeurs" to the module "le C pour les nuls"
+      And "Marcel" has already registered a QCM "Syntaxe" to the questionnaire "Examens Pointeurs" of the module "le C pour les nuls"
+      When "Louis" wants to delete a Question "Syntaxe" from the questionnaire "Examens Pointeurs" of the module "le C pour les nuls"
+      Then the Question "Syntaxe" is not deleted from the questionnaire "Examens Pointeurs" of the module "le C pour les nuls"
 
     Scenario: Student want to delete an Open on a questionnaire of his module*/
-
+      Given "Marcel" has registered the questionnaire "Examens Pointeurs" to the module "le C pour les nuls"
+      And "Marcel" has already registered an Open "Integer Size" to the questionnaire "Examens Pointeurs" of the module "le C pour les nuls"
+      When "Louis" wants to delete a Question "Integer size" from the questionnaire "Examens Pointeurs" of the module "le C pour les nuls"
+      Then the Question "Integer size" is not deleted from the questionnaire "Examens Pointeurs" of the module "le C pour les nuls"
 
 
   Scenario: Teacher want to get a QCM from his questionnaire of his module
