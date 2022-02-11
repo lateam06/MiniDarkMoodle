@@ -1,18 +1,16 @@
 package fr.uca.springbootstrap;
 
 import fr.uca.springbootstrap.controllers.AuthController;
-import fr.uca.springbootstrap.models.users.ERole;
+
 import fr.uca.springbootstrap.models.modules.Module;
-import fr.uca.springbootstrap.models.users.Role;
+
 import fr.uca.springbootstrap.models.users.User;
 import fr.uca.springbootstrap.repository.ModuleRepository;
 import fr.uca.springbootstrap.repository.RoleRepository;
 import fr.uca.springbootstrap.repository.UserRepository;
-import io.cucumber.java.en.And;
-import io.cucumber.java.en.Given;
+
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
-import org.apache.http.util.EntityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -54,7 +52,6 @@ public class RegisterStudentStepDefs  extends  SpringIntegration{
         String jwt = authController.generateJwt(arg0, PASSWORD);
 
         executePost("http://localhost:8080/api/module/"+module.getId()+"/participants/"+user.getId(), jwt);
-        EntityUtils.consume(latestHttpResponse.getEntity());
     }
 
 }
