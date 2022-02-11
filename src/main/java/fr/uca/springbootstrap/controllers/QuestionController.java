@@ -10,6 +10,7 @@ import fr.uca.springbootstrap.payload.request.CodeRequest;
 
 import fr.uca.springbootstrap.payload.request.CreateNewOpenRequest;
 import fr.uca.springbootstrap.payload.request.CreateNewQCMRequest;
+import fr.uca.springbootstrap.payload.response.ResultResponse;
 import fr.uca.springbootstrap.repository.*;
 
 import fr.uca.springbootstrap.security.services.jwt.JwtUtils;
@@ -26,6 +27,7 @@ import javax.persistence.DiscriminatorValue;
 import javax.validation.Valid;
 import java.security.Principal;
 import java.util.Optional;
+import java.util.Set;
 
 
 @RestController
@@ -70,6 +72,11 @@ public class QuestionController {
 
     @Autowired
     CodeRunnerRepository codeRunnerRepository;
+
+
+
+    @Autowired
+    ResultRepository resultRepository;
 
     private ResponseEntity<?> checkModuleQuestionnaryUser(Principal principal, long moduleId, long resourcesId) {
         Optional<Module> optionalModule = moduleRepository.findById(moduleId);
@@ -263,6 +270,41 @@ public class QuestionController {
 //        return ResponseEntity.ok(new MessageResponse(String.format("student grade is %d", grade)));
         return ResponseEntity.ok(new MessageResponse("student grade is ???"));
     }
+
+    @GetMapping("/{moduleId}/resources/{questionnaryId}/validate")
+    public ResponseEntity<?> validateQuestionnary(Principal principal, @PathVariable long moduleId, @PathVariable long questionnaryId){
+        Optional<Module> omodule = moduleRepository.findById(moduleId);
+        Optional<Questionnary> oquestionnary = questionnaryRepository.findById(questionnaryId);
+        User actor = userRepository.findByUsername(principal.getName()).get();
+
+        if(omodule.isEmpty() ||oquestionnary.isEmpty()){
+            return ResponseEntity.notFound().build();
+        }
+        Module mod = omodule.get();
+        Questionnary questionnary = oquestionnary.get();
+        if(!mod.getParticipants().contains(actor)){
+            return ResponseEntity.status(403).body(new MessageResponse("User unregistered to the module"));
+        }
+
+        Set<Question> questionSet = questionnary.getQuestionSet();
+        int rate = 0;
+        for (Question question : questionSet) {
+            for (Attempt attempt : question.getAttempts()) {
+                if (attempt.computeResult())
+                    rate ++;
+            }
+        }
+        Result result = new Result(actor.getId(),questionnaryId, rate);
+        questionnary.getResults().add(result);
+        questionnaryRepository.save(questionnary);
+        resultRepository.save(result);
+
+        return ResponseEntity.accepted().body(new ResultResponse(result.getRate()));
+
+    }
+
+
+
 
 //    public void validateQuestionnary(Long studentId) {
 //        int rate = 0;
