@@ -45,7 +45,7 @@ public class User {
 			inverseJoinColumns = @JoinColumn(name = "module_id"))
 	private Set<Module> modules = new HashSet<>();
 
-	public List<Module> listmod(){
+	public List<Module> getModules(){
 		return	new ArrayList<>(modules);
 
 

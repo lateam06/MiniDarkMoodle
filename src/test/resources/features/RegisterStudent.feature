@@ -1,12 +1,12 @@
 Feature: Register Student
 
   Background:
-    Given a teacher with login "steve"
-    And a student with login "Bruce"
+    Given a teacher named "Steve"
+    And a student named "Bruce"
     And a module named "Gestion de projet"
 
   Scenario: Register Student
-    When "steve" registers "Bruce" as a student to module "Gestion de projet"
+    When "Steve" registers "Bruce" as a student to module "Gestion de projet"
     Then the last request status is 200
     And "Bruce" is registered to module "Gestion de projet"
 

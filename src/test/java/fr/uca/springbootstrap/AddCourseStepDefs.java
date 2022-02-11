@@ -1,7 +1,5 @@
 package fr.uca.springbootstrap;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.uca.springbootstrap.controllers.AuthController;
 import fr.uca.springbootstrap.models.modules.Module;
 import fr.uca.springbootstrap.models.modules.Resource;
@@ -10,13 +8,11 @@ import fr.uca.springbootstrap.models.users.ERole;
 import fr.uca.springbootstrap.models.users.Role;
 import fr.uca.springbootstrap.models.users.User;
 import fr.uca.springbootstrap.payload.request.ResourceRequest;
-import fr.uca.springbootstrap.payload.response.MessageResponse;
 import fr.uca.springbootstrap.repository.*;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
-import org.apache.http.util.EntityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -26,7 +22,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.IOException;
 import java.util.HashSet;
-import java.util.Optional;
 
 public class AddCourseStepDefs extends SpringIntegration {
     private static final String PASSWORD = "password";
@@ -53,12 +48,11 @@ public class AddCourseStepDefs extends SpringIntegration {
     CourseRepository courseRepository;
 
 
-
-    @Given("a teacher named {string} with ID {int}")
-    public void aTeacherNamedWithID(String arg0, int arg1) {
+    @Given("a teacher named {string}")
+    public void aTeacherNamedWithID(String arg0) {
         User user = userRepository.findByUsername(arg0).
                 orElse(new User(arg0, arg0 + "@test.fr", encoder.encode(PASSWORD)));
-        user.setRoles(new HashSet<Role>() {{
+        user.setRoles(new HashSet<>() {{
             add(roleRepository.findByName(ERole.ROLE_TEACHER).
                     orElseThrow(() -> new RuntimeException("Error: Role is not found.")));
         }});
@@ -67,11 +61,11 @@ public class AddCourseStepDefs extends SpringIntegration {
 
     }
 
-    @And("a Student named {string}")
+    @Given("a student named {string}")
     public void aStudentNamed(String arg0) {
         User user = userRepository.findByUsername(arg0).
                 orElse(new User(arg0, arg0 + "@test.fr", encoder.encode(PASSWORD)));
-        user.setRoles(new HashSet<Role>() {{
+        user.setRoles(new HashSet<>() {{
             add(roleRepository.findByName(ERole.ROLE_STUDENT).
                     orElseThrow(() -> new RuntimeException("Error: Role is not found.")));
         }});
@@ -80,32 +74,13 @@ public class AddCourseStepDefs extends SpringIntegration {
     }
 
 
-    @And("a module with ID {string}")
-    public void aModuleWithID(String arg0) {
-        Module module = moduleRepository.findByName(arg0).orElse(new Module(arg0));
-        module.setParticipants(new HashSet<>());
-        moduleRepository.save(module);
-    }
-
-    @And("a course with name {string} with a description {string}")
-    public void aCourseWithName(String arg0,String arg1) throws IOException {
+    @And("a course named {string} with a description {string}")
+    public void aCourseWithName(String arg0, String arg1) {
         Course course = courseRepository.findByName(arg0).orElse(new Course(arg0));
         course.setDescription(arg1);
         courseRepository.save(course);
-//        resources r = resourcesRepository.findByName(arg0).orElse(new resources(arg0, EType.COURSE));
-//        resourcesRepository.save(r);
-
     }
 
-
-    @Given("{string} is the teacher registered to the module {string}")
-    public void isTheTeacherRegisteredToTheModule(String arg0, String arg1) throws IOException {
-        Module module = moduleRepository.findByName(arg1).get();
-        User user = userRepository.findByUsername(arg0).get();
-        String jwt = authController.generateJwt(arg0, PASSWORD);
-        executePost("http://localhost:8080/api/module/" + module.getId() + "/participants/" + user.getId(), jwt);
-//        System.out.println("ajout du prof , debug " + latestHttpResponse.getStatusLine().getStatusCode());
-    }
 
     @Then("The course {string} is added to the module {string}")
     public void theCourseIsAddedToTheModule(String arg0, String arg1) {
@@ -114,6 +89,7 @@ public class AddCourseStepDefs extends SpringIntegration {
         System.out.println(module.getResources());
         assertTrue(module.getResources().contains(course));
     }
+
     @When("{string} wants to add the course {string} to the module {string}")
     public void wantsToAddTheCourseToTheModule(String arg0, String arg1, String arg2) throws IOException {
         User user = userRepository.findByUsername(arg0).get();
@@ -122,8 +98,6 @@ public class AddCourseStepDefs extends SpringIntegration {
         Course course = courseRepository.findByName(arg1).get();
         executePost("http://localhost:8080/api/module/" + module.getId() + "/resources/" + course.getId(), jwt);
     }
-
-
 
 
     @When("{string} wants to delete the course {string} from the module {string}")
@@ -154,8 +128,6 @@ public class AddCourseStepDefs extends SpringIntegration {
         executeDelete("http://localhost:8080/api/module/" + module.getId() + "/resources/" + course.getId(), jwt);
 
 
-
-
     }
 
 
@@ -184,13 +156,13 @@ public class AddCourseStepDefs extends SpringIntegration {
 
 
     @When("{string} adds the course {string} to the post request to the module {string}")
-    public void addsTheCourseObjectToThePostRequestToTheModule(String arg0,String courseName ,String arg1) throws IOException {
+    public void addsTheCourseObjectToThePostRequestToTheModule(String arg0, String courseName, String arg1) throws IOException {
         String jwt = authController.generateJwt(arg0, PASSWORD);
         Module mod = moduleRepository.findByName(arg1).get();
         Course course = new Course(courseName);
         String disc = course.getClass().getAnnotation(DiscriminatorValue.class).value();
-        ResourceRequest re = new ResourceRequest(course.getName(),disc,"",true,null,null);
-        executePost("http://localhost:8080/api/module/"+mod.getId()+"/resources/",re,jwt);
+        ResourceRequest re = new ResourceRequest(course.getName(), disc, "", true, null, null);
+        executePost("http://localhost:8080/api/module/" + mod.getId() + "/resources/", re, jwt);
 //        MessageResponse message =  ObjMapper.readValue(latestJson,MessageResponse.class);
 //        System.out.println(latestJson);
 
@@ -203,7 +175,6 @@ public class AddCourseStepDefs extends SpringIntegration {
         Module mod = moduleRepository.findByName(arg2).get();
         Course course = courseRepository.findByName(arg1).get();
         assertTrue(mod.getResources().contains(course));
-
 
 
     }

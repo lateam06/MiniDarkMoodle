@@ -38,14 +38,6 @@ public class RegisterStudentStepDefs  extends  SpringIntegration{
     @Autowired
     PasswordEncoder encoder;
 
-    @And("a student with login {string}")
-    public void aStudentWithLogin(String arg0) {
-        User user = userRepository.findByUsername(arg0).
-                orElse(new User(arg0, arg0 + "@test.fr", encoder.encode(PASSWORD)));
-        user.setRoles(new HashSet<Role>(){{ add(roleRepository.findByName(ERole.ROLE_STUDENT).
-                orElseThrow(() -> new RuntimeException("Error: Role is not found"))); }});
-        userRepository.save(user);
-    }
 
 
     @When("{string} registers {string} as a student to module {string}")
