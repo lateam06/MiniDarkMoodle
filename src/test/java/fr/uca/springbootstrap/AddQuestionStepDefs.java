@@ -5,6 +5,7 @@ import fr.uca.springbootstrap.controllers.AuthController;
 import fr.uca.springbootstrap.models.modules.Module;
 import fr.uca.springbootstrap.models.modules.questions.OpenQuestion;
 import fr.uca.springbootstrap.models.modules.questions.QCM;
+import fr.uca.springbootstrap.models.modules.questions.Question;
 import fr.uca.springbootstrap.models.modules.questions.Questionnary;
 import fr.uca.springbootstrap.models.users.User;
 import fr.uca.springbootstrap.payload.request.CreateNewOpenRequest;
@@ -20,6 +21,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.IOException;
+import java.util.Optional;
 
 public class AddQuestionStepDefs extends SpringIntegration {
 
@@ -49,6 +51,9 @@ public class AddQuestionStepDefs extends SpringIntegration {
 
     @Autowired
     QuestionnaryRepository questionnaryRepository;
+
+    @Autowired
+    QuestionRepository questionRepository;
 
     @Autowired
     QCMRepository qcmRepository;
@@ -183,22 +188,28 @@ public class AddQuestionStepDefs extends SpringIntegration {
         executePost("http://localhost:8080/api/module/" + module.getId() + "/participants/" + user.getId(), jwt);
     }
 
-    @When("{string} wants to delete a QCM {string} from the questionnaire {string} of the module {string}")
-    public void wantsToDeleteAQCMFromTheQuestionnaireOfTheModule(String userName, String qcmName, String questionnaireName, String moduleName) throws IOException {
+    @When("{string} wants to delete a Question {string} from the questionnaire {string} of the module {string}")
+    public void wantsToDeleteAQuestionFromTheQuestionnaireOfTheModule(String userName, String questionName, String questionnaireName, String moduleName) throws IOException {
         User user = userRepository.findByUsername(userName).get();
         Questionnary questionnary = questionnaryRepository.findByName(questionnaireName).get();
         Module module = moduleRepository.findByName(moduleName).get();
-        QCM qcm = qcmRepository.findByName(qcmName).get();
+        Optional<OpenQuestion> optionalOpenQuestion = openQuestionRepository.findByName(questionName);
+        Optional<QCM> optionalQCM = qcmRepository.findByName(questionName);
+        Question question = questionRepository.findByName(questionName).get();
 
-        String url = "http://localhost:8080/api/module/" + module.getId() + "/resources/" + questionnary.getId() + "/" + qcm.getId();
+        String url = "http://localhost:8080/api/module/" + module.getId() + "/resources/" + questionnary.getId() + "/" + question.getId();
         String token = authController.generateJwt(userName, PASSWORD);
         executeDelete(url, token);
+        System.out.println("http deleted : "+  EntityUtils.toString(latestHttpResponse.getEntity()));
         EntityUtils.consume(latestHttpResponse.getEntity());
     }
 
-    @Then("the QCM {string} is deleted from the questionnaire {string} of the module {string}")
-    public void theQCMIsDeletedFromTheQuestionnaireOfTheModule(String qcmName, String questionnaireName, String moduleName) {
-        assertFalse(qcmRepository.findByName(qcmName).isPresent());
+    @Then("the Question {string} is deleted from the questionnaire {string} of the module {string}")
+    public void theQuestionIsDeletedFromTheQuestionnaireOfTheModule(String questionName, String questionnaireName, String moduleName) {
+        Optional<Question> questionOptional = questionRepository.findByName(questionName);
+        Questionnary questionnary = questionnaryRepository.findByName(questionnaireName).get();
+        Module module = moduleRepository.findByName(moduleName).get();
+        assertFalse(questionRepository.findByName(questionName).isPresent());
     }
 
     @And("{string} has already registered a QCM {string} to the questionnaire {string} of the module {string}")
@@ -211,7 +222,7 @@ public class AddQuestionStepDefs extends SpringIntegration {
         String url = "http://localhost:8080/api/module/" + module.getId() + "/resources/" + questionnary.getId() + "/newQcm";
         String token = authController.generateJwt(user.getUsername(), PASSWORD);
         executePost(url, qcm, token);
-        System.out.println("http: "+  EntityUtils.toString(latestHttpResponse.getEntity()));
+        System.out.println("http already : "+  EntityUtils.toString(latestHttpResponse.getEntity()));
         EntityUtils.consume(latestHttpResponse.getEntity());
     }
 
@@ -225,7 +236,7 @@ public class AddQuestionStepDefs extends SpringIntegration {
         String url = "http://localhost:8080/api/module/" + module.getId() + "/resources/" + questionnary.getId() + "/newOpen";
         String token = authController.generateJwt(user.getUsername(), PASSWORD);
         executePost(url, openRequest, token);
-        System.out.println("http: "+  EntityUtils.toString(latestHttpResponse.getEntity()));
+        System.out.println("http already : "+  EntityUtils.toString(latestHttpResponse.getEntity()));
         EntityUtils.consume(latestHttpResponse.getEntity());
     }
 }
