@@ -11,9 +11,4 @@ public class SpringBootSecurityPostgresqlApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(SpringBootSecurityPostgresqlApplication.class, args);
 	}
-
-	@Bean
-	public RestTemplate getRestTemplate() {
-		return new RestTemplate();
-	}
 }
