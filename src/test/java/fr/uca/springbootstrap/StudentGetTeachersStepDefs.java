@@ -36,7 +36,7 @@ public class StudentGetTeachersStepDefs extends SpringIntegration{
         User student = userRepository.findByUsername(arg0).get();
         Module module = moduleRepository.findByName(arg1).get();
 
-        String url = "http://localhost:8080/api/module/" + module.getId() + "/getTeacher";
+        String url = "http://localhost:8080/api/module/" + module.getId() + "/teachers";
         String jwt = authController.generateJwt(student.getUsername(), PASSWORD);
 
         executeGet(url, jwt);

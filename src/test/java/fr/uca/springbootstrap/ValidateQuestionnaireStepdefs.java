@@ -56,20 +56,14 @@ public class ValidateQuestionnaireStepdefs extends SpringIntegration  {
     @Autowired
     OpenQuestionRepository openQuestionRepository;
 
-
-
-
     @When("{string} validate his questionnary {string} of the module {string}")
     public void validateHisQuestionnaryOfTheModule(String arg0, String arg1, String arg2) throws IOException {
         User student = userRepository.findByUsername(arg0).get();
         Questionnary quest = questionnaryRepository.findByName(arg1).get();
         Module mod = moduleRepository.findByName(arg2).get();
         String token = authController.generateJwt(student.getUsername(), PASSWORD);
-        executeGet("http://localhost:8080/api/module/"+mod.getId()+"/resources/"+quest.getId()+"/validate",token);
-
+        executePost("http://localhost:8080/api/module/"+mod.getId()+"/resources/"+quest.getId(),token);
     }
-
-
 
     @Then("he gets a {int} because he's bad")
     public void heGetsABecauseHeSBad(int arg0) throws JsonProcessingException {

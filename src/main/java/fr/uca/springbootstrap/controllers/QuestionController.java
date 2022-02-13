@@ -73,8 +73,6 @@ public class QuestionController {
     @Autowired
     CodeRunnerRepository codeRunnerRepository;
 
-
-
     @Autowired
     ResultRepository resultRepository;
 
@@ -109,27 +107,7 @@ public class QuestionController {
         return null;
     }
 
-    @PostMapping("/{moduleId}/resources/{resourcesId}/newQcm")
-    @PreAuthorize("hasRole('TEACHER')")
-    public ResponseEntity<?> createNewQCM(Principal principal, @PathVariable long moduleId, @PathVariable long resourcesId, @Valid @RequestBody CreateNewQCMRequest cnqRequest) {
-        var responseCheck = checkModuleQuestionnaryUser(principal, moduleId, resourcesId);
-        if (responseCheck != null)
-            return responseCheck;
-
-        Questionnary questionnary = questionnaryRepository.findById(resourcesId).get();
-        QCM qcm = qcmRepository.findByName(cnqRequest.getName()).orElse(new QCM(cnqRequest.getName(), cnqRequest.getDescription(), cnqRequest.getResponse()));
-
-        if (questionnary.getQuestionSet().contains(qcm)) {
-            return ResponseEntity.badRequest().body("Error: this qcm is already on the questionnaire");
-        }
-
-        questionnary.getQuestionSet().add(qcm);
-        qcmRepository.save(qcm);
-        questionnaryRepository.save(questionnary);
-        return ResponseEntity.ok(new MessageResponse("QCM added succesfully!"));
-    }
-
-    @PostMapping("/{moduleId}/resources/{resourcesId}/newOpen")
+    @PostMapping("/{moduleId}/resources/{resourcesId}/open_question")
     @PreAuthorize("hasRole('TEACHER')")
     public ResponseEntity<?> createNewOpen(Principal principal, @PathVariable long moduleId, @PathVariable long resourcesId, @Valid @RequestBody CreateNewOpenRequest cnoRequest) {
         var responseCheck = checkModuleQuestionnaryUser(principal, moduleId, resourcesId);
@@ -154,7 +132,27 @@ public class QuestionController {
         return ResponseEntity.ok(new MessageResponse("OpenQuestion added succesfully!"));
     }
 
-    @GetMapping("/{moduleId}/resources/{resourcesId}/{questionId}")
+    @PostMapping("/{moduleId}/resources/{resourcesId}/qcm")
+    @PreAuthorize("hasRole('TEACHER')")
+    public ResponseEntity<?> createNewQCM(Principal principal, @PathVariable long moduleId, @PathVariable long resourcesId, @Valid @RequestBody CreateNewQCMRequest cnqRequest) {
+        var responseCheck = checkModuleQuestionnaryUser(principal, moduleId, resourcesId);
+        if (responseCheck != null)
+            return responseCheck;
+
+        Questionnary questionnary = questionnaryRepository.findById(resourcesId).get();
+        QCM qcm = qcmRepository.findByName(cnqRequest.getName()).orElse(new QCM(cnqRequest.getName(), cnqRequest.getDescription(), cnqRequest.getResponse()));
+
+        if (questionnary.getQuestionSet().contains(qcm)) {
+            return ResponseEntity.badRequest().body("Error: this qcm is already on the questionnaire");
+        }
+
+        questionnary.getQuestionSet().add(qcm);
+        qcmRepository.save(qcm);
+        questionnaryRepository.save(questionnary);
+        return ResponseEntity.ok(new MessageResponse("QCM added succesfully!"));
+    }
+
+    @GetMapping("/{moduleId}/resources/{resourcesId}/questions/{questionId}")
     public ResponseEntity<?> getQuestion(Principal principal, @PathVariable long moduleId, @PathVariable long resourcesId, @PathVariable long questionId) {
         var responseCheck = checkModuleQuestionnaryUser(principal, moduleId, resourcesId);
         if (responseCheck != null)
@@ -187,7 +185,7 @@ public class QuestionController {
         }
     }
 
-    @DeleteMapping("/{moduleId}/resources/{resourcesId}/{questionId}")
+    @DeleteMapping("/{moduleId}/resources/{resourcesId}/questions/{questionId}")
     @PreAuthorize("hasRole('TEACHER')")
     public ResponseEntity<?> deleteQuestion(Principal principal, @PathVariable long moduleId, @PathVariable long resourcesId, @PathVariable long questionId) {
         var responseCheck = checkModuleQuestionnaryUser(principal, moduleId, resourcesId);
@@ -211,7 +209,7 @@ public class QuestionController {
         return ResponseEntity.ok("Question deleted.");
     }
 
-    @PostMapping("/{moduleId}/resources/{resourcesId}/{questionId}/sendCode")
+    @PostMapping("/{moduleId}/resources/{resourcesId}/questions/{questionId}/code")
     public ResponseEntity<?> submitCode(Principal principal, @PathVariable long moduleId, @PathVariable long resourcesId, @PathVariable long questionId, @Valid @RequestBody CodeRequest body) {
         Optional<CodeRunner> orunner = codeRunnerRepository.findById(questionId);
         Optional<Module> omodule = moduleRepository.findById(moduleId);
@@ -271,7 +269,7 @@ public class QuestionController {
         return ResponseEntity.ok(new MessageResponse("student grade is ???"));
     }
 
-    @GetMapping("/{moduleId}/resources/{questionnaryId}/validate")
+    @PostMapping("/{moduleId}/resources/{questionnaryId}")
     public ResponseEntity<?> validateQuestionnary(Principal principal, @PathVariable long moduleId, @PathVariable long questionnaryId){
         Optional<Module> omodule = moduleRepository.findById(moduleId);
         Optional<Questionnary> oquestionnary = questionnaryRepository.findById(questionnaryId);

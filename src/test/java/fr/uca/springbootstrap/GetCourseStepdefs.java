@@ -56,7 +56,7 @@ public class GetCourseStepdefs extends SpringIntegration  {
         String jwt = authController.generateJwt(arg1, PASSWORD);
         Module module = moduleRepository.findByName(arg2).get();
         Course course = courseRepository.findByName(arg0).get();
-        executePost("http://localhost:8080/api/module/" + module.getId() + "/resources/" + course.getId(), jwt);
+        executePut("http://localhost:8080/api/module/" + module.getId() + "/resources/" + course.getId(), jwt);
 
 
 
@@ -69,7 +69,7 @@ public class GetCourseStepdefs extends SpringIntegration  {
         String jwt = authController.generateJwt(arg0, PASSWORD);
         Module module = moduleRepository.findByName(arg2).get();
         Course course = courseRepository.findByName(arg1).get();
-        executePost("http://localhost:8080/api/module/" + module.getId() + "/resources/" + course.getId(), jwt);
+        executePut("http://localhost:8080/api/module/" + module.getId() + "/resources/" + course.getId(), jwt);
     }
     @Then("the course is not added and the return status of the request is {int}")
     public void theCourseIsNotAddedAndTheReturnStatusOfTheRequestIs(int status) {
@@ -131,7 +131,7 @@ public class GetCourseStepdefs extends SpringIntegration  {
         String jwt = authController.generateJwt(arg0, PASSWORD);
         Module module = moduleRepository.findByName(arg2).get();
         courseRepository.save(cours);
-        executePost("http://localhost:8080/api/module/" + module.getId() + "/resources/" + cours.getId(),jwt);
+        executePut("http://localhost:8080/api/module/" + module.getId() + "/resources/" + cours.getId(),jwt);
     }
 
 

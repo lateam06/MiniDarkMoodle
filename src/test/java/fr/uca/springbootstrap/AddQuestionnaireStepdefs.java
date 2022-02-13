@@ -55,7 +55,7 @@ public class AddQuestionnaireStepdefs extends  SpringIntegration {
         String jwt = authController.generateJwt(arg0, PASSWORD);
         Module module = moduleRepository.findByName(arg2).get();
         Questionnary questionnary = questionnaryRepository.findByName(arg1).get();
-        executePost("http://localhost:8080/api/module/" + module.getId() + "/resources/" + questionnary.getId(), jwt);
+        executePut("http://localhost:8080/api/module/" + module.getId() + "/resources/" + questionnary.getId(), jwt);
     }
 
     @Then("The questionnaire {string} is added to the module {string}")

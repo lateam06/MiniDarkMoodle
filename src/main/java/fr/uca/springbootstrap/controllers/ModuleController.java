@@ -1,6 +1,5 @@
 package fr.uca.springbootstrap.controllers;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.uca.springbootstrap.models.modules.Module;
 import fr.uca.springbootstrap.models.modules.Resource;
@@ -11,7 +10,6 @@ import fr.uca.springbootstrap.models.users.Role;
 import fr.uca.springbootstrap.models.users.User;
 import fr.uca.springbootstrap.payload.request.CreateModuleRequest;
 import fr.uca.springbootstrap.payload.request.ResourceRequest;
-import fr.uca.springbootstrap.payload.request.SignupRequest;
 import fr.uca.springbootstrap.payload.response.MessageResponse;
 import fr.uca.springbootstrap.payload.response.TeacherResponse;
 import fr.uca.springbootstrap.repository.*;
@@ -61,9 +59,9 @@ public class ModuleController {
     QuestionnaryRepository questionnaryRepository;
 
 
-    @GetMapping("/{id}/resources/{resourcesId}")
-    public ResponseEntity<?> getResourceByModule(@PathVariable long id, @PathVariable long resourcesId) {
-        Optional<Module> omodule = moduleRepository.findById(id);
+    @GetMapping("/{moduleId}/resources/{resourcesId}")
+    public ResponseEntity<?> getResourceByModule(@PathVariable long moduleId, @PathVariable long resourcesId) {
+        Optional<Module> omodule = moduleRepository.findById(moduleId);
         Optional<Resource> oresource = resourcesRepository.findById(resourcesId);
         if (omodule.isEmpty()) {
             return ResponseEntity
@@ -99,22 +97,11 @@ public class ModuleController {
     }
 
 
-    @GetMapping("/users/{userId}")
-    public ResponseEntity<?> getUsers(@PathVariable long userId) {
-        Optional<User> ouser = userRepository.findById(userId);
-
-        User us = ouser.get();
-        ObjectMapper Obj = new ObjectMapper();
-        return ResponseEntity.ok(us);
-
-
-    }
-
-    @GetMapping("/{moduleId}/participants/{userid}/getSingleUser")
+    @GetMapping("/{moduleId}/participants/{userId}")
     @PreAuthorize("hasRole('TEACHER')")
-    public ResponseEntity<?> getSingleModuleUser(@PathVariable long moduleId, @PathVariable long userid) {
+    public ResponseEntity<?> getSingleModuleUser(@PathVariable long moduleId, @PathVariable long userId) {
         Optional<Module> omodule = moduleRepository.findById(moduleId);
-        Optional<User> ouser = userRepository.findById(userid);
+        Optional<User> ouser = userRepository.findById(userId);
 
         if (omodule.isEmpty()) {
             return ResponseEntity
@@ -138,7 +125,7 @@ public class ModuleController {
         return ResponseEntity.ok(user);
     }
 
-    @GetMapping("/{moduleId}/participants/getAllUsers")
+    @GetMapping("/{moduleId}/participants")
     @PreAuthorize("hasRole('TEACHER')")
     public ResponseEntity<?> getAllModuleUsers(Principal principal, @PathVariable long moduleId) {
         Optional<Module> omodule = moduleRepository.findById(moduleId);
@@ -162,10 +149,10 @@ public class ModuleController {
     }
 
 
-    @PostMapping("/{id}/participants/{userid}")
+    @PostMapping("/{moduleId}/participants/{userid}")
     @PreAuthorize("hasRole('TEACHER')")
-    public ResponseEntity<?> addUserToModule(Principal principal, @PathVariable long id, @PathVariable long userid) {
-        Optional<Module> omodule = moduleRepository.findById(id);
+    public ResponseEntity<?> addUserToModule(Principal principal, @PathVariable long moduleId, @PathVariable long userid) {
+        Optional<Module> omodule = moduleRepository.findById(moduleId);
         Optional<User> ouser = userRepository.findById(userid);
         if (omodule.isEmpty()) {
             return ResponseEntity
@@ -195,7 +182,7 @@ public class ModuleController {
         return ResponseEntity.ok(new MessageResponse("User successfully added to module!"));
     }
 
-    @PostMapping("/createModule")
+    @PostMapping("")
     @PreAuthorize("hasRole('TEACHER')")
     public ResponseEntity<?> createNewModule(@Valid @RequestBody CreateModuleRequest moduleRequest) {
         Optional<Module> omodule = moduleRepository.findByName(moduleRequest.getName());
@@ -212,10 +199,10 @@ public class ModuleController {
         return ResponseEntity.accepted().body(new MessageResponse("Module successfully created"));
     }
 
-    @PostMapping("/{id}/resources/{resourcesId}")
+    @PutMapping("/{moduleId}/resources/{resourcesId}")
     @PreAuthorize("hasRole('TEACHER')")
-    public ResponseEntity<?> addResourceToModule(Principal principal, @PathVariable long id, @PathVariable long resourcesId) {
-        Optional<Module> omodule = moduleRepository.findById(id);
+    public ResponseEntity<?> updateResourceToModule(Principal principal, @PathVariable long moduleId, @PathVariable long resourcesId) {
+        Optional<Module> omodule = moduleRepository.findById(moduleId);
         Optional<Resource> oresource = resourcesRepository.findById(resourcesId);
         if (omodule.isEmpty()) {
             return ResponseEntity
@@ -248,10 +235,10 @@ public class ModuleController {
     }
 
 
-    @PostMapping("/{id}/resources/")
+    @PostMapping("/{moduleId}/resources")
     @PreAuthorize("hasRole('TEACHER')")
-    public ResponseEntity<?> addResourceToModule(@PathVariable long id, @RequestBody ResourceRequest body) {
-        Optional<Module> omodule = moduleRepository.findById(id);
+    public ResponseEntity<?> updateResourceToModule(@PathVariable long moduleId, @RequestBody ResourceRequest body) {
+        Optional<Module> omodule = moduleRepository.findById(moduleId);
         if (omodule.isEmpty()) {
             return ResponseEntity.notFound().build();
         } else {
@@ -283,10 +270,10 @@ public class ModuleController {
     }
 
 
-    @DeleteMapping("/{id}/resources/{resourcesId}")
+    @DeleteMapping("/{moduleId}/resources/{resourcesId}")
     @PreAuthorize("hasRole('TEACHER')")
-    public ResponseEntity<?> removeResourceFromModule(@PathVariable long id, @PathVariable long resourcesId) {
-        Optional<Module> omodule = moduleRepository.findById(id);
+    public ResponseEntity<?> removeResourceFromModule(@PathVariable long moduleId, @PathVariable long resourcesId) {
+        Optional<Module> omodule = moduleRepository.findById(moduleId);
         Optional<Resource> oresource = resourcesRepository.findById(resourcesId);
         if (omodule.isEmpty()) {
             return ResponseEntity
@@ -320,7 +307,7 @@ public class ModuleController {
 
     }
 
-    @DeleteMapping("/{moduleId}/participants/{userId}/deleteUser")
+    @DeleteMapping("/{moduleId}/participants/{userId}")
     @PreAuthorize("hasRole('TEACHER')")
     public ResponseEntity<?> removeUser(Principal principal, @PathVariable long moduleId, @PathVariable long userId) {
         Optional<Module> omodule = moduleRepository.findById(moduleId);
@@ -353,7 +340,7 @@ public class ModuleController {
         return ResponseEntity.ok((new MessageResponse("User successfully remove from module")));
     }
 
-    @DeleteMapping("/{moduleId}/deleteModule")
+    @DeleteMapping("/{moduleId}")
     @PreAuthorize("hasRole('TEACHER')")
     public ResponseEntity<?> removeModule(Principal principal, @PathVariable long moduleId) {
         Optional<Module> omodule = moduleRepository.findById(moduleId);
@@ -378,7 +365,7 @@ public class ModuleController {
         return ResponseEntity.ok(new MessageResponse("Module successfully remove"));
     }
 
-    @GetMapping("/{moduleId}/getModule")
+    @GetMapping("/{moduleId}")
     @PreAuthorize("hasRole('TEACHER')")
     public ResponseEntity<?> getModuleInformation(@PathVariable long moduleId) {
         Optional<Module> omodule = moduleRepository.findById(moduleId);
@@ -394,7 +381,7 @@ public class ModuleController {
         return ResponseEntity.ok(module);
     }
 
-    @GetMapping("/{moduleId}/getTeacher")
+    @GetMapping("/{moduleId}/teachers")
     @PreAuthorize("hasRole('STUDENT')")
     public ResponseEntity<?> getModuleTeacher(Principal principal, @PathVariable long moduleId) {
         Optional<Module> omodule = moduleRepository.findById(moduleId);
@@ -460,27 +447,5 @@ public class ModuleController {
         }
         user.setRoles(roles);
         return user;
-    }
-
-    @PostMapping("/signup")
-    public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest signUpRequest) {
-        if (userRepository.existsByUsername(signUpRequest.getUsername())) {
-            return ResponseEntity
-                    .badRequest()
-                    .body(new MessageResponse("Error: Username is already taken!"));
-        }
-
-        if (userRepository.existsByEmail(signUpRequest.getEmail())) {
-            return ResponseEntity
-                    .badRequest()
-                    .body(new MessageResponse("Error: Email is already in use!"));
-        }
-
-        // Create new user's account
-        User user = createUser(signUpRequest.getUsername(),
-                signUpRequest.getEmail(),
-                encoder.encode(signUpRequest.getPassword()), signUpRequest.getRole());
-        userRepository.save(user);
-        return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
     }
 }
