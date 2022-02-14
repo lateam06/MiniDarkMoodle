@@ -1,8 +1,8 @@
 package fr.lateam.auth.springbootsrap.security;
 
-import fr.uca.springbootstrap.security.services.UserDetailsServiceImpl;
-import fr.uca.springbootstrap.security.services.jwt.AuthEntryPointJwt;
-import fr.uca.springbootstrap.security.services.jwt.AuthTokenFilter;
+import fr.lateam.auth.springbootsrap.security.services.UserDetailsServiceImpl;
+import fr.lateam.auth.springbootsrap.security.services.jwt.AuthEntryPointJwt;
+import fr.lateam.auth.springbootsrap.security.services.jwt.AuthTokenFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

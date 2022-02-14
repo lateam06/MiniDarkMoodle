@@ -1,8 +1,10 @@
 package fr.lateam.auth.springbootsrap.security.services;
 
-import fr.uca.springbootstrap.models.users.User;
-import fr.uca.springbootstrap.repository.UserRepository;
+import fr.lateam.auth.springbootsrap.models.users.User;
+import fr.lateam.auth.springbootsrap.repository.UserRepository;
+
 import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -19,6 +21,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
   public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
     User user = userRepository.findByUsername(username)
         .orElseThrow(() -> new UsernameNotFoundException("User Not Found with username: " + username));
+
 
     return UserDetailsImpl.build(user);
   }

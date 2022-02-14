@@ -17,7 +17,6 @@ import javax.validation.constraints.Size;
 		})
 public class User {
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
 	@NotBlank
@@ -60,6 +59,13 @@ public class User {
 		this.password = password;
 	}
 
+
+	public User(long id ,String username, String email, String password){
+		this.id = id ;
+		this.username = username;
+		this.email = email;
+		this.password = password;
+	}
 
 	public Long getId() {
 		return id;

@@ -1,9 +1,9 @@
 package fr.lateam.auth.springbootsrap.security.services;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import fr.lateam.auth.springbootsrap.models.AuthUser;
+
 import fr.lateam.auth.springbootsrap.models.users.User;
-import fr.uca.springbootstrap.models.users.User;
+
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;

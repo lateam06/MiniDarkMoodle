@@ -1,16 +1,15 @@
 package fr.lateam.auth.springbootsrap.controllers;
-
-import fr.uca.springbootstrap.models.users.ERole;
-import fr.uca.springbootstrap.models.users.Role;
-import fr.uca.springbootstrap.models.users.User;
-import fr.uca.springbootstrap.payload.request.LoginRequest;
-import fr.uca.springbootstrap.payload.request.SignupRequest;
-import fr.uca.springbootstrap.payload.response.JwtResponse;
-import fr.uca.springbootstrap.payload.response.MessageResponse;
-import fr.uca.springbootstrap.repository.RoleRepository;
-import fr.uca.springbootstrap.repository.UserRepository;
-import fr.uca.springbootstrap.security.services.UserDetailsImpl;
-import fr.uca.springbootstrap.security.services.jwt.JwtUtils;
+import fr.lateam.auth.springbootsrap.models.users.ERole;
+import fr.lateam.auth.springbootsrap.models.users.Role;
+import fr.lateam.auth.springbootsrap.models.users.User;
+import fr.lateam.auth.springbootsrap.payload.request.LoginRequest;
+import fr.lateam.auth.springbootsrap.payload.request.SignupRequest;
+import fr.lateam.auth.springbootsrap.payload.response.JwtResponse;
+import fr.lateam.auth.springbootsrap.payload.response.MessageResponse;
+import fr.lateam.auth.springbootsrap.repository.UserRepository;
+import fr.lateam.auth.springbootsrap.repository.RoleRepository;
+import fr.lateam.auth.springbootsrap.security.services.UserDetailsImpl;
+import fr.lateam.auth.springbootsrap.security.services.jwt.JwtUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -43,7 +42,7 @@ public class AuthController {
 	PasswordEncoder encoder;
 
 	@Autowired
-    JwtUtils jwtUtils;
+	JwtUtils jwtUtils;
 
 	private Authentication authentication;
 
@@ -57,7 +56,7 @@ public class AuthController {
 	@PostMapping("/signin")
 	public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
 		String jwt = generateJwt(loginRequest.getUsername(), loginRequest.getPassword());
-		UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();		
+		UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
 		List<String> roles = userDetails.getAuthorities().stream()
 				.map(item -> item.getAuthority())
 				.collect(Collectors.toList());
@@ -122,6 +121,6 @@ public class AuthController {
 							 signUpRequest.getEmail(),
 							 encoder.encode(signUpRequest.getPassword()), signUpRequest.getRole());
 		userRepository.save(user);
-		return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
+		return ResponseEntity.ok(user);
 	}
 }

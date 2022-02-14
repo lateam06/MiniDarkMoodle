@@ -1,6 +1,6 @@
 package fr.lateam.auth.springbootsrap.security.services.jwt;
 
-import fr.uca.springbootstrap.security.services.UserDetailsImpl;
+import fr.lateam.auth.springbootsrap.security.services.UserDetailsImpl;
 import io.jsonwebtoken.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
