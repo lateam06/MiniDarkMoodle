@@ -5,7 +5,6 @@ import fr.uca.springbootstrap.models.modules.Module;
 import fr.uca.springbootstrap.models.modules.Resource;
 import fr.uca.springbootstrap.models.modules.courses.Course;
 import fr.uca.springbootstrap.models.users.ERole;
-import fr.uca.springbootstrap.models.users.Role;
 import fr.uca.springbootstrap.models.users.User;
 import fr.uca.springbootstrap.payload.request.ResourceRequest;
 import fr.uca.springbootstrap.repository.*;
@@ -96,7 +95,7 @@ public class AddCourseStepDefs extends SpringIntegration {
         String jwt = authController.generateJwt(arg0, PASSWORD);
         Module module = moduleRepository.findByName(arg2).get();
         Course course = courseRepository.findByName(arg1).get();
-        executePost("http://localhost:8080/api/module/" + module.getId() + "/resources/" + course.getId(), jwt);
+        executePut("http://localhost:8080/api/module/" + module.getId() + "/resources/" + course.getId(), jwt);
     }
 
 
@@ -107,8 +106,6 @@ public class AddCourseStepDefs extends SpringIntegration {
         Module module = moduleRepository.findByName(arg2).get();
         Resource course = resourcesRepository.findByName(arg1).get();
         executeDelete("http://localhost:8080/api/module/" + module.getId() + "/resources/" + course.getId(), jwtStudent);
-
-
     }
 
     @Then("the course {string} is deleted from the module {string}")
@@ -126,8 +123,6 @@ public class AddCourseStepDefs extends SpringIntegration {
         Module module = moduleRepository.findByName(arg2).get();
         Resource course = resourcesRepository.findByName(arg1).get();
         executeDelete("http://localhost:8080/api/module/" + module.getId() + "/resources/" + course.getId(), jwt);
-
-
     }
 
 
@@ -162,35 +157,14 @@ public class AddCourseStepDefs extends SpringIntegration {
         Course course = new Course(courseName);
         String disc = course.getClass().getAnnotation(DiscriminatorValue.class).value();
         ResourceRequest re = new ResourceRequest(course.getName(), disc, "", true, null, null);
-        executePost("http://localhost:8080/api/module/" + mod.getId() + "/resources/", re, jwt);
-//        MessageResponse message =  ObjMapper.readValue(latestJson,MessageResponse.class);
-//        System.out.println(latestJson);
-
+        executePost("http://localhost:8080/api/module/" + mod.getId() + "/resources", re, jwt);
     }
 
     @Then("{string} check that the {string} course has been added correcty in {string}")
     public void checkThatTheCourseHasBeenAddedCorrectyIn(String arg0, String arg1, String arg2) {
-
         String jwt = authController.generateJwt(arg0, PASSWORD);
         Module mod = moduleRepository.findByName(arg2).get();
         Course course = courseRepository.findByName(arg1).get();
         assertTrue(mod.getResources().contains(course));
-
-
     }
-
-
-//    @And("a course {string} has already been added by {string} in the module {string}")
-//    public void aCourseHasAlreadyBeenAddedByInTheModule(String courseName, String teacherName, String moduleName) throws IOException {
-//        /*User user = userRepository.findByUsername(teacherName).get();
-//        //String jwt = authController.generateJwt(teacherName, PASSWORD);
-//        Module module = moduleRepository.findByName(moduleName).get();
-//        resources course = resourcesRepository.findByName(courseName).orElse(new resources(courseName, EType.COURSE));
-//        resourcesRepository.save(course);
-//
-//        executePost("http://localhost:8080/api/module/" + module.getId() + "/resources/" + course.getId(), jwt);
-//
-//        //module = moduleRepository.findByName(moduleName).get();
-//        //assertTrue(module.getresources().contains(course));*/
-//    }
 }

@@ -8,6 +8,7 @@ import io.cucumber.spring.CucumberContextConfiguration;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
@@ -44,7 +45,16 @@ public class SpringIntegration {
 
     }
 
+    void executePut(String url, String jwt) throws IOException {
+        HttpPut request = new HttpPut(url);
+        request.addHeader("Accept", "application/json");
+        if (jwt != null) {
+            request.addHeader("Authorization", "Bearer " + jwt);
+        }
 
+        latestHttpResponse = httpClient.execute(request);
+        latestJson = EntityUtils.toString(latestHttpResponse.getEntity());
+    }
 
     void executePost(String url, String jwt) throws IOException {
         HttpPost request = new HttpPost(url);
@@ -54,6 +64,7 @@ public class SpringIntegration {
         }
         request.setEntity(new StringEntity("{}"));
         latestHttpResponse = httpClient.execute(request);
+        latestJson = EntityUtils.toString(latestHttpResponse.getEntity());
     }
 
     void executePost(String url, Object obj ,String jwt) throws IOException {

@@ -64,7 +64,7 @@ public class ModuleTestStepDefs extends SpringIntegration {
         CreateModuleRequest createModuleRequest = new CreateModuleRequest(arg1);
         String jwt = authController.generateJwt(arg0, PASSWORD);
 
-        executePost("http://localhost:8080/api/module/createModule", createModuleRequest, jwt);
+        executePost("http://localhost:8080/api/module", createModuleRequest, jwt);
         EntityUtils.consume(latestHttpResponse.getEntity());
         assertTrue(moduleRepository.findByName(arg1).isPresent());
     }

@@ -68,7 +68,7 @@ public class AddQuestionStepDefs extends SpringIntegration {
         Module module = moduleRepository.findByName(moduleName).get();
 
         String token = authController.generateJwt(teacherName, PASSWORD);
-        executePost(Questionnary.generateUrl(module.getId(), questionnary.getId()), token);
+        executePut(Questionnary.generateUrl(module.getId(), questionnary.getId()), token);
         EntityUtils.consume(latestHttpResponse.getEntity());
 
         module = moduleRepository.findByName(moduleName).get();
@@ -82,7 +82,7 @@ public class AddQuestionStepDefs extends SpringIntegration {
         Module module = moduleRepository.findByName(moduleName).get();
 
         CreateNewQCMRequest qcm = new CreateNewQCMRequest(qcmName, "description du cours", "reponse a la question");
-        String url = "http://localhost:8080/api/module/" + module.getId() + "/resources/" + questionnary.getId() + "/newQcm";
+        String url = "http://localhost:8080/api/module/" + module.getId() + "/resources/" + questionnary.getId() + "/qcm";
         String token = authController.generateJwt(user.getUsername(), PASSWORD);
         executePost(url, qcm, token);
         System.out.println("http: "+  EntityUtils.toString(latestHttpResponse.getEntity()));
@@ -111,7 +111,7 @@ public class AddQuestionStepDefs extends SpringIntegration {
         Module module = moduleRepository.findByName(moduleName).get();
 
         CreateNewOpenRequest openRequest = new CreateNewOpenRequest(openName, "description du cours", "reponse a la question");
-        String url = "http://localhost:8080/api/module/" + module.getId() + "/resources/" + questionnary.getId() + "/newOpen";
+        String url = "http://localhost:8080/api/module/" + module.getId() + "/resources/" + questionnary.getId() + "/open_question";
         String token = authController.generateJwt(user.getUsername(), PASSWORD);
         executePost(url, openRequest, token);
         System.out.println("http: "+  EntityUtils.toString(latestHttpResponse.getEntity()));
@@ -140,7 +140,7 @@ public class AddQuestionStepDefs extends SpringIntegration {
         Module module = moduleRepository.findByName(moduleName).get();
         QCM qcm = qcmRepository.findByName(qcmName).get();
 
-        String url = "http://localhost:8080/api/module/" + module.getId() + "/resources/" + questionnary.getId() + "/" + qcm.getId();
+        String url = "http://localhost:8080/api/module/" + module.getId() + "/resources/" + questionnary.getId() + "/questions/" + qcm.getId();
         String token = authController.generateJwt(userName, PASSWORD);
         executeGet(url, token);
         EntityUtils.consume(latestHttpResponse.getEntity());
@@ -159,7 +159,7 @@ public class AddQuestionStepDefs extends SpringIntegration {
         Module module = moduleRepository.findByName(moduleName).get();
         OpenQuestion open = openQuestionRepository.findByName(openName).get();
 
-        String url = "http://localhost:8080/api/module/" + module.getId() + "/resources/" + questionnary.getId() + "/" + open.getId();
+        String url = "http://localhost:8080/api/module/" + module.getId() + "/resources/" + questionnary.getId() + "/questions/" + open.getId();
         String token = authController.generateJwt(userName, PASSWORD);
         executeGet(url, token);
         EntityUtils.consume(latestHttpResponse.getEntity());
@@ -180,7 +180,7 @@ public class AddQuestionStepDefs extends SpringIntegration {
         Optional<QCM> optionalQCM = qcmRepository.findByName(questionName);
         Question question = questionRepository.findByName(questionName).get();
 
-        String url = "http://localhost:8080/api/module/" + module.getId() + "/resources/" + questionnary.getId() + "/" + question.getId();
+        String url = "http://localhost:8080/api/module/" + module.getId() + "/resources/" + questionnary.getId() + "/questions/" + question.getId();
         String token = authController.generateJwt(userName, PASSWORD);
         executeDelete(url, token);
         System.out.println("http deleted : "+  EntityUtils.toString(latestHttpResponse.getEntity()));
@@ -203,7 +203,7 @@ public class AddQuestionStepDefs extends SpringIntegration {
 
         if(questionRepository.findByName(qcmName).isEmpty()) {
             CreateNewQCMRequest qcm = new CreateNewQCMRequest(qcmName, "description du cours", "reponse a la question");
-            String url = "http://localhost:8080/api/module/" + module.getId() + "/resources/" + questionnary.getId() + "/newQcm";
+            String url = "http://localhost:8080/api/module/" + module.getId() + "/resources/" + questionnary.getId() + "/qcm";
             String token = authController.generateJwt(user.getUsername(), PASSWORD);
             executePost(url, qcm, token);
             System.out.println("http already : " + EntityUtils.toString(latestHttpResponse.getEntity()));
@@ -219,7 +219,7 @@ public class AddQuestionStepDefs extends SpringIntegration {
 
         if(questionRepository.findByName(openName).isEmpty()) {
             CreateNewOpenRequest openRequest = new CreateNewOpenRequest(openName, "description du cours", "reponse a la question");
-            String url = "http://localhost:8080/api/module/" + module.getId() + "/resources/" + questionnary.getId() + "/newOpen";
+            String url = "http://localhost:8080/api/module/" + module.getId() + "/resources/" + questionnary.getId() + "/open_question";
             String token = authController.generateJwt(user.getUsername(), PASSWORD);
             executePost(url, openRequest, token);
             System.out.println("http already : " + EntityUtils.toString(latestHttpResponse.getEntity()));
