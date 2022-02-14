@@ -27,8 +27,6 @@ public class SpringIntegration {
     private final CloseableHttpClient httpClient = HttpClients.createDefault();
     protected HttpResponse latestHttpResponse;
     protected ObjectMapper ObjMapper = new ObjectMapper();
-    @Autowired
-    RestTemplate restTemplate;
 
     protected String latestJson;
 

@@ -40,9 +40,6 @@ public class GetCourseStepdefs extends SpringIntegration  {
     @Autowired
     CourseRepository courseRepository;
 
-    @Autowired
-    RestTemplate restTemplate;
-
     @And("a course with name {string}")
     public void aCourseWithName(String arg0) throws IOException {
         Course course = courseRepository.findByName(arg0).orElse(new Course(arg0));
