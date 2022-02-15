@@ -228,6 +228,7 @@ public class QuestionController {
 
     }
 
+
     @PostMapping("/{moduleId}/resources/{questionnaryId}/qcm/{qcmId}")
     public ResponseEntity<?> answerQcm(Principal principal, @PathVariable long moduleId, @PathVariable long questionnaryId, @PathVariable long qcmId, @Valid @RequestBody AnswerQCMRequest answer) {
         var oqcm = qcmRepository.findById(qcmId);
@@ -271,11 +272,15 @@ public class QuestionController {
                         .body(new MessageResponse("Error : this answer don't belongs to the qcm."));
             }
 
-            System.out.println(qcm);
-            System.out.println(actor.getId());
-
             QCMAttempt qcmAttempt = new QCMAttempt(qcm.getId(), actor.getId());
             qcmAttempt.setStudentAttempt(answer.getResponse());
+
+            var oqcmAttempt = qcmAttemptRepository.findByQuestionIdAndUserId(qcm.getId(), actor.getId());
+            if (oqcmAttempt.isPresent()) {
+                qcm.getAttempts().remove(oqcmAttempt.get());
+                qcmAttemptRepository.delete(oqcmAttempt.get());
+            }
+
             qcm.getAttempts().add(qcmAttempt);
             qcmAttemptRepository.save(qcmAttempt);
             qcmRepository.save(qcm);

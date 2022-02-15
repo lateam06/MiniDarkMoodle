@@ -13,7 +13,7 @@ public class Attempt {
     @Column(name = "id", nullable = false)
     private Long id;
 
-    private Long userId;
+    protected Long userId;
 
     protected Long questionId;
 

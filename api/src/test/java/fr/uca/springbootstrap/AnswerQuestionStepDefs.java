@@ -3,6 +3,7 @@ package fr.uca.springbootstrap;
 import fr.uca.springbootstrap.controllers.AuthController;
 import fr.uca.springbootstrap.models.modules.Module;
 import fr.uca.springbootstrap.models.modules.questions.QCM;
+import fr.uca.springbootstrap.models.modules.questions.QCMAttempt;
 import fr.uca.springbootstrap.models.modules.questions.QCMResponse;
 import fr.uca.springbootstrap.models.modules.questions.Questionnary;
 import fr.uca.springbootstrap.models.users.UserApi;
@@ -17,6 +18,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.io.IOException;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 
 public class AnswerQuestionStepDefs extends SpringIntegration {
@@ -112,12 +115,16 @@ public class AnswerQuestionStepDefs extends SpringIntegration {
                 + "/qcm/" + qcm.getId();
         AnswerQCMRequest re = new AnswerQCMRequest(qcmResponse.getId(), qcmResponse.getDescription());
         executePost(url, re, token);
-
-        System.out.println(EntityUtils.toString(latestHttpResponse.getEntity()));
     }
 
     @Then("{string} responsed {string} to the qcm {string} of the questionnaire {string} of the module {string}")
     public void responsedToTheQcmOfTheQuestionnaireOfTheModule(String arg0, String arg1, String arg2, String arg3, String arg4) {
+        UserApi user = userApiRepository.findByUsername(arg0).get();
+        QCM qcm = qcmRepository.findByName(arg2).get();
 
+        QCMAttempt qcmAttempt = qcmAttemptRepository.findByQuestionIdAndUserId(qcm.getId(), user.getId()).get();
+        assertNotNull(qcmAttempt);
+        assertEquals(arg1, qcmAttempt.getStudentAttempt());
+        assertEquals(200, latestHttpResponse.getStatusLine().getStatusCode());
     }
 }
