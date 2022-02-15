@@ -1,12 +1,12 @@
 package fr.uca.springbootstrap;
 
+import fr.uca.springbootstrap.payload.request.ResourceRequest;
 import fr.uca.springbootstrap.controllers.AuthController;
 import fr.uca.springbootstrap.models.modules.Module;
 import fr.uca.springbootstrap.models.modules.Resource;
 import fr.uca.springbootstrap.models.modules.courses.Course;
 import fr.uca.springbootstrap.models.users.ERole;
 import fr.uca.springbootstrap.models.users.User;
-import fr.uca.springbootstrap.payload.request.ResourceRequest;
 import fr.uca.springbootstrap.repository.*;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;

@@ -1,11 +1,11 @@
 package fr.lateam.auth.springbootsrap.controllers;
+import com.lateam.payload.request.LoginRequest;
+import com.lateam.payload.request.SignupRequest;
+import com.lateam.payload.response.JwtResponse;
+import com.lateam.payload.response.MessageResponse;
 import fr.lateam.auth.springbootsrap.models.users.ERole;
 import fr.lateam.auth.springbootsrap.models.users.Role;
 import fr.lateam.auth.springbootsrap.models.users.User;
-import fr.lateam.auth.springbootsrap.payload.request.LoginRequest;
-import fr.lateam.auth.springbootsrap.payload.request.SignupRequest;
-import fr.lateam.auth.springbootsrap.payload.response.JwtResponse;
-import fr.lateam.auth.springbootsrap.payload.response.MessageResponse;
 import fr.lateam.auth.springbootsrap.repository.UserRepository;
 import fr.lateam.auth.springbootsrap.repository.RoleRepository;
 import fr.lateam.auth.springbootsrap.security.services.UserDetailsImpl;

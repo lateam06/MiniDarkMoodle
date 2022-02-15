@@ -1,4 +1,4 @@
-package fr.uca.springbootstrap.payload.response;
+package com.lateam.payload.response;
 
 public class MessageResponse {
 	private String message;

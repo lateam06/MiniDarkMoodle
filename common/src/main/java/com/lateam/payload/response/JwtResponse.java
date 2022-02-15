@@ -1,4 +1,4 @@
-package fr.lateam.auth.springbootsrap.payload.response;
+package com.lateam.payload.response;
 
 import java.util.List;
 

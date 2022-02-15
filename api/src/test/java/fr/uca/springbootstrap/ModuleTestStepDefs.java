@@ -1,9 +1,9 @@
 package fr.uca.springbootstrap;
 
+import fr.uca.springbootstrap.payload.request.CreateModuleRequest;
 import fr.uca.springbootstrap.controllers.AuthController;
 import fr.uca.springbootstrap.models.modules.Module;
 import fr.uca.springbootstrap.models.users.User;
-import fr.uca.springbootstrap.payload.request.CreateModuleRequest;
 import fr.uca.springbootstrap.repository.*;
 import io.cucumber.java.en.*;
 import org.apache.http.util.EntityUtils;

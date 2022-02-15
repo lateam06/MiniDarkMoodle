@@ -1,10 +1,9 @@
 package fr.uca.springbootstrap.controllers;
 
+import com.lateam.payload.response.MessageResponse;
 import fr.uca.springbootstrap.models.modules.Module;
 import fr.uca.springbootstrap.models.modules.questions.*;
 import fr.uca.springbootstrap.models.users.User;
-import fr.uca.springbootstrap.payload.response.MessageResponse;
-
 import fr.uca.springbootstrap.payload.request.CodeRequest;
 
 import fr.uca.springbootstrap.payload.request.CreateNewOpenRequest;

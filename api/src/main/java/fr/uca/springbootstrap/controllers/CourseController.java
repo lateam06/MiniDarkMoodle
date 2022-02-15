@@ -1,12 +1,12 @@
 package fr.uca.springbootstrap.controllers;
 
+import com.lateam.payload.response.MessageResponse;
 import fr.uca.springbootstrap.models.modules.Module;
 import fr.uca.springbootstrap.models.modules.Resource;
 import fr.uca.springbootstrap.models.modules.courses.Course;
 import fr.uca.springbootstrap.models.modules.courses.Text;
 import fr.uca.springbootstrap.models.users.User;
 import fr.uca.springbootstrap.payload.request.CreateTextRequest;
-import fr.uca.springbootstrap.payload.response.MessageResponse;
 import fr.uca.springbootstrap.repository.*;
 import fr.uca.springbootstrap.security.services.jwt.JwtUtils;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,4 +1,4 @@
-package fr.uca.springbootstrap.payload.request;
+package com.lateam.payload.request;
 
 import javax.validation.constraints.NotBlank;
 

@@ -1,6 +1,7 @@
 package fr.uca.springbootstrap.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.lateam.payload.response.MessageResponse;
 import fr.uca.springbootstrap.models.modules.Module;
 import fr.uca.springbootstrap.models.modules.Resource;
 import fr.uca.springbootstrap.models.modules.courses.Course;
@@ -10,7 +11,6 @@ import fr.uca.springbootstrap.models.users.Role;
 import fr.uca.springbootstrap.models.users.User;
 import fr.uca.springbootstrap.payload.request.CreateModuleRequest;
 import fr.uca.springbootstrap.payload.request.ResourceRequest;
-import fr.uca.springbootstrap.payload.response.MessageResponse;
 import fr.uca.springbootstrap.payload.response.TeacherResponse;
 import fr.uca.springbootstrap.repository.*;
 import fr.uca.springbootstrap.security.services.jwt.JwtUtils;

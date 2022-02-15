@@ -1,19 +1,19 @@
 package fr.uca.springbootstrap;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import fr.uca.springbootstrap.payload.response.ResultResponse;
 import fr.uca.springbootstrap.controllers.AuthController;
 import fr.uca.springbootstrap.models.modules.Module;
 import fr.uca.springbootstrap.models.modules.questions.Questionnary;
 import fr.uca.springbootstrap.models.users.User;
-import fr.uca.springbootstrap.payload.response.ResultResponse;
 import fr.uca.springbootstrap.repository.*;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 import java.io.IOException;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class ValidateQuestionnaireStepdefs extends SpringIntegration  {
     private static final String PASSWORD = "password";

@@ -1,7 +1,6 @@
 package fr.uca.springbootstrap.controllers;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -10,14 +9,13 @@ import java.util.stream.Collectors;
 import javax.validation.Valid;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import fr.uca.springbootstrap.models.modules.courses.Course;
+import com.lateam.payload.request.LoginRequest;
+import com.lateam.payload.request.SignupRequest;
+import com.lateam.payload.response.JwtResponse;
+import com.lateam.payload.response.MessageResponse;
 import fr.uca.springbootstrap.models.users.ERole;
 import fr.uca.springbootstrap.models.users.Role;
 import fr.uca.springbootstrap.models.users.User;
-import fr.uca.springbootstrap.payload.request.LoginRequest;
-import fr.uca.springbootstrap.payload.request.SignupRequest;
-import fr.uca.springbootstrap.payload.response.JwtResponse;
-import fr.uca.springbootstrap.payload.response.MessageResponse;
 import fr.uca.springbootstrap.security.services.jwt.JwtUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
