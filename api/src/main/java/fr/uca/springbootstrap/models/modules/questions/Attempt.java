@@ -1,7 +1,6 @@
 package fr.uca.springbootstrap.models.modules.questions;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotBlank;
 
 @Entity
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
@@ -14,17 +13,14 @@ public class Attempt {
     @Column(name = "id", nullable = false)
     private Long id;
 
-    @NotBlank
-    private Long userId;
+    protected Long userId;
 
-    @ManyToOne
-    @JoinColumn(name = "question_id")
-    protected Question question;
+    protected Long questionId;
 
-    private String student_attempt;
+    private String studentAttempt;
 
-    public Attempt(Question question, Long userId) {
-        this.question = question;
+    public Attempt(Long questionId, Long userId) {
+        this.questionId = questionId;
         this.userId = userId;
     }
 
@@ -39,12 +35,12 @@ public class Attempt {
         return id;
     }
 
-    public String getStudent_attempt() {
-        return student_attempt;
+    public String getStudentAttempt() {
+        return studentAttempt;
     }
 
-    public void setStudent_attempt(String student_attempt) {
-        this.student_attempt = student_attempt;
+    public void setStudentAttempt(String student_attempt) {
+        this.studentAttempt = student_attempt;
     }
 
     public void setId(Long id) {
@@ -59,8 +55,8 @@ public class Attempt {
         this.userId = userId;
     }
 
-    public void setQuestion(Question question) {
-        this.question = question;
+    public void setQuestionId(Long questionId) {
+        this.questionId = questionId;
     }
 
 }

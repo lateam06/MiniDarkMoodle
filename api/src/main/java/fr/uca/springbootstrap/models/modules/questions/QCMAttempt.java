@@ -8,6 +8,13 @@ import javax.persistence.Entity;
 @DiscriminatorValue("qcm_attempt")
 public class QCMAttempt extends Attempt{
 
+    public QCMAttempt(Long questionId, Long userId) {
+        super(questionId, userId);
+    }
+
+    public QCMAttempt() {
+    }
+
     @Override
     public boolean computeResult() {
         return true;

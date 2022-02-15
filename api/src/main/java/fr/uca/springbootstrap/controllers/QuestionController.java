@@ -4,6 +4,7 @@ import com.lateam.payload.response.MessageResponse;
 import fr.uca.springbootstrap.models.modules.Module;
 import fr.uca.springbootstrap.models.modules.questions.*;
 import fr.uca.springbootstrap.models.users.UserApi;
+import fr.uca.springbootstrap.payload.request.AnswerQuestionRequest;
 import fr.uca.springbootstrap.payload.request.CodeRequest;
 
 import fr.uca.springbootstrap.payload.request.CreateNewOpenRequest;
@@ -30,7 +31,7 @@ import java.util.Set;
 public class QuestionController {
 
     @Autowired
-    UserApiRepository userRepository;
+    UserApiRepository userApiRepository;
 
     @Autowired
     RoleRepository roleRepository;
@@ -62,6 +63,12 @@ public class QuestionController {
     @Autowired
     ResultRepository resultRepository;
 
+    @Autowired
+    QCMAttemptRepository qcmAttemptRepository;
+
+    @Autowired
+    AttemptRepository attemptRepository;
+
     private ResponseEntity<?> checkModuleQuestionnaryUser(Principal principal, long moduleId, long resourcesId) {
         Optional<Module> optionalModule = moduleRepository.findById(moduleId);
         Optional<Questionnary> optionalQuestionnary = questionnaryRepository.findById(resourcesId);
@@ -80,7 +87,7 @@ public class QuestionController {
             return ResponseEntity.badRequest().body(new MessageResponse("Error: The given questionnary is not found on the given module."));
         }
 
-        Optional<UserApi> optionalUser = userRepository.findByUsername(principal.getName());
+        Optional<UserApi> optionalUser = userApiRepository.findByUsername(principal.getName());
         if (optionalUser.isEmpty()) {
             return ResponseEntity.badRequest().body(new MessageResponse("Error: You're not on the user database."));
         }
@@ -92,6 +99,45 @@ public class QuestionController {
 
         return null;
     }
+
+    private ResponseEntity<?> verifyQuestion(Principal principal, long moduleId, long resourceId, long questionId) {
+        var oqcm = qcmRepository.findById(questionId);
+        var omodule = moduleRepository.findById(moduleId);
+        var oquestionnary = questionnaryRepository.findById(resourceId);
+
+        UserApi actor = userApiRepository.findByUsername(principal.getName()).get();
+
+        if (oqcm.isEmpty() || omodule.isEmpty() || oquestionnary.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        Module mod = omodule.get();
+        Questionnary quest = oquestionnary.get();
+        Question qcm = oqcm.get();
+        if (!mod.getParticipants().contains(actor)) {
+            return ResponseEntity.status(403).body(new MessageResponse("User not registered to this module"));
+        }
+        if (!mod.getResources().contains(quest)) {
+            return ResponseEntity
+                    .badRequest()
+                    .body(new MessageResponse("This questionnary doesn't belong to this module."));
+        }
+        if (!quest.getQuestionSet().contains(qcm)) {
+            return ResponseEntity
+                    .badRequest()
+                    .body(new MessageResponse("This question doesn't belong to this questionnary."));
+        }
+
+        var oresult = resultRepository.findByQuestionnaryIdAndUserId(resourceId, actor.getId());
+
+        if (oresult.isPresent()) {
+            return ResponseEntity
+                    .badRequest()
+                    .body(new MessageResponse("Error : the student already validate the questionnary."));
+        }
+        return null;
+    }
+
 
     @PostMapping("/{moduleId}/resources/{resourcesId}/open_question")
     @PreAuthorize("hasRole('TEACHER')")
@@ -200,7 +246,7 @@ public class QuestionController {
         Optional<CodeRunner> orunner = codeRunnerRepository.findById(questionId);
         Optional<Module> omodule = moduleRepository.findById(moduleId);
         Optional<Questionnary> oquestionnary = questionnaryRepository.findById(resourcesId);
-        UserApi actor = userRepository.findByUsername(principal.getName()).get();
+        UserApi actor = userApiRepository.findByUsername(principal.getName()).get();
 
         if (orunner.isEmpty() || omodule.isEmpty() || oquestionnary.isEmpty()) {
             return ResponseEntity.notFound().build();
@@ -224,12 +270,58 @@ public class QuestionController {
 
     }
 
+
+    @PostMapping("/{moduleId}/resources/{resourceId}/questions/{questionId}")
+    public ResponseEntity<?> answerQcm(Principal principal, @PathVariable long moduleId, @PathVariable long resourceId, @PathVariable long questionId, @Valid @RequestBody AnswerQuestionRequest answer) {
+        var responseEntity = verifyQuestion(principal, moduleId, resourceId, questionId);
+        if (responseEntity != null) {
+            return responseEntity;
+        }
+
+        UserApi actor = userApiRepository.findByUsername(principal.getName()).get();
+        Question question = questionRepository.findById(questionId).get();
+        var oattempt = attemptRepository.findByQuestionIdAndUserId(questionId, actor.getId());
+        if (oattempt.isPresent()) {
+            question.getAttempts().remove(oattempt.get());
+            attemptRepository.delete(oattempt.get());
+        }
+
+        switch (answer.getQuestionType()) {
+            case QCM:
+                QCM qcm = qcmRepository.findById(questionId).get();
+                if (!qcm.containsID(answer.getId())) {
+                    return ResponseEntity
+                            .badRequest()
+                            .body(new MessageResponse("Error : this answer don't belongs to the qcm."));
+                }
+
+                QCMAttempt qcmAttempt = new QCMAttempt(qcm.getId(), actor.getId());
+                qcmAttempt.setStudentAttempt(answer.getResponse());
+
+                qcm.getAttempts().add(qcmAttempt);
+                qcmAttemptRepository.save(qcmAttempt);
+                qcmRepository.save(qcm);
+
+                break;
+
+            case OPEN:
+                break;
+
+            case CODE:
+                break;
+        }
+
+        return ResponseEntity
+                .ok()
+                .body(new MessageResponse("Question answered correctly"));
+    }
+
     @GetMapping("/{moduleId}/resources/{questionnaryId}/result/{userid}")
     @PreAuthorize("hasRole('TEACHER')")
     public ResponseEntity<?> getStudentsResponses(@PathVariable long moduleId, @PathVariable long questionnaryId, @PathVariable long userid) {
         Optional<Module> omodule = moduleRepository.findById(moduleId);
         Optional<Questionnary> oquestionnary = questionnaryRepository.findById(questionnaryId);
-        Optional<UserApi> ouser = userRepository.findById(userid);
+        Optional<UserApi> ouser = userApiRepository.findById(userid);
 
         if (omodule.isEmpty()) {
             return ResponseEntity
@@ -256,17 +348,17 @@ public class QuestionController {
     }
 
     @PostMapping("/{moduleId}/resources/{questionnaryId}")
-    public ResponseEntity<?> validateQuestionnary(Principal principal, @PathVariable long moduleId, @PathVariable long questionnaryId){
+    public ResponseEntity<?> validateQuestionnary(Principal principal, @PathVariable long moduleId, @PathVariable long questionnaryId) {
         Optional<Module> omodule = moduleRepository.findById(moduleId);
         Optional<Questionnary> oquestionnary = questionnaryRepository.findById(questionnaryId);
-        UserApi actor = userRepository.findByUsername(principal.getName()).get();
+        UserApi actor = userApiRepository.findByUsername(principal.getName()).get();
 
-        if(omodule.isEmpty() ||oquestionnary.isEmpty()){
+        if (omodule.isEmpty() || oquestionnary.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
         Module mod = omodule.get();
         Questionnary questionnary = oquestionnary.get();
-        if(!mod.getParticipants().contains(actor)){
+        if (!mod.getParticipants().contains(actor)) {
             return ResponseEntity.status(403).body(new MessageResponse("User unregistered to the module"));
         }
 
@@ -275,20 +367,16 @@ public class QuestionController {
         for (Question question : questionSet) {
             for (Attempt attempt : question.getAttempts()) {
                 if (attempt.computeResult())
-                    rate ++;
+                    rate++;
             }
         }
-        Result result = new Result(actor.getId(),questionnaryId, rate);
+        Result result = new Result(actor.getId(), questionnaryId, rate);
         questionnary.getResults().add(result);
         questionnaryRepository.save(questionnary);
         resultRepository.save(result);
 
         return ResponseEntity.accepted().body(new ResultResponse(result.getRate()));
-
     }
-
-
-
 
 //    public void validateQuestionnary(Long studentId) {
 //        int rate = 0;

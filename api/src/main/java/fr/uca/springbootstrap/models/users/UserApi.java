@@ -15,6 +15,7 @@ import javax.validation.constraints.Size;
 			@UniqueConstraint(columnNames = "username")
 		})
 public class UserApi {
+
 	@Id
 	private Long id;
 

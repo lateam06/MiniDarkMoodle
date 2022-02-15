@@ -26,6 +26,16 @@ public class QCM extends Question {
     public QCM() {
     }
 
+    public boolean containsID(Long id) {
+        for (QCMResponse respons : responses) {
+            if (respons.getId().equals(id)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+
     public String getResponse() {
         return response;
     }
