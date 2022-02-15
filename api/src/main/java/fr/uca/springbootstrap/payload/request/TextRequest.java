@@ -1,14 +1,14 @@
 package fr.uca.springbootstrap.payload.request;
 
-public class CreateTextRequest {
+public class TextRequest {
 
     private String paragraph;
 
-    public CreateTextRequest(String paragraph) {
+    public TextRequest(String paragraph) {
         this.paragraph = paragraph;
     }
 
-    public CreateTextRequest() {
+    public TextRequest() {
     }
 
     public String getParagraph() {

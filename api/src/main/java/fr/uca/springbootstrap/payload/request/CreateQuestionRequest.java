@@ -1,9 +1,12 @@
 package fr.uca.springbootstrap.payload.request;
 
+import fr.uca.springbootstrap.models.modules.questions.EQuestion;
+import fr.uca.springbootstrap.models.modules.questions.Question;
+
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
-public class CreateNewOpenRequest {
+public class CreateQuestionRequest {
 
     @NotBlank
     @Size(max = 20)
@@ -13,17 +16,19 @@ public class CreateNewOpenRequest {
     @Size(max = 256)
     private String description;
 
-    @Size(max = 512)
     private String response;
+    private EQuestion questionType;
 
-    public CreateNewOpenRequest() {
+
+    public CreateQuestionRequest() {
 
     }
 
-    public CreateNewOpenRequest(String name, String description, String response) {
+    public CreateQuestionRequest(String name, String description, String response, EQuestion questionType) {
         this.name = name;
         this.description = description;
         this.response = response;
+        this.questionType = questionType;
     }
 
     public String getName() {
@@ -48,5 +53,13 @@ public class CreateNewOpenRequest {
 
     public void setResponse(String response) {
         this.response = response;
+    }
+
+    public EQuestion getQuestionType() {
+        return questionType;
+    }
+
+    public void setQuestionType(EQuestion questionType) {
+        this.questionType = questionType;
     }
 }

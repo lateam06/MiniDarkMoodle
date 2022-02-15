@@ -5,10 +5,8 @@ import fr.uca.springbootstrap.models.modules.Module;
 import fr.uca.springbootstrap.models.modules.questions.*;
 import fr.uca.springbootstrap.models.users.UserApi;
 import fr.uca.springbootstrap.payload.request.AnswerQuestionRequest;
-import fr.uca.springbootstrap.payload.request.CodeRequest;
 
-import fr.uca.springbootstrap.payload.request.CreateNewOpenRequest;
-import fr.uca.springbootstrap.payload.request.CreateNewQCMRequest;
+import fr.uca.springbootstrap.payload.request.CreateQuestionRequest;
 import fr.uca.springbootstrap.payload.response.ResultResponse;
 import fr.uca.springbootstrap.repository.*;
 
@@ -68,6 +66,12 @@ public class QuestionController {
 
     @Autowired
     AttemptRepository attemptRepository;
+
+    /*
+     * ##########################################
+     * #             VERIFICATION               #
+     * ##########################################
+     */
 
     private ResponseEntity<?> checkModuleQuestionnaryUser(Principal principal, long moduleId, long resourcesId) {
         Optional<Module> optionalModule = moduleRepository.findById(moduleId);
@@ -139,50 +143,11 @@ public class QuestionController {
     }
 
 
-    @PostMapping("/{moduleId}/resources/{resourcesId}/open_question")
-    @PreAuthorize("hasRole('TEACHER')")
-    public ResponseEntity<?> createNewOpen(Principal principal, @PathVariable long moduleId, @PathVariable long resourcesId, @Valid @RequestBody CreateNewOpenRequest cnoRequest) {
-        var responseCheck = checkModuleQuestionnaryUser(principal, moduleId, resourcesId);
-        if (responseCheck != null)
-            return responseCheck;
-
-        Questionnary questionnary = questionnaryRepository.findById(resourcesId).get();
-        Optional<OpenQuestion> optionalOpenQuestion = openQuestionRepository.findByName(cnoRequest.getName());
-        if (optionalOpenQuestion.isEmpty() && resourcesRepository.findByName(cnoRequest.getName()).isPresent()) {
-            return ResponseEntity.badRequest().body("Error: a question has already on this name");
-        }
-
-        OpenQuestion open = optionalOpenQuestion.orElse(new OpenQuestion(cnoRequest.getName(), cnoRequest.getDescription(), cnoRequest.getResponse()));
-
-        if (questionnary.getQuestionSet().contains(open)) {
-            return ResponseEntity.badRequest().body("Error: this open question is already on the questionnaire");
-        }
-
-        questionnary.getQuestionSet().add(open);
-        openQuestionRepository.save(open);
-        questionnaryRepository.save(questionnary);
-        return ResponseEntity.ok(new MessageResponse("OpenQuestion added succesfully!"));
-    }
-
-    @PostMapping("/{moduleId}/resources/{resourcesId}/qcm")
-    @PreAuthorize("hasRole('TEACHER')")
-    public ResponseEntity<?> createNewQCM(Principal principal, @PathVariable long moduleId, @PathVariable long resourcesId, @Valid @RequestBody CreateNewQCMRequest cnqRequest) {
-        var responseCheck = checkModuleQuestionnaryUser(principal, moduleId, resourcesId);
-        if (responseCheck != null)
-            return responseCheck;
-
-        Questionnary questionnary = questionnaryRepository.findById(resourcesId).get();
-        QCM qcm = qcmRepository.findByName(cnqRequest.getName()).orElse(new QCM(cnqRequest.getName(), cnqRequest.getDescription(), cnqRequest.getResponse()));
-
-        if (questionnary.getQuestionSet().contains(qcm)) {
-            return ResponseEntity.badRequest().body("Error: this qcm is already on the questionnaire");
-        }
-
-        questionnary.getQuestionSet().add(qcm);
-        qcmRepository.save(qcm);
-        questionnaryRepository.save(questionnary);
-        return ResponseEntity.ok(new MessageResponse("QCM added succesfully!"));
-    }
+    /*
+     * ##########################################
+     * #          QUESTION RESOURCE             #
+     * ##########################################
+     */
 
     @GetMapping("/{moduleId}/resources/{resourcesId}/questions/{questionId}")
     public ResponseEntity<?> getQuestion(Principal principal, @PathVariable long moduleId, @PathVariable long resourcesId, @PathVariable long questionId) {
@@ -206,15 +171,84 @@ public class QuestionController {
         switch (discriminator) {
             case "qcms":
                 QCM qcm = qcmRepository.findById(question.getId()).get();
-                var qcmr = new CreateNewQCMRequest(qcm.getName(), qcm.getDescription(), qcm.getResponse());
+                var qcmr = new CreateQuestionRequest(qcm.getName(), qcm.getDescription(), qcm.getResponse(), EQuestion.QCM);
                 return ResponseEntity.ok(qcmr);
             case "open_questions":
                 OpenQuestion op = openQuestionRepository.findById(question.getId()).get();
-                var opr = new CreateNewOpenRequest(op.getName(), op.getDescription(), op.getResponse());
+                var opr = new CreateQuestionRequest(op.getName(), op.getDescription(), op.getResponse(), EQuestion.OPEN);
                 return ResponseEntity.ok(opr);
             default:
                 return ResponseEntity.ok(question);
         }
+    }
+
+    @GetMapping("/{moduleId}/resources/{resourcesId}/questions")
+    public ResponseEntity<?> getAllQuestion(Principal principal, @PathVariable long moduleId, @PathVariable long resourcesId) {
+
+        // TODO
+
+        return null;
+    }
+
+    @PostMapping("/{moduleId}/resources/{resourcesId}/questions")
+    @PreAuthorize("hasRole('TEACHER')")
+    public ResponseEntity<?> createQuestion(Principal principal, @PathVariable long moduleId, @PathVariable long resourcesId,
+                                            @Valid @RequestBody CreateQuestionRequest cnoRequest) {
+        var responseCheck = checkModuleQuestionnaryUser(principal, moduleId, resourcesId);
+        if (responseCheck != null)
+            return responseCheck;
+
+        Questionnary questionnary = questionnaryRepository.findById(resourcesId).get();
+        Optional<Question> oQuestion = questionRepository.findByName(cnoRequest.getName());
+        if (oQuestion.isEmpty() && resourcesRepository.findByName(cnoRequest.getName()).isPresent()) {
+            return ResponseEntity.badRequest().body("Error: a question has already on this name");
+        }
+
+        switch (cnoRequest.getQuestionType()) {
+            case OPEN:
+                OpenQuestion open = openQuestionRepository.findByName(cnoRequest.getName())
+                        .orElse(new OpenQuestion(cnoRequest.getName(), cnoRequest.getDescription(), cnoRequest.getResponse()));
+
+                if (questionnary.getQuestionSet().contains(open)) {
+                    return ResponseEntity.badRequest().body("Error: this open question is already on the questionnaire");
+                }
+
+                questionnary.getQuestionSet().add(open);
+                openQuestionRepository.save(open);
+                questionnaryRepository.save(questionnary);
+                break;
+
+            case QCM:
+
+                QCM qcm = qcmRepository.findByName(cnoRequest.getName())
+                        .orElse(new QCM(cnoRequest.getName(), cnoRequest.getDescription(), cnoRequest.getResponse()));
+
+                if (questionnary.getQuestionSet().contains(qcm)) {
+                    return ResponseEntity.badRequest().body("Error: this qcm is already on the questionnaire");
+                }
+
+                questionnary.getQuestionSet().add(qcm);
+                qcmRepository.save(qcm);
+                questionnaryRepository.save(questionnary);
+
+                break;
+            case CODE:
+
+                // TODO
+                break;
+        }
+
+        return ResponseEntity.ok(new MessageResponse("Question added successfully!"));
+    }
+
+    @PutMapping("/{moduleId}/resources/{resourcesId}/questions/{questionId}")
+    @PreAuthorize("hasRole('TEACHER')")
+    public ResponseEntity<?> updateQuestion(Principal principal, @PathVariable long moduleId, @PathVariable long resourcesId,
+                                            @Valid @RequestBody CreateQuestionRequest cnoRequest) {
+
+        // TODO
+
+        return null;
     }
 
     @DeleteMapping("/{moduleId}/resources/{resourcesId}/questions/{questionId}")
@@ -241,38 +275,35 @@ public class QuestionController {
         return ResponseEntity.ok("Question deleted.");
     }
 
-    @PostMapping("/{moduleId}/resources/{resourcesId}/questions/{questionId}/code")
-    public ResponseEntity<?> submitCode(Principal principal, @PathVariable long moduleId, @PathVariable long resourcesId, @PathVariable long questionId, @Valid @RequestBody CodeRequest body) {
-        Optional<CodeRunner> orunner = codeRunnerRepository.findById(questionId);
-        Optional<Module> omodule = moduleRepository.findById(moduleId);
-        Optional<Questionnary> oquestionnary = questionnaryRepository.findById(resourcesId);
-        UserApi actor = userApiRepository.findByUsername(principal.getName()).get();
 
-        if (orunner.isEmpty() || omodule.isEmpty() || oquestionnary.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
-        Module mod = omodule.get();
-        Questionnary quest = oquestionnary.get();
-        CodeRunner runner = orunner.get();
-        if (!mod.getParticipants().contains(actor)) {
+    /*
+     * ##########################################
+     * #            VARIOUS QUESTION            #
+     * ##########################################
+     */
 
-            return ResponseEntity.status(403).body(new MessageResponse("User not registered to this module"));
-        }
+    @GetMapping("/{moduleId}/resources/{questionnaryId}/result/{userid}")
+    @PreAuthorize("hasRole('TEACHER')")
+    public ResponseEntity<?> getStudentResponse(Principal principal, @PathVariable long moduleId, @PathVariable long questionnaryId, @PathVariable long userid) {
 
-        if (!mod.getResources().contains(quest) || !quest.getQuestionSet().contains(runner)) {
-            return ResponseEntity.notFound().build();
-        }
+        // TODO
 
-        runner.setStudentResponse(body.getCode());
-
-        codeRunnerRepository.save(runner);
-        return ResponseEntity.ok().body(new MessageResponse("Code Submitted !"));
-
+        return null;
     }
 
+    @GetMapping("/{moduleId}/resources/{questionnaryId}/result")
+    @PreAuthorize("hasRole('TEACHER')")
+    public ResponseEntity<?> getAllStudentResponse(Principal principal, @PathVariable long moduleId, @PathVariable long questionnaryId) {
+
+        // TODO
+
+        return null;
+    }
 
     @PostMapping("/{moduleId}/resources/{resourceId}/questions/{questionId}")
-    public ResponseEntity<?> answerQcm(Principal principal, @PathVariable long moduleId, @PathVariable long resourceId, @PathVariable long questionId, @Valid @RequestBody AnswerQuestionRequest answer) {
+    public ResponseEntity<?> answerQuestion(Principal principal, @PathVariable long moduleId, @PathVariable long resourceId, @PathVariable long questionId,
+                                            @Valid @RequestBody AnswerQuestionRequest answer) {
+
         var responseEntity = verifyQuestion(principal, moduleId, resourceId, questionId);
         if (responseEntity != null) {
             return responseEntity;
@@ -305,46 +336,24 @@ public class QuestionController {
                 break;
 
             case OPEN:
+
+                // TODO
+
                 break;
 
             case CODE:
+                Optional<CodeRunner> orunner = codeRunnerRepository.findById(questionId);
+                CodeRunner runner = orunner.get();
+
+                runner.setStudentResponse(answer.getResponse());
+                codeRunnerRepository.save(runner);
+
                 break;
         }
 
         return ResponseEntity
                 .ok()
                 .body(new MessageResponse("Question answered correctly"));
-    }
-
-    @GetMapping("/{moduleId}/resources/{questionnaryId}/result/{userid}")
-    @PreAuthorize("hasRole('TEACHER')")
-    public ResponseEntity<?> getStudentsResponses(@PathVariable long moduleId, @PathVariable long questionnaryId, @PathVariable long userid) {
-        Optional<Module> omodule = moduleRepository.findById(moduleId);
-        Optional<Questionnary> oquestionnary = questionnaryRepository.findById(questionnaryId);
-        Optional<UserApi> ouser = userApiRepository.findById(userid);
-
-        if (omodule.isEmpty()) {
-            return ResponseEntity
-                    .badRequest()
-                    .body(new MessageResponse("Error: No such Module"));
-        }
-
-        if (oquestionnary.isEmpty()) {
-            return ResponseEntity
-                    .badRequest()
-                    .body(new MessageResponse("Error: No such questionnary in the module"));
-        }
-
-        if (ouser.isEmpty()) {
-            return ResponseEntity
-                    .badRequest()
-                    .body(new MessageResponse("Error: No such user"));
-        }
-
-        Questionnary questionnary = oquestionnary.get();
-//        int grade = questionnary.getStudentGrade(userid);
-//        return ResponseEntity.ok(new MessageResponse(String.format("student grade is %d", grade)));
-        return ResponseEntity.ok(new MessageResponse("student grade is ???"));
     }
 
     @PostMapping("/{moduleId}/resources/{questionnaryId}")
@@ -377,6 +386,41 @@ public class QuestionController {
 
         return ResponseEntity.accepted().body(new ResultResponse(result.getRate()));
     }
+
+
+
+//    @GetMapping("/{moduleId}/resources/{questionnaryId}/result/{userid}")
+//    @PreAuthorize("hasRole('TEACHER')")
+//    public ResponseEntity<?> getStudentsResponses(@PathVariable long moduleId, @PathVariable long questionnaryId, @PathVariable long userid) {
+//        Optional<Module> omodule = moduleRepository.findById(moduleId);
+//        Optional<Questionnary> oquestionnary = questionnaryRepository.findById(questionnaryId);
+//        Optional<UserApi> ouser = userApiRepository.findById(userid);
+//
+//        if (omodule.isEmpty()) {
+//            return ResponseEntity
+//                    .badRequest()
+//                    .body(new MessageResponse("Error: No such Module"));
+//        }
+//
+//        if (oquestionnary.isEmpty()) {
+//            return ResponseEntity
+//                    .badRequest()
+//                    .body(new MessageResponse("Error: No such questionnary in the module"));
+//        }
+//
+//        if (ouser.isEmpty()) {
+//            return ResponseEntity
+//                    .badRequest()
+//                    .body(new MessageResponse("Error: No such user"));
+//        }
+//
+//        Questionnary questionnary = oquestionnary.get();
+////        int grade = questionnary.getStudentGrade(userid);
+////        return ResponseEntity.ok(new MessageResponse(String.format("student grade is %d", grade)));
+//        return ResponseEntity.ok(new MessageResponse("student grade is ???"));
+//    }
+//
+
 
 //    public void validateQuestionnary(Long studentId) {
 //        int rate = 0;
