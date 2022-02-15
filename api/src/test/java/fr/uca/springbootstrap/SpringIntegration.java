@@ -65,6 +65,9 @@ public class SpringIntegration {
     }
 
     void executePost(String url, Object obj ,String jwt) throws IOException {
+        if (latestHttpResponse != null) {
+            EntityUtils.consume(latestHttpResponse.getEntity());
+        }
         HttpPost request = new HttpPost(url);
         request.addHeader("content-type", "application/json");
         if (jwt != null) {

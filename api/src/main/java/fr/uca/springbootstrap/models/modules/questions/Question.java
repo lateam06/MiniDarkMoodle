@@ -26,7 +26,7 @@ public class Question {
     @Size(max = 256)
     private String description;
 
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "userId")
+    @OneToMany(fetch = FetchType.EAGER)
     private List<Attempt> attempts = new java.util.ArrayList<>();
 
     @OneToOne(fetch = FetchType.EAGER)

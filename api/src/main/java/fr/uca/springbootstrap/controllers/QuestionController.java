@@ -4,6 +4,7 @@ import com.lateam.payload.response.MessageResponse;
 import fr.uca.springbootstrap.models.modules.Module;
 import fr.uca.springbootstrap.models.modules.questions.*;
 import fr.uca.springbootstrap.models.users.UserApi;
+import fr.uca.springbootstrap.payload.request.AnswerQCMRequest;
 import fr.uca.springbootstrap.payload.request.CodeRequest;
 
 import fr.uca.springbootstrap.payload.request.CreateNewOpenRequest;
@@ -61,6 +62,9 @@ public class QuestionController {
 
     @Autowired
     ResultRepository resultRepository;
+
+    @Autowired
+    QCMAttemptRepository qcmAttemptRepository;
 
     private ResponseEntity<?> checkModuleQuestionnaryUser(Principal principal, long moduleId, long resourcesId) {
         Optional<Module> optionalModule = moduleRepository.findById(moduleId);
@@ -224,6 +228,63 @@ public class QuestionController {
 
     }
 
+    @PostMapping("/{moduleId}/resources/{questionnaryId}/qcm/{qcmId}")
+    public ResponseEntity<?> answerQcm(Principal principal, @PathVariable long moduleId, @PathVariable long questionnaryId, @PathVariable long qcmId, @Valid @RequestBody AnswerQCMRequest answer) {
+        var oqcm = qcmRepository.findById(qcmId);
+        var omodule = moduleRepository.findById(moduleId);
+        var oquestionnary = questionnaryRepository.findById(questionnaryId);
+
+        UserApi actor = userRepository.findByUsername(principal.getName()).get();
+
+        if (oqcm.isEmpty() || omodule.isEmpty() || oquestionnary.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        Module mod = omodule.get();
+        Questionnary quest = oquestionnary.get();
+        QCM qcm = oqcm.get();
+        if (!mod.getParticipants().contains(actor)) {
+            return ResponseEntity.status(403).body(new MessageResponse("User not registered to this module"));
+        }
+        if (!mod.getResources().contains(quest)) {
+            return ResponseEntity
+                    .badRequest()
+                    .body(new MessageResponse("This questionnary don't belongs to this module."));
+        }
+        if (!quest.getQuestionSet().contains(qcm)) {
+            return ResponseEntity
+                    .badRequest()
+                    .body(new MessageResponse("This QCM don't belongs to this questionnary."));
+        }
+
+        var oresult = resultRepository.findByQuestionnaryIdAndUserId(questionnaryId, actor.getId());
+
+        if (oresult.isPresent()) {
+            return ResponseEntity
+                    .badRequest()
+                    .body(new MessageResponse("Error : the student already validated the questionnary."));
+        }
+        else {
+            if (!qcm.containsID(answer.getId())) {
+                return ResponseEntity
+                        .badRequest()
+                        .body(new MessageResponse("Error : this answer don't belongs to the qcm."));
+            }
+
+            System.out.println(qcm);
+            System.out.println(actor.getId());
+
+            QCMAttempt qcmAttempt = new QCMAttempt(qcm.getId(), actor.getId());
+            qcmAttempt.setStudentAttempt(answer.getResponse());
+            qcm.getAttempts().add(qcmAttempt);
+            qcmAttemptRepository.save(qcmAttempt);
+            qcmRepository.save(qcm);
+            return ResponseEntity
+                    .ok()
+                    .body(new MessageResponse("QCM answered correctly"));
+        }
+    }
+
     @GetMapping("/{moduleId}/resources/{questionnaryId}/result/{userid}")
     @PreAuthorize("hasRole('TEACHER')")
     public ResponseEntity<?> getStudentsResponses(@PathVariable long moduleId, @PathVariable long questionnaryId, @PathVariable long userid) {
@@ -284,11 +345,7 @@ public class QuestionController {
         resultRepository.save(result);
 
         return ResponseEntity.accepted().body(new ResultResponse(result.getRate()));
-
     }
-
-
-
 
 //    public void validateQuestionnary(Long studentId) {
 //        int rate = 0;
