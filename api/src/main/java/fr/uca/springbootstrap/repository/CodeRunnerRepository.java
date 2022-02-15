@@ -9,4 +9,7 @@ public interface CodeRunnerRepository extends JpaRepository<CodeRunner, Long> {
 
     @Override
     Optional<CodeRunner> findById(Long aLong);
+
+
+    Optional<CodeRunner> findByName(String name);
 }

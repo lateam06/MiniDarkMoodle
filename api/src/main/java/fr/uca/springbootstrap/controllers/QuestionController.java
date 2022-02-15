@@ -233,8 +233,20 @@ public class QuestionController {
 
                 break;
             case CODE:
+                    CodeRunner code = codeRunnerRepository.findByName(cnoRequest.getName()).orElse(cnoRequest.getCodeRunner());
+                    if(code == null){
+                        return ResponseEntity.badRequest().body(new MessageResponse("Specify a code runner in the request!"));
+                    }
+                    else{
+                        if(questionnary.getQuestionSet().contains(code)){
+                            return ResponseEntity.badRequest().body("Error: this Code Runner is already in the questionnaire");
+                        }
 
-                // TODO
+                    }
+                    questionnary.getQuestionSet().add(code);
+                    codeRunnerRepository.save(code);
+                    questionnaryRepository.save(questionnary);
+
                 break;
         }
 

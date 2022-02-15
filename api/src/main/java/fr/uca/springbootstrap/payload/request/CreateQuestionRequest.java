@@ -1,5 +1,6 @@
 package fr.uca.springbootstrap.payload.request;
 
+import fr.uca.springbootstrap.models.modules.questions.CodeRunner;
 import fr.uca.springbootstrap.models.modules.questions.EQuestion;
 import fr.uca.springbootstrap.models.modules.questions.Question;
 
@@ -19,6 +20,7 @@ public class CreateQuestionRequest {
     private String response;
     private EQuestion questionType;
 
+    private CodeRunner codeRunner;
 
     public CreateQuestionRequest() {
 
@@ -61,5 +63,13 @@ public class CreateQuestionRequest {
 
     public void setQuestionType(EQuestion questionType) {
         this.questionType = questionType;
+    }
+
+    public CodeRunner getCodeRunner() {
+        return codeRunner;
+    }
+
+    public void setCodeRunner(CodeRunner codeRunner) {
+        this.codeRunner = codeRunner;
     }
 }

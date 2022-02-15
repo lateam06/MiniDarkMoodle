@@ -17,7 +17,7 @@ public class Attempt {
 
     protected Long questionId;
 
-    private String studentAttempt;
+    protected String studentAttempt;
 
     public Attempt(Long questionId, Long userId) {
         this.questionId = questionId;
