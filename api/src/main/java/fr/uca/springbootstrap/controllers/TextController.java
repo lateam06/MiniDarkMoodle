@@ -118,31 +118,58 @@ public class TextController {
         }
     }
 
-    @PostMapping("{module_id}/course/{course_id}/text")
+    @PostMapping("{module_id}/resource/{resourceId}/text")
     @PreAuthorize("hasRole('TEACHER')")
-    public ResponseEntity<?> createNewText(Principal principal, @PathVariable long module_id, @PathVariable long course_id, @Valid @RequestBody TextRequest re) {
-        var resp = verifyCourseInfo(principal, module_id, course_id);
+    public ResponseEntity<?> createNewText(Principal principal, @PathVariable long module_id, @PathVariable long resourceId, @Valid @RequestBody TextRequest re) {
+        var resp = verifyCourseInfo(principal, module_id, resourceId);
 
         if (resp != null)
             return resp;
 
-        Course course = (Course) resourcesRepository.findById(course_id).get();
+        for (Text text : courseRepository.findById(resourceId).get().getTexts()) {
+            if (text.getParagraph().equals(re.getParagraph())) {
+                return ResponseEntity
+                        .badRequest()
+                        .body("Error : This text is already in the course.");
+            }
+        }
 
+        Course course = (Course) resourcesRepository.findById(resourceId).get();
         Text text = new Text(re.getParagraph());
         course.getTexts().add(text);
-
         textRepository.save(text);
 
         return ResponseEntity.accepted().body("The text has been added to the course.");
     }
 
 
-    @PutMapping("{module_id}/course/{course_id}/text/{text_id}")
+    @PutMapping("{module_id}/resource/{resourceId}/text/{text_id}")
     @PreAuthorize("hasRole('TEACHER')")
-    public ResponseEntity<?> updateText(Principal principal, @PathVariable long module_id, @PathVariable long course_id, @PathVariable long text_id,
+    public ResponseEntity<?> updateText(Principal principal, @PathVariable long module_id, @PathVariable long resourceId, @PathVariable long text_id,
                                         @Valid @RequestBody TextRequest re) {
-        // TODO
-        return null;
+        var resp = verifyCourseInfo(principal, module_id, resourceId);
+        if (resp != null)
+            return resp;
+
+        Optional<Text> otext = textRepository.findById(text_id);
+        Course course = courseRepository.findById(resourceId).get();
+
+        if (otext.isPresent()) {
+            Text text = otext.get();
+            course.getTexts().remove(text);
+            textRepository.delete(text);
+            courseRepository.save(course);
+        }
+
+        Text text = new Text(re.getParagraph());
+        course.getTexts().add(text);
+
+        textRepository.save(text);
+        courseRepository.save(course);
+
+        return ResponseEntity
+                .ok()
+                .body(new MessageResponse("Text successfully added"));
     }
 
     @DeleteMapping("{module_id}/course/{course_id}/text/{text_id}")

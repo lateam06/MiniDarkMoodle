@@ -3,6 +3,7 @@ package fr.uca.springbootstrap.models.modules.courses;
 import fr.uca.springbootstrap.models.modules.Resource;
 
 import javax.persistence.*;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -13,7 +14,7 @@ public class Course extends Resource {
     @JoinTable(name = "text_courses",
             joinColumns = @JoinColumn(name = "course_id"),
             inverseJoinColumns = @JoinColumn(name = "text_id"))
-    private Set<Text> texts;
+    private List<Text> texts;
 
     public Course(String name) {
         super(name);
@@ -22,11 +23,11 @@ public class Course extends Resource {
     public Course() {
     }
 
-    public Set<Text> getTexts() {
+    public List<Text> getTexts() {
         return texts;
     }
 
-    public void setTexts(Set<Text> texts) {
+    public void setTexts(List<Text> texts) {
         this.texts = texts;
     }
 }
