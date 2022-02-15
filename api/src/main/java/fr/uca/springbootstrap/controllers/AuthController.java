@@ -137,15 +137,20 @@ public class AuthController {
 //							 signUpRequest.getEmail(),
 //							 encoder.encode(signUpRequest.getPassword()), signUpRequest.getRole());
 //		userRepository.save(user);
+        System.out.println("Sign up on 8080 :");
+        System.out.println(signUpRequest);
 
 
-        HttpPost request = new HttpPost("http://localhost:8081/api/auth");
+        HttpPost request = new HttpPost("http://localhost:8081/api/auth/signup");
         request.addHeader("content-type", "application/json");
 
 
         request.setEntity(new StringEntity(ObjMapper.writeValueAsString(signUpRequest)));
         HttpResponse response =  httpClient.execute(request);
         String bodyResponseAuthServer = EntityUtils.toString(response.getEntity());
+
+        System.out.println("response from 8081:");
+        System.out.println(bodyResponseAuthServer);
         User resp = ObjMapper.readValue(bodyResponseAuthServer,User.class); //TODO Récup le user depuis le server d'auth
         userRepository.save(resp);
 
