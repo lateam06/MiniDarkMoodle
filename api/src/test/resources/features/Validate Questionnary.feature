@@ -4,6 +4,8 @@ Feature: Validate questionnary
   Background:
     Given a teacher named "Marcel"
     And a student named "Louis"
+    And "Marcel" is connected
+    And "Louis" is connected
     And a module named "le Python pour les nuls"
     And a questionnaire with name "Examens Python"
     And "Marcel" is the teacher registered to the module "le Python pour les nuls"

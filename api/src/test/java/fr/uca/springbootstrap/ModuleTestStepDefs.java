@@ -1,9 +1,9 @@
 package fr.uca.springbootstrap;
 
+import fr.uca.springbootstrap.models.users.UserApi;
 import fr.uca.springbootstrap.payload.request.CreateModuleRequest;
 import fr.uca.springbootstrap.controllers.AuthController;
 import fr.uca.springbootstrap.models.modules.Module;
-import fr.uca.springbootstrap.models.users.User;
 import fr.uca.springbootstrap.repository.*;
 import io.cucumber.java.en.*;
 import org.apache.http.util.EntityUtils;
@@ -30,21 +30,18 @@ public class ModuleTestStepDefs extends SpringIntegration {
     RoleRepository roleRepository;
 
     @Autowired
-    UserRepository userRepository;
+    UserApiRepository userRepository;
 
     @Autowired
     AuthController authController;
-
-    @Autowired
-    PasswordEncoder encoder;
 
     @Autowired
     CourseRepository courseRepository;
 
     @Given("{string} is a teacher not registered to any module")
     public void isATeacherNotRegisteredToAnyModule(String arg0) {
-        User user = userRepository.findByUsername(arg0).get();
-        List<Module> modules = user.getModules();
+        UserApi userApi = userRepository.findByUsername(arg0).get();
+        List<Module> modules = userApi.getModules();
 
         assertTrue(modules.isEmpty());
     }
@@ -52,16 +49,16 @@ public class ModuleTestStepDefs extends SpringIntegration {
     @Given("{string} is the teacher registered to the module {string}")
     public void isTheTeacherRegisteredToTheModule(String arg0, String arg1) throws IOException {
         Module module = moduleRepository.findByName(arg1).get();
-        User user = userRepository.findByUsername(arg0).get();
-        String jwt = authController.generateJwt(arg0, PASSWORD);
-        executePost("http://localhost:8080/api/module/" + module.getId() + "/participants/" + user.getId(), jwt);
+        UserApi userApi = userRepository.findByUsername(arg0).get();
+        String jwt = SpringIntegration.tokenHashMap.get(arg0);
+        executePost("http://localhost:8080/api/module/" + module.getId() + "/participants/" + userApi.getId(), jwt);
         EntityUtils.consume(latestHttpResponse.getEntity());
     }
 
     @When("{string} wants to create a new Module {string}")
     public void wantsToCreateANewModule(String arg0, String arg1) throws IOException {
         CreateModuleRequest createModuleRequest = new CreateModuleRequest(arg1);
-        String jwt = authController.generateJwt(arg0, PASSWORD);
+        String jwt = SpringIntegration.tokenHashMap.get(arg0);
 
         executePost("http://localhost:8080/api/module", createModuleRequest, jwt);
         EntityUtils.consume(latestHttpResponse.getEntity());
@@ -71,9 +68,9 @@ public class ModuleTestStepDefs extends SpringIntegration {
     @And("{string} has registered {string} on the module {string}")
     public void hasRegisteredOnTheModule(String teacherName, String userName, String moduleName) throws IOException {
         Module module = moduleRepository.findByName(moduleName).get();
-        User user = userRepository.findByUsername(userName).get();
-        String jwt = authController.generateJwt(teacherName, PASSWORD);
-        executePost("http://localhost:8080/api/module/" + module.getId() + "/participants/" + user.getId(), jwt);
+        UserApi userApi = userRepository.findByUsername(userName).get();
+        String jwt = SpringIntegration.tokenHashMap.get(teacherName);
+        executePost("http://localhost:8080/api/module/" + module.getId() + "/participants/" + userApi.getId(), jwt);
         EntityUtils.consume(latestHttpResponse.getEntity());
     }
 

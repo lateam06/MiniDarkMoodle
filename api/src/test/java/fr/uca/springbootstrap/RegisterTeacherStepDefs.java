@@ -4,10 +4,10 @@ import fr.uca.springbootstrap.controllers.AuthController;
 import fr.uca.springbootstrap.models.users.ERole;
 import fr.uca.springbootstrap.models.modules.Module;
 import fr.uca.springbootstrap.models.users.Role;
-import fr.uca.springbootstrap.models.users.User;
+import fr.uca.springbootstrap.models.users.UserApi;
 import fr.uca.springbootstrap.repository.ModuleRepository;
 import fr.uca.springbootstrap.repository.RoleRepository;
-import fr.uca.springbootstrap.repository.UserRepository;
+import fr.uca.springbootstrap.repository.UserApiRepository;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
@@ -30,23 +30,11 @@ public class RegisterTeacherStepDefs extends SpringIntegration {
     RoleRepository roleRepository;
 
     @Autowired
-    UserRepository userRepository;
+    UserApiRepository userRepository;
 
     @Autowired
     AuthController authController;
 
-    @Autowired
-    PasswordEncoder encoder;
-
-    @Given("a teacher with login {string}")
-    public void aTeacherWithLogin(String arg0) {
-        User user = userRepository.findByUsername(arg0).
-                orElse(new User(arg0, arg0 + "@test.fr", encoder.encode(PASSWORD)));
-        user.setRoles(new HashSet<Role>(){{ add(roleRepository.findByName(ERole.ROLE_TEACHER).
-                orElseThrow(() -> new RuntimeException("Error: Role is not found."))); }});
-        userRepository.save(user);
-
-    }
 
     @And("a module named {string}")
     public void aModuleNamed(String arg0) {
@@ -59,12 +47,12 @@ public class RegisterTeacherStepDefs extends SpringIntegration {
     @When("{string} registers to module {string}")
     public void registersToModule(String arg0, String arg1) throws Exception {
         Module module = moduleRepository.findByName(arg1).get();
-        User user = userRepository.findByUsername(arg0).get();
-        String jwt = authController.generateJwt(arg0, PASSWORD);
+        UserApi userApi = userRepository.findByUsername(arg0).get();
+        String jwt = SpringIntegration.tokenHashMap.get(arg0);
 
 //        executePost("http://localhost:8080/api/test/mod", jwt);
 //        executePost("http://localhost:8080/api/module/1/participants/7", jwt);
-        executePost("http://localhost:8080/api/module/"+module.getId()+"/participants/"+user.getId(), jwt);
+        executePost("http://localhost:8080/api/module/"+module.getId()+"/participants/"+ userApi.getId(), jwt);
     }
     @Then("last request status is {int}")
     public void isRegisteredToModule(int status) {
@@ -74,15 +62,15 @@ public class RegisterTeacherStepDefs extends SpringIntegration {
     @Then("{string} is registered to module {string}")
     public void isRegisteredToModule(String arg0, String arg1) {
         Module module = moduleRepository.findByName(arg1).get();
-        User user = userRepository.findByUsername(arg0).get();
-        assertTrue(module.getParticipants().contains(user));
+        UserApi userApi = userRepository.findByUsername(arg0).get();
+        assertTrue(module.getParticipants().contains(userApi));
     }
 
     @And("{string} is not registered to module {string}")
     public void isNotRegisteredToModule(String arg0, String arg1) {
         Module module = moduleRepository.findByName(arg1).get();
-        User user = userRepository.findByUsername(arg0).get();
-        assertFalse(module.getParticipants().contains(user));
+        UserApi userApi = userRepository.findByUsername(arg0).get();
+        assertFalse(module.getParticipants().contains(userApi));
     }
 
 

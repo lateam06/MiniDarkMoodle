@@ -3,6 +3,8 @@ Feature: Register Teacher
   Background:
     Given a teacher named "Steve"
     And a teacher named "Sarah"
+    And "Steve" is connected
+    And "Sarah" is connected
     And a module named "Gestion de projet"
 
   Scenario: Register Teacher

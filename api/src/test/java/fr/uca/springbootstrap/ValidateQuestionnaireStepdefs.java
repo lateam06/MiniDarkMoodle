@@ -4,7 +4,7 @@ import fr.uca.springbootstrap.payload.response.ResultResponse;
 import fr.uca.springbootstrap.controllers.AuthController;
 import fr.uca.springbootstrap.models.modules.Module;
 import fr.uca.springbootstrap.models.modules.questions.Questionnary;
-import fr.uca.springbootstrap.models.users.User;
+import fr.uca.springbootstrap.models.users.UserApi;
 import fr.uca.springbootstrap.repository.*;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
@@ -29,13 +29,10 @@ public class ValidateQuestionnaireStepdefs extends SpringIntegration  {
     RoleRepository roleRepository;
 
     @Autowired
-    UserRepository userRepository;
+    UserApiRepository userRepository;
 
     @Autowired
     AuthController authController;
-
-    @Autowired
-    PasswordEncoder encoder;
 
     @Autowired
     CourseRepository courseRepository;
@@ -51,10 +48,10 @@ public class ValidateQuestionnaireStepdefs extends SpringIntegration  {
 
     @When("{string} validate his questionnary {string} of the module {string}")
     public void validateHisQuestionnaryOfTheModule(String arg0, String arg1, String arg2) throws IOException {
-        User student = userRepository.findByUsername(arg0).get();
+        UserApi student = userRepository.findByUsername(arg0).get();
         Questionnary quest = questionnaryRepository.findByName(arg1).get();
         Module mod = moduleRepository.findByName(arg2).get();
-        String token = authController.generateJwt(student.getUsername(), PASSWORD);
+        String token = SpringIntegration.tokenHashMap.get(student.getUsername());
         executePost("http://localhost:8080/api/module/"+mod.getId()+"/resources/"+quest.getId(),token);
     }
 

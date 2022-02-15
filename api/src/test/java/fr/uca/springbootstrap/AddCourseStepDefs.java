@@ -1,25 +1,31 @@
 package fr.uca.springbootstrap;
 
+import com.lateam.payload.request.SignupRequest;
+import com.lateam.payload.response.UserApiResponse;
+import fr.uca.springbootstrap.models.users.UserApi;
 import fr.uca.springbootstrap.payload.request.ResourceRequest;
 import fr.uca.springbootstrap.controllers.AuthController;
 import fr.uca.springbootstrap.models.modules.Module;
 import fr.uca.springbootstrap.models.modules.Resource;
 import fr.uca.springbootstrap.models.modules.courses.Course;
 import fr.uca.springbootstrap.models.users.ERole;
-import fr.uca.springbootstrap.models.users.User;
 import fr.uca.springbootstrap.repository.*;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.util.EntityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
 import javax.persistence.DiscriminatorValue;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.HashSet;
 
 public class AddCourseStepDefs extends SpringIntegration {
@@ -35,40 +41,66 @@ public class AddCourseStepDefs extends SpringIntegration {
     RoleRepository roleRepository;
 
     @Autowired
-    UserRepository userRepository;
+    UserApiRepository userRepository;
 
     @Autowired
     AuthController authController;
 
     @Autowired
-    PasswordEncoder encoder;
+    CourseRepository courseRepository;
 
     @Autowired
-    CourseRepository courseRepository;
+    UserApiRepository userApiRepository;
 
 
     @Given("a teacher named {string}")
-    public void aTeacherNamedWithID(String arg0) {
-        User user = userRepository.findByUsername(arg0).
-                orElse(new User(arg0, arg0 + "@test.fr", encoder.encode(PASSWORD)));
-        user.setRoles(new HashSet<>() {{
-            add(roleRepository.findByName(ERole.ROLE_TEACHER).
-                    orElseThrow(() -> new RuntimeException("Error: Role is not found.")));
-        }});
-        userRepository.save(user);
+    public void aTeacherNamedWithID(String arg0) throws IOException {
+        var user = userRepository.findByUsername(arg0);
 
+        if (user.isEmpty()) {
+            SignupRequest signUpRequest = new SignupRequest(
+                    arg0,
+                    arg0+"@test.fr",
+                    Collections.singleton("teacher"),
+                    PASSWORD);
+
+            HttpPost request = new HttpPost("http://localhost:8080/api/auth/signup");
+            request.addHeader("content-type", "application/json");
+            request.setEntity(new StringEntity(ObjMapper.writeValueAsString(signUpRequest)));
+            HttpResponse response =  httpClient.execute(request);
+
+            String bodyResponseAuthServer = EntityUtils.toString(response.getEntity());
+            assertEquals(200, response.getStatusLine().getStatusCode());
+
+            UserApiResponse resp = ObjMapper.readValue(bodyResponseAuthServer,UserApiResponse.class); //TODO Récup le user depuis le server d'auth
+            userApiRepository.save(new UserApi(resp.getId(), resp.getUsername()));
+        }
 
     }
 
     @Given("a student named {string}")
-    public void aStudentNamed(String arg0) {
-        User user = userRepository.findByUsername(arg0).
-                orElse(new User(arg0, arg0 + "@test.fr", encoder.encode(PASSWORD)));
-        user.setRoles(new HashSet<>() {{
-            add(roleRepository.findByName(ERole.ROLE_STUDENT).
-                    orElseThrow(() -> new RuntimeException("Error: Role is not found.")));
-        }});
-        userRepository.save(user);
+    public void aStudentNamed(String arg0) throws IOException{
+        var user = userRepository.findByUsername(arg0);
+
+        if (user.isEmpty()) {
+            SignupRequest signUpRequest = new SignupRequest(
+                    arg0,
+                    arg0+"@test.fr",
+                    Collections.singleton("student"),
+                    PASSWORD);
+
+            HttpPost request = new HttpPost("http://localhost:8080/api/auth/signup");
+            request.addHeader("content-type", "application/json");
+
+            request.setEntity(new StringEntity(ObjMapper.writeValueAsString(signUpRequest)));
+            HttpResponse response =  httpClient.execute(request);
+            String bodyResponseAuthServer = EntityUtils.toString(response.getEntity());
+
+            assertEquals(200, response.getStatusLine().getStatusCode());
+
+            UserApiResponse resp = ObjMapper.readValue(bodyResponseAuthServer,UserApiResponse.class); //TODO Récup le user depuis le server d'auth
+            userApiRepository.save(new UserApi(resp.getId(), resp.getUsername()));
+        }
 
     }
 
@@ -91,8 +123,8 @@ public class AddCourseStepDefs extends SpringIntegration {
 
     @When("{string} wants to add the course {string} to the module {string}")
     public void wantsToAddTheCourseToTheModule(String arg0, String arg1, String arg2) throws IOException {
-        User user = userRepository.findByUsername(arg0).get();
-        String jwt = authController.generateJwt(arg0, PASSWORD);
+        UserApi userApi = userRepository.findByUsername(arg0).get();
+        String jwt = SpringIntegration.tokenHashMap.get(arg0);
         Module module = moduleRepository.findByName(arg2).get();
         Course course = courseRepository.findByName(arg1).get();
         executePut("http://localhost:8080/api/module/" + module.getId() + "/resources/" + course.getId(), jwt);
@@ -101,11 +133,11 @@ public class AddCourseStepDefs extends SpringIntegration {
 
     @When("{string} wants to delete the course {string} from the module {string}")
     public void wantsToDeleteTheCourseFromTheModule(String arg0, String arg1, String arg2) throws IOException {
-        User user = userRepository.findByUsername(arg0).get();
-        String jwtStudent = authController.generateJwt(arg0, PASSWORD);
+        UserApi userApi = userRepository.findByUsername(arg0).get();
+        String jwt = SpringIntegration.tokenHashMap.get(arg0);
         Module module = moduleRepository.findByName(arg2).get();
         Resource course = resourcesRepository.findByName(arg1).get();
-        executeDelete("http://localhost:8080/api/module/" + module.getId() + "/resources/" + course.getId(), jwtStudent);
+        executeDelete("http://localhost:8080/api/module/" + module.getId() + "/resources/" + course.getId(), jwt);
     }
 
     @Then("the course {string} is deleted from the module {string}")
@@ -118,8 +150,8 @@ public class AddCourseStepDefs extends SpringIntegration {
 
     @When("{string} wants to delete the course {string} to the module {string}")
     public void wantsToDeleteTheCourseToTheModule(String arg0, String arg1, String arg2) throws IOException {
-        User user = userRepository.findByUsername(arg0).get();
-        String jwt = authController.generateJwt(arg0, PASSWORD);
+        UserApi userApi = userRepository.findByUsername(arg0).get();
+        String jwt = SpringIntegration.tokenHashMap.get(arg0);
         Module module = moduleRepository.findByName(arg2).get();
         Resource course = resourcesRepository.findByName(arg1).get();
         executeDelete("http://localhost:8080/api/module/" + module.getId() + "/resources/" + course.getId(), jwt);
@@ -143,7 +175,7 @@ public class AddCourseStepDefs extends SpringIntegration {
 
     @And("{string} is not a teacher registered to the module {string}")
     public void isNotATeacherRegisteredToTheModule(String teacherName, String moduleName) {
-        User teacher = userRepository.findByUsername(teacherName).get();
+        UserApi teacher = userRepository.findByUsername(teacherName).get();
         Module module = moduleRepository.findByName(moduleName).get();
 
         assertFalse(module.getParticipants().contains(teacher));
@@ -152,7 +184,7 @@ public class AddCourseStepDefs extends SpringIntegration {
 
     @When("{string} adds the course {string} to the post request to the module {string}")
     public void addsTheCourseObjectToThePostRequestToTheModule(String arg0, String courseName, String arg1) throws IOException {
-        String jwt = authController.generateJwt(arg0, PASSWORD);
+        String jwt = SpringIntegration.tokenHashMap.get(arg0);
         Module mod = moduleRepository.findByName(arg1).get();
         Course course = new Course(courseName);
         String disc = course.getClass().getAnnotation(DiscriminatorValue.class).value();
@@ -162,7 +194,7 @@ public class AddCourseStepDefs extends SpringIntegration {
 
     @Then("{string} check that the {string} course has been added correcty in {string}")
     public void checkThatTheCourseHasBeenAddedCorrectyIn(String arg0, String arg1, String arg2) {
-        String jwt = authController.generateJwt(arg0, PASSWORD);
+        String jwt = SpringIntegration.tokenHashMap.get(arg0);
         Module mod = moduleRepository.findByName(arg2).get();
         Course course = courseRepository.findByName(arg1).get();
         assertTrue(mod.getResources().contains(course));

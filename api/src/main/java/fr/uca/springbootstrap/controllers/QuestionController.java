@@ -3,7 +3,7 @@ package fr.uca.springbootstrap.controllers;
 import com.lateam.payload.response.MessageResponse;
 import fr.uca.springbootstrap.models.modules.Module;
 import fr.uca.springbootstrap.models.modules.questions.*;
-import fr.uca.springbootstrap.models.users.User;
+import fr.uca.springbootstrap.models.users.UserApi;
 import fr.uca.springbootstrap.payload.request.CodeRequest;
 
 import fr.uca.springbootstrap.payload.request.CreateNewOpenRequest;
@@ -11,14 +11,10 @@ import fr.uca.springbootstrap.payload.request.CreateNewQCMRequest;
 import fr.uca.springbootstrap.payload.response.ResultResponse;
 import fr.uca.springbootstrap.repository.*;
 
-import fr.uca.springbootstrap.security.services.jwt.JwtUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 
-
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.persistence.DiscriminatorValue;
@@ -32,11 +28,9 @@ import java.util.Set;
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RequestMapping("/api/module")
 public class QuestionController {
-    @Autowired
-    AuthenticationManager authenticationManager;
 
     @Autowired
-    UserRepository userRepository;
+    UserApiRepository userRepository;
 
     @Autowired
     RoleRepository roleRepository;
@@ -46,12 +40,6 @@ public class QuestionController {
 
     @Autowired
     ResourcesRepository resourcesRepository;
-
-    @Autowired
-    PasswordEncoder encoder;
-
-    @Autowired
-    JwtUtils jwtUtils;
 
     @Autowired
     CourseRepository courseRepository;
@@ -92,13 +80,13 @@ public class QuestionController {
             return ResponseEntity.badRequest().body(new MessageResponse("Error: The given questionnary is not found on the given module."));
         }
 
-        Optional<User> optionalUser = userRepository.findByUsername(principal.getName());
+        Optional<UserApi> optionalUser = userRepository.findByUsername(principal.getName());
         if (optionalUser.isEmpty()) {
             return ResponseEntity.badRequest().body(new MessageResponse("Error: You're not on the user database."));
         }
-        User user = optionalUser.get();
+        UserApi userApi = optionalUser.get();
 
-        if (!module.getParticipants().contains(user)) {
+        if (!module.getParticipants().contains(userApi)) {
             return ResponseEntity.status(403).body(new MessageResponse("Error: You're not an user registered on this module."));
         }
 
@@ -212,7 +200,7 @@ public class QuestionController {
         Optional<CodeRunner> orunner = codeRunnerRepository.findById(questionId);
         Optional<Module> omodule = moduleRepository.findById(moduleId);
         Optional<Questionnary> oquestionnary = questionnaryRepository.findById(resourcesId);
-        User actor = userRepository.findByUsername(principal.getName()).get();
+        UserApi actor = userRepository.findByUsername(principal.getName()).get();
 
         if (orunner.isEmpty() || omodule.isEmpty() || oquestionnary.isEmpty()) {
             return ResponseEntity.notFound().build();
@@ -241,7 +229,7 @@ public class QuestionController {
     public ResponseEntity<?> getStudentsResponses(@PathVariable long moduleId, @PathVariable long questionnaryId, @PathVariable long userid) {
         Optional<Module> omodule = moduleRepository.findById(moduleId);
         Optional<Questionnary> oquestionnary = questionnaryRepository.findById(questionnaryId);
-        Optional<User> ouser = userRepository.findById(userid);
+        Optional<UserApi> ouser = userRepository.findById(userid);
 
         if (omodule.isEmpty()) {
             return ResponseEntity
@@ -271,7 +259,7 @@ public class QuestionController {
     public ResponseEntity<?> validateQuestionnary(Principal principal, @PathVariable long moduleId, @PathVariable long questionnaryId){
         Optional<Module> omodule = moduleRepository.findById(moduleId);
         Optional<Questionnary> oquestionnary = questionnaryRepository.findById(questionnaryId);
-        User actor = userRepository.findByUsername(principal.getName()).get();
+        UserApi actor = userRepository.findByUsername(principal.getName()).get();
 
         if(omodule.isEmpty() ||oquestionnary.isEmpty()){
             return ResponseEntity.notFound().build();

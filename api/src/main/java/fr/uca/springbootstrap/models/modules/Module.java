@@ -1,6 +1,6 @@
 package fr.uca.springbootstrap.models.modules;
 
-import fr.uca.springbootstrap.models.users.User;
+import fr.uca.springbootstrap.models.users.UserApi;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
@@ -32,7 +32,7 @@ public class Module {
     @JoinTable(name = "user_modules",
             joinColumns = @JoinColumn(name = "module_id"),
             inverseJoinColumns = @JoinColumn(name = "user_id"))
-    private Set<User> participants;
+    private Set<UserApi> participants;
 
     @OneToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "resource_modules",
@@ -47,11 +47,11 @@ public class Module {
         this.name = name;
     }
 
-    public Set<User> getParticipants() {
+    public Set<UserApi> getParticipants() {
         return participants;
     }
 
-    public void setParticipants(Set<User> participants) {
+    public void setParticipants(Set<UserApi> participants) {
         this.participants = participants;
     }
 

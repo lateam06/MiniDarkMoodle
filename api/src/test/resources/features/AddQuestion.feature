@@ -3,6 +3,8 @@ Feature: AddQuestion
   Background:
     Given a teacher named "Marcel"
     And a student named "Louis"
+    And "Marcel" is connected
+    And "Louis" is connected
     And a module named "le C pour les nuls"
     And "Marcel" is the teacher registered to the module "le C pour les nuls"
     And a questionnaire with name "Examens Pointeurs"
@@ -12,6 +14,7 @@ Feature: AddQuestion
   Scenario: Teacher add a question on a module where he isn't registered
     Given a module named "le C++ pour les nuls"
     And a teacher named "Enrico"
+    And "Enrico" is connected
     And "Enrico" is the teacher registered to the module "le C++ pour les nuls"
     And a questionnaire with name "Examens Pointeurs Intelligents"
     And "Enrico" has registered the questionnaire "Examens Pointeurs Intelligents" to the module "le C++ pour les nuls"
@@ -72,6 +75,7 @@ Feature: AddQuestion
     Scenario: Teacher want to delete a QCM on a questionnaire of a module where he is not registered
       Given a module named "le C++ pour les nuls"
       And a teacher named "Enrico"
+      And "Enrico" is connected
       And "Enrico" is the teacher registered to the module "le C++ pour les nuls"
       And "Enrico" has registered the questionnaire "Examens Pointeurs Intelligents" to the module "le C++ pour les nuls"
       And "Enrico" has already registered a QCM "Unique Ptr" to the questionnaire "Examens Pointeurs Intelligents" of the module "le C++ pour les nuls"
@@ -110,6 +114,7 @@ Feature: AddQuestion
   Scenario: Student want to get a QCM from a questionnaire of a module where he is not registered
     Given a module named "le C++ pour les nuls"
     And a teacher named "Enrico"
+    And "Enrico" is connected
     And "Enrico" is the teacher registered to the module "le C++ pour les nuls"
     And "Enrico" has registered the questionnaire "Examens Pointeurs Intelligents" to the module "le C++ pour les nuls"
     And "Enrico" has already registered a QCM "Unique Ptr" to the questionnaire "Examens Pointeurs Intelligents" of the module "le C++ pour les nuls"
@@ -122,6 +127,7 @@ Feature: AddQuestion
   Scenario: Teacher want to get a QCM from a questionnaire of a module where he is not registered
     Given a module named "le C++ pour les nuls"
     And a teacher named "Enrico"
+    And "Enrico" is connected
     And "Enrico" is the teacher registered to the module "le C++ pour les nuls"
     And "Enrico" has registered the questionnaire "Examens Pointeurs Intelligents" to the module "le C++ pour les nuls"
     And "Enrico" has already registered a QCM "Unique Ptr" to the questionnaire "Examens Pointeurs Intelligents" of the module "le C++ pour les nuls"

@@ -2,8 +2,9 @@ Feature: Student get teachers
 
   Background:
     Given a teacher named "Marcel"
-    And the teacher "Marcel" is connected
     And a student named "Louis"
+    And "Marcel" is connected
+    And "Louis" is connected
     And a module named "le C pour les nuls"
     And "Marcel" is the teacher registered to the module "le C pour les nuls"
 

@@ -3,6 +3,7 @@ import com.lateam.payload.request.LoginRequest;
 import com.lateam.payload.request.SignupRequest;
 import com.lateam.payload.response.JwtResponse;
 import com.lateam.payload.response.MessageResponse;
+import com.lateam.payload.response.UserApiResponse;
 import fr.lateam.auth.springbootsrap.models.users.ERole;
 import fr.lateam.auth.springbootsrap.models.users.Role;
 import fr.lateam.auth.springbootsrap.models.users.User;
@@ -104,6 +105,8 @@ public class AuthController {
 
 	@PostMapping("/signup")
 	public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest signUpRequest) {
+		System.out.println(signUpRequest.toString());
+
 		if (userRepository.existsByUsername(signUpRequest.getUsername())) {
 			return ResponseEntity
 					.badRequest()
@@ -121,6 +124,7 @@ public class AuthController {
 							 signUpRequest.getEmail(),
 							 encoder.encode(signUpRequest.getPassword()), signUpRequest.getRole());
 		userRepository.save(user);
-		return ResponseEntity.ok(user);
+
+		return ResponseEntity.ok(new UserApiResponse(user.getId(), user.getUsername()));
 	}
 }

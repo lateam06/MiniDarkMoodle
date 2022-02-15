@@ -3,8 +3,9 @@ Feature: Get Course
   # Enter feature description here
   Background:
     Given a teacher named "Marcel"
-    And the teacher "Marcel" is connected
     And a student named "Louis"
+    And "Marcel" is connected
+    And "Louis" is connected
     And a module named "le C pour les nuls"
     And a course named "introduction" with a description "cours d'introduction au c très facile"
     And the course "introduction" has been added by "Marcel" into "le C pour les nuls"

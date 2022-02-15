@@ -1,6 +1,8 @@
 package fr.uca.springbootstrap;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.cucumber.spring.CucumberContextConfiguration;
@@ -21,11 +23,11 @@ import org.springframework.http.*;
 @SpringBootTest(classes = SpringBootSecurityPostgresqlApplication.class, webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class SpringIntegration {
     static ResponseResults latestResponse = null;
-    private final CloseableHttpClient httpClient = HttpClients.createDefault();
+    protected final CloseableHttpClient httpClient = HttpClients.createDefault();
     protected HttpResponse latestHttpResponse;
     protected ObjectMapper ObjMapper = new ObjectMapper();
-
     protected String latestJson;
+    protected static Map<String, String> tokenHashMap = new HashMap<>();
 
     void executeGet(String url,  String jwt) throws IOException {
         HttpGet request = new HttpGet(url);

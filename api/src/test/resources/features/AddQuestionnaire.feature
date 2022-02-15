@@ -3,6 +3,8 @@ Feature: AddQuestionnaire
   Background:
     Given a teacher named "Marcel"
     And a student named "Louis"
+    And "Marcel" is connected
+    And "Louis" is connected
     And a module named "le C pour les nuls"
     And a questionnaire with name "questionnaire"
     And another questionnaire with name "autre questionnaire" and description "QCM facile"

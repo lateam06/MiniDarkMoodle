@@ -3,6 +3,8 @@ Feature: AddCourse
   Background:
     Given a teacher named "Marcel"
     And a student named "Louis"
+    And "Marcel" is connected
+    And "Louis" is connected
     And a module named "le C pour les nuls"
     And a course with name "introduction"
 

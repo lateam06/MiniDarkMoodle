@@ -3,6 +3,8 @@ Feature: Module Creation and Managing
   Background:
     Given a teacher named "Ernesto"
     And a student named "Yann"
+    And "Ernesto" is connected
+    And "Yann" is connected
     And a module named "le C pour les nuls"
 
   Scenario: Teacher create a new module and assign himself on it

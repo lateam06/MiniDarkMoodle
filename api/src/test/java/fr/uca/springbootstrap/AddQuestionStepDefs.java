@@ -1,6 +1,7 @@
 package fr.uca.springbootstrap;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import fr.uca.springbootstrap.models.users.UserApi;
 import fr.uca.springbootstrap.payload.request.CreateNewOpenRequest;
 import fr.uca.springbootstrap.payload.request.CreateNewQCMRequest;
 import fr.uca.springbootstrap.controllers.AuthController;
@@ -9,7 +10,6 @@ import fr.uca.springbootstrap.models.modules.questions.OpenQuestion;
 import fr.uca.springbootstrap.models.modules.questions.QCM;
 import fr.uca.springbootstrap.models.modules.questions.Question;
 import fr.uca.springbootstrap.models.modules.questions.Questionnary;
-import fr.uca.springbootstrap.models.users.User;
 import fr.uca.springbootstrap.repository.*;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Then;
@@ -38,13 +38,10 @@ public class AddQuestionStepDefs extends SpringIntegration {
     RoleRepository roleRepository;
 
     @Autowired
-    UserRepository userRepository;
+    UserApiRepository userRepository;
 
     @Autowired
     AuthController authController;
-
-    @Autowired
-    PasswordEncoder encoder;
 
     @Autowired
     CourseRepository courseRepository;
@@ -63,12 +60,12 @@ public class AddQuestionStepDefs extends SpringIntegration {
 
     @And("{string} has registered the questionnaire {string} to the module {string}")
     public void hasRegisteredTheQuestionnaireToTheModule(String teacherName, String questionnaireName, String moduleName) throws IOException {
-        User teacher = userRepository.findByUsername(teacherName).get();
+        UserApi teacher = userRepository.findByUsername(teacherName).get();
         Questionnary questionnary = questionnaryRepository.findByName(questionnaireName).get();
         Module module = moduleRepository.findByName(moduleName).get();
 
-        String token = authController.generateJwt(teacherName, PASSWORD);
-        executePut(Questionnary.generateUrl(module.getId(), questionnary.getId()), token);
+        String jwt = SpringIntegration.tokenHashMap.get(teacherName);
+        executePut(Questionnary.generateUrl(module.getId(), questionnary.getId()), jwt);
         EntityUtils.consume(latestHttpResponse.getEntity());
 
         module = moduleRepository.findByName(moduleName).get();
@@ -77,13 +74,13 @@ public class AddQuestionStepDefs extends SpringIntegration {
 
     @When("{string} wants to add a QCM {string} to the questionnaire {string} of the module {string}")
     public void wantsToAddAQCMToTheQuestionnaireOfTheModule(String userName, String qcmName, String questionnaireName, String moduleName) throws IOException {
-        User user = userRepository.findByUsername(userName).get();
+        UserApi userApi = userRepository.findByUsername(userName).get();
         Questionnary questionnary = questionnaryRepository.findByName(questionnaireName).get();
         Module module = moduleRepository.findByName(moduleName).get();
 
         CreateNewQCMRequest qcm = new CreateNewQCMRequest(qcmName, "description du cours", "reponse a la question");
         String url = "http://localhost:8080/api/module/" + module.getId() + "/resources/" + questionnary.getId() + "/qcm";
-        String token = authController.generateJwt(user.getUsername(), PASSWORD);
+        String token = SpringIntegration.tokenHashMap.get(userApi.getUsername());
         executePost(url, qcm, token);
         System.out.println("http: "+  EntityUtils.toString(latestHttpResponse.getEntity()));
         EntityUtils.consume(latestHttpResponse.getEntity());
@@ -106,13 +103,13 @@ public class AddQuestionStepDefs extends SpringIntegration {
 
     @When("{string} wants to add an Open {string} to the questionnaire {string} of the module {string}")
     public void wantsToAddAnOpenToTheQuestionnaireOfTheModule(String userName, String openName, String questionnaireName, String moduleName) throws IOException {
-        User user = userRepository.findByUsername(userName).get();
+        UserApi userApi = userRepository.findByUsername(userName).get();
         Questionnary questionnary = questionnaryRepository.findByName(questionnaireName).get();
         Module module = moduleRepository.findByName(moduleName).get();
 
         CreateNewOpenRequest openRequest = new CreateNewOpenRequest(openName, "description du cours", "reponse a la question");
         String url = "http://localhost:8080/api/module/" + module.getId() + "/resources/" + questionnary.getId() + "/open_question";
-        String token = authController.generateJwt(user.getUsername(), PASSWORD);
+        String token = SpringIntegration.tokenHashMap.get(userApi.getUsername());
         executePost(url, openRequest, token);
         System.out.println("http: "+  EntityUtils.toString(latestHttpResponse.getEntity()));
         EntityUtils.consume(latestHttpResponse.getEntity());
@@ -135,13 +132,13 @@ public class AddQuestionStepDefs extends SpringIntegration {
 
     @When("{string} wants to get a QCM {string} from the questionnaire {string} of the module {string}")
     public void wantsToGetAQCMFromTheQuestionnaireOfTheModule(String userName, String qcmName, String questionnaireName, String moduleName) throws IOException {
-        User user = userRepository.findByUsername(userName).get();
+        UserApi userApi = userRepository.findByUsername(userName).get();
         Questionnary questionnary = questionnaryRepository.findByName(questionnaireName).get();
         Module module = moduleRepository.findByName(moduleName).get();
         QCM qcm = qcmRepository.findByName(qcmName).get();
 
         String url = "http://localhost:8080/api/module/" + module.getId() + "/resources/" + questionnary.getId() + "/questions/" + qcm.getId();
-        String token = authController.generateJwt(userName, PASSWORD);
+        String token = SpringIntegration.tokenHashMap.get(userName);
         executeGet(url, token);
         EntityUtils.consume(latestHttpResponse.getEntity());
     }
@@ -154,13 +151,13 @@ public class AddQuestionStepDefs extends SpringIntegration {
 
     @When("{string} wants to get an OpenQuestion {string} from the questionnaire {string} of the module {string}")
     public void wantsToGetAnOpenQuestionFromTheQuestionnaireOfTheModule(String userName, String openName, String questionnaireName, String moduleName) throws IOException {
-        User user = userRepository.findByUsername(userName).get();
+        UserApi userApi = userRepository.findByUsername(userName).get();
         Questionnary questionnary = questionnaryRepository.findByName(questionnaireName).get();
         Module module = moduleRepository.findByName(moduleName).get();
         OpenQuestion open = openQuestionRepository.findByName(openName).get();
 
         String url = "http://localhost:8080/api/module/" + module.getId() + "/resources/" + questionnary.getId() + "/questions/" + open.getId();
-        String token = authController.generateJwt(userName, PASSWORD);
+        String token = SpringIntegration.tokenHashMap.get(userName);
         executeGet(url, token);
         EntityUtils.consume(latestHttpResponse.getEntity());
     }
@@ -173,7 +170,7 @@ public class AddQuestionStepDefs extends SpringIntegration {
 
     @When("{string} wants to delete a Question {string} from the questionnaire {string} of the module {string}")
     public void wantsToDeleteAQuestionFromTheQuestionnaireOfTheModule(String userName, String questionName, String questionnaireName, String moduleName) throws IOException {
-        User user = userRepository.findByUsername(userName).get();
+        UserApi userApi = userRepository.findByUsername(userName).get();
         Questionnary questionnary = questionnaryRepository.findByName(questionnaireName).get();
         Module module = moduleRepository.findByName(moduleName).get();
         Optional<OpenQuestion> optionalOpenQuestion = openQuestionRepository.findByName(questionName);
@@ -181,7 +178,7 @@ public class AddQuestionStepDefs extends SpringIntegration {
         Question question = questionRepository.findByName(questionName).get();
 
         String url = "http://localhost:8080/api/module/" + module.getId() + "/resources/" + questionnary.getId() + "/questions/" + question.getId();
-        String token = authController.generateJwt(userName, PASSWORD);
+        String token = SpringIntegration.tokenHashMap.get(userName);
         executeDelete(url, token);
         System.out.println("http deleted : "+  EntityUtils.toString(latestHttpResponse.getEntity()));
         EntityUtils.consume(latestHttpResponse.getEntity());
@@ -197,14 +194,14 @@ public class AddQuestionStepDefs extends SpringIntegration {
 
     @And("{string} has already registered a QCM {string} to the questionnaire {string} of the module {string}")
     public void hasAlreadyRegisteredAQCMToTheQuestionnaireOfTheModule(String userName, String qcmName, String questionnaireName, String moduleName) throws IOException {
-        User user = userRepository.findByUsername(userName).get();
+        UserApi userApi = userRepository.findByUsername(userName).get();
         Questionnary questionnary = questionnaryRepository.findByName(questionnaireName).get();
         Module module = moduleRepository.findByName(moduleName).get();
 
         if(questionRepository.findByName(qcmName).isEmpty()) {
             CreateNewQCMRequest qcm = new CreateNewQCMRequest(qcmName, "description du cours", "reponse a la question");
             String url = "http://localhost:8080/api/module/" + module.getId() + "/resources/" + questionnary.getId() + "/qcm";
-            String token = authController.generateJwt(user.getUsername(), PASSWORD);
+            String token = SpringIntegration.tokenHashMap.get(userName);
             executePost(url, qcm, token);
             System.out.println("http already : " + EntityUtils.toString(latestHttpResponse.getEntity()));
             EntityUtils.consume(latestHttpResponse.getEntity());
@@ -213,14 +210,14 @@ public class AddQuestionStepDefs extends SpringIntegration {
 
     @And("{string} has already registered an Open {string} to the questionnaire {string} of the module {string}")
     public void hasAlreadyRegisteredAnOpenToTheQuestionnaireOfTheModule(String userName, String openName, String questionnaireName, String moduleName) throws IOException {
-        User user = userRepository.findByUsername(userName).get();
+        UserApi userApi = userRepository.findByUsername(userName).get();
         Questionnary questionnary = questionnaryRepository.findByName(questionnaireName).get();
         Module module = moduleRepository.findByName(moduleName).get();
 
         if(questionRepository.findByName(openName).isEmpty()) {
             CreateNewOpenRequest openRequest = new CreateNewOpenRequest(openName, "description du cours", "reponse a la question");
             String url = "http://localhost:8080/api/module/" + module.getId() + "/resources/" + questionnary.getId() + "/open_question";
-            String token = authController.generateJwt(user.getUsername(), PASSWORD);
+            String token = SpringIntegration.tokenHashMap.get(userApi.getUsername());
             executePost(url, openRequest, token);
             System.out.println("http already : " + EntityUtils.toString(latestHttpResponse.getEntity()));
             EntityUtils.consume(latestHttpResponse.getEntity());

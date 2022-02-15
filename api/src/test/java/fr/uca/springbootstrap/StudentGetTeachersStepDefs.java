@@ -4,9 +4,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import fr.uca.springbootstrap.payload.response.TeacherResponse;
 import fr.uca.springbootstrap.controllers.AuthController;
 import fr.uca.springbootstrap.models.modules.Module;
-import fr.uca.springbootstrap.models.users.User;
+import fr.uca.springbootstrap.models.users.UserApi;
 import fr.uca.springbootstrap.repository.ModuleRepository;
-import fr.uca.springbootstrap.repository.UserRepository;
+import fr.uca.springbootstrap.repository.UserApiRepository;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +21,7 @@ public class StudentGetTeachersStepDefs extends SpringIntegration{
 
 
     @Autowired
-    UserRepository userRepository;
+    UserApiRepository userRepository;
 
     @Autowired
     ModuleRepository moduleRepository;
@@ -31,11 +31,11 @@ public class StudentGetTeachersStepDefs extends SpringIntegration{
 
     @When("{string} wants to access the teacher of the module {string}")
     public void wantsToAccessTheTeacherOfTheModule(String arg0, String arg1) throws IOException {
-        User student = userRepository.findByUsername(arg0).get();
+        UserApi student = userRepository.findByUsername(arg0).get();
         Module module = moduleRepository.findByName(arg1).get();
 
         String url = "http://localhost:8080/api/module/" + module.getId() + "/teachers";
-        String jwt = authController.generateJwt(student.getUsername(), PASSWORD);
+        String jwt = SpringIntegration.tokenHashMap.get(student.getUsername());
 
         executeGet(url, jwt);
 

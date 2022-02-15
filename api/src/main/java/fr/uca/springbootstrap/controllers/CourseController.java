@@ -5,15 +5,12 @@ import fr.uca.springbootstrap.models.modules.Module;
 import fr.uca.springbootstrap.models.modules.Resource;
 import fr.uca.springbootstrap.models.modules.courses.Course;
 import fr.uca.springbootstrap.models.modules.courses.Text;
-import fr.uca.springbootstrap.models.users.User;
+import fr.uca.springbootstrap.models.users.UserApi;
 import fr.uca.springbootstrap.payload.request.CreateTextRequest;
 import fr.uca.springbootstrap.repository.*;
-import fr.uca.springbootstrap.security.services.jwt.JwtUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.persistence.DiscriminatorValue;
@@ -26,11 +23,9 @@ import java.util.Optional;
 @RequestMapping("/api/module")
 public class CourseController {
 
-    @Autowired
-    AuthenticationManager authenticationManager;
 
     @Autowired
-    UserRepository userRepository;
+    UserApiRepository userRepository;
 
     @Autowired
     RoleRepository roleRepository;
@@ -41,11 +36,6 @@ public class CourseController {
     @Autowired
     ResourcesRepository resourcesRepository;
 
-    @Autowired
-    PasswordEncoder encoder;
-
-    @Autowired
-    JwtUtils jwtUtils;
 
     @Autowired
     CourseRepository courseRepository;
@@ -56,7 +46,7 @@ public class CourseController {
 
 
     private ResponseEntity<?> verifyCourseInfo(Principal principal, long module_id, long course_id) {
-        Optional<User> ouser = userRepository.findByUsername(principal.getName());
+        Optional<UserApi> ouser = userRepository.findByUsername(principal.getName());
         Optional<Module> omodule = moduleRepository.findById(module_id);
         Optional<Resource> ocourse = resourcesRepository.findById(course_id);
 
@@ -73,11 +63,11 @@ public class CourseController {
                     .body(new MessageResponse("Error : You can ony add texts to a course."));
         }
 
-        User user = ouser.get();
+        UserApi userApi = ouser.get();
         Module module = omodule.get();
         Course course = (Course) ocourse.get();
 
-        if (!module.getParticipants().contains(user)) {
+        if (!module.getParticipants().contains(userApi)) {
             return ResponseEntity.badRequest()
                     .body("Error : The user is not registered to the module.");
         }

@@ -8,17 +8,14 @@ import fr.uca.springbootstrap.models.modules.courses.Course;
 import fr.uca.springbootstrap.models.modules.questions.Questionnary;
 import fr.uca.springbootstrap.models.users.ERole;
 import fr.uca.springbootstrap.models.users.Role;
-import fr.uca.springbootstrap.models.users.User;
+import fr.uca.springbootstrap.models.users.UserApi;
 import fr.uca.springbootstrap.payload.request.CreateModuleRequest;
 import fr.uca.springbootstrap.payload.request.ResourceRequest;
 import fr.uca.springbootstrap.payload.response.TeacherResponse;
 import fr.uca.springbootstrap.repository.*;
-import fr.uca.springbootstrap.security.services.jwt.JwtUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.persistence.DiscriminatorValue;
@@ -32,10 +29,7 @@ import java.util.*;
 public class ModuleController {
 
     @Autowired
-    AuthenticationManager authenticationManager;
-
-    @Autowired
-    UserRepository userRepository;
+    UserApiRepository userRepository;
 
     @Autowired
     RoleRepository roleRepository;
@@ -45,12 +39,6 @@ public class ModuleController {
 
     @Autowired
     ResourcesRepository resourcesRepository;
-
-    @Autowired
-    PasswordEncoder encoder;
-
-    @Autowired
-    JwtUtils jwtUtils;
 
     @Autowired
     CourseRepository courseRepository;
@@ -101,7 +89,7 @@ public class ModuleController {
     @PreAuthorize("hasRole('TEACHER')")
     public ResponseEntity<?> getSingleModuleUser(@PathVariable long moduleId, @PathVariable long userId) {
         Optional<Module> omodule = moduleRepository.findById(moduleId);
-        Optional<User> ouser = userRepository.findById(userId);
+        Optional<UserApi> ouser = userRepository.findById(userId);
 
         if (omodule.isEmpty()) {
             return ResponseEntity
@@ -115,14 +103,14 @@ public class ModuleController {
         }
 
         Module module = omodule.get();
-        User user = ouser.get();
-        Set<User> participants = module.getParticipants();
-        if ((!participants.contains(user))) {
+        UserApi userApi = ouser.get();
+        Set<UserApi> participants = module.getParticipants();
+        if ((!participants.contains(userApi))) {
             return ResponseEntity
                     .badRequest()
                     .body(new MessageResponse("Error: No such user in this module"));
         }
-        return ResponseEntity.ok(user);
+        return ResponseEntity.ok(userApi);
     }
 
     @GetMapping("/{moduleId}/participants")
@@ -137,8 +125,8 @@ public class ModuleController {
         }
 
         Module module = omodule.get();
-        User actor = userRepository.findByUsername(principal.getName()).get();
-        Set<User> participants = module.getParticipants();
+        UserApi actor = userRepository.findByUsername(principal.getName()).get();
+        Set<UserApi> participants = module.getParticipants();
         if (!participants.contains(actor)) {
             return ResponseEntity
                     .badRequest()
@@ -153,7 +141,7 @@ public class ModuleController {
     @PreAuthorize("hasRole('TEACHER')")
     public ResponseEntity<?> addUserToModule(Principal principal, @PathVariable long moduleId, @PathVariable long userid) {
         Optional<Module> omodule = moduleRepository.findById(moduleId);
-        Optional<User> ouser = userRepository.findById(userid);
+        Optional<UserApi> ouser = userRepository.findById(userid);
         if (omodule.isEmpty()) {
             return ResponseEntity
                     .badRequest()
@@ -166,13 +154,13 @@ public class ModuleController {
         }
 
         Module module = omodule.get();
-        User user = ouser.get();
-        User actor = userRepository.findByUsername(principal.getName()).get();
+        UserApi userApi = ouser.get();
+        UserApi actor = userRepository.findByUsername(principal.getName()).get();
 
-        Set<User> participants = module.getParticipants();
-        if ((participants.isEmpty() && actor.equals(user))
+        Set<UserApi> participants = module.getParticipants();
+        if ((participants.isEmpty() && actor.equals(userApi))
                 || participants.contains(actor)) {
-            participants.add(user);
+            participants.add(userApi);
         } else {
             return ResponseEntity
                     .badRequest()
@@ -311,7 +299,7 @@ public class ModuleController {
     @PreAuthorize("hasRole('TEACHER')")
     public ResponseEntity<?> removeUser(Principal principal, @PathVariable long moduleId, @PathVariable long userId) {
         Optional<Module> omodule = moduleRepository.findById(moduleId);
-        Optional<User> ouser = userRepository.findById(userId);
+        Optional<UserApi> ouser = userRepository.findById(userId);
         if (omodule.isEmpty()) {
             return ResponseEntity
                     .badRequest()
@@ -324,13 +312,13 @@ public class ModuleController {
         }
 
         Module module = omodule.get();
-        User user = ouser.get();
-        User actor = userRepository.findByUsername(principal.getName()).get();
+        UserApi userApi = ouser.get();
+        UserApi actor = userRepository.findByUsername(principal.getName()).get();
 
-        Set<User> participants = module.getParticipants();
-        if ((participants.isEmpty() && actor.equals(user))
+        Set<UserApi> participants = module.getParticipants();
+        if ((participants.isEmpty() && actor.equals(userApi))
                 || participants.contains(actor)) {
-            participants.remove(user);
+            participants.remove(userApi);
         } else {
             return ResponseEntity
                     .badRequest()
@@ -352,8 +340,8 @@ public class ModuleController {
         }
 
         Module module = omodule.get();
-        User actor = userRepository.findByUsername(principal.getName()).get();
-        Set<User> participants = module.getParticipants();
+        UserApi actor = userRepository.findByUsername(principal.getName()).get();
+        Set<UserApi> participants = module.getParticipants();
 
         if (participants.contains(actor)) {
             moduleRepository.delete(module);
@@ -393,8 +381,8 @@ public class ModuleController {
         }
 
         Module module = omodule.get();
-        User actor = userRepository.findByUsername(principal.getName()).get();
-        Set<User> participants = module.getParticipants();
+        UserApi actor = userRepository.findByUsername(principal.getName()).get();
+        Set<UserApi> participants = module.getParticipants();
 
         if (!participants.contains(actor)) {
             return ResponseEntity
@@ -403,7 +391,7 @@ public class ModuleController {
         }
 
         List<String> teachers = new ArrayList<>();
-        for (User participant : participants) {
+        for (UserApi participant : participants) {
             for (Role r : participant.getRoles()) {
                 if (r.getName().compareTo(ERole.ROLE_TEACHER) == 0) {
                     teachers.add(participant.getUsername());
@@ -413,39 +401,5 @@ public class ModuleController {
         TeacherResponse teacherResponse = new TeacherResponse();
         teacherResponse.setTeachers(teachers);
         return ResponseEntity.ok(teacherResponse);
-    }
-
-    User createUser(String userName, String email, String password, Set<String> strRoles) {
-        User user = new User(userName, email, password);
-        Set<Role> roles = new HashSet<>();
-
-        if (strRoles == null) {
-            Role userRole = roleRepository.findByName(ERole.ROLE_STUDENT)
-                    .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
-            roles.add(userRole);
-        } else {
-            strRoles.forEach(role -> {
-                switch (role) {
-                    case "admin":
-                        Role adminRole = roleRepository.findByName(ERole.ROLE_ADMIN)
-                                .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
-                        roles.add(adminRole);
-
-                        break;
-                    case "mod":
-                        Role modRole = roleRepository.findByName(ERole.ROLE_TEACHER)
-                                .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
-                        roles.add(modRole);
-
-                        break;
-                    default:
-                        Role userRole = roleRepository.findByName(ERole.ROLE_STUDENT)
-                                .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
-                        roles.add(userRole);
-                }
-            });
-        }
-        user.setRoles(roles);
-        return user;
     }
 }

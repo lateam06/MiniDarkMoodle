@@ -10,6 +10,4 @@ public class SpringBootSecurityPostgresqlApplication {
 		SpringApplication.run(SpringBootSecurityPostgresqlApplication.class, args);
 	}
 
-
-
 }

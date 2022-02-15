@@ -3,6 +3,8 @@ Feature: Register Student
   Background:
     Given a teacher named "Steve"
     And a student named "Bruce"
+    And "Steve" is connected
+    And "Bruce" is connected
     And a module named "Gestion de projet"
     And "Steve" is the teacher registered to the module "Gestion de projet"
 
