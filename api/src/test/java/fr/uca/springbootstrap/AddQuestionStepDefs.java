@@ -1,22 +1,17 @@
 package fr.uca.springbootstrap;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import fr.uca.springbootstrap.models.modules.questions.*;
 import fr.uca.springbootstrap.models.users.UserApi;
-import fr.uca.springbootstrap.payload.request.CreateNewOpenRequest;
-import fr.uca.springbootstrap.payload.request.CreateNewQCMRequest;
+import fr.uca.springbootstrap.payload.request.CreateQuestionRequest;
 import fr.uca.springbootstrap.controllers.AuthController;
 import fr.uca.springbootstrap.models.modules.Module;
-import fr.uca.springbootstrap.models.modules.questions.OpenQuestion;
-import fr.uca.springbootstrap.models.modules.questions.QCM;
-import fr.uca.springbootstrap.models.modules.questions.Question;
-import fr.uca.springbootstrap.models.modules.questions.Questionnary;
 import fr.uca.springbootstrap.repository.*;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import org.apache.http.util.EntityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -78,10 +73,10 @@ public class AddQuestionStepDefs extends SpringIntegration {
         Questionnary questionnary = questionnaryRepository.findByName(questionnaireName).get();
         Module module = moduleRepository.findByName(moduleName).get();
 
-        CreateNewQCMRequest qcm = new CreateNewQCMRequest(qcmName, "description du cours", "reponse a la question");
-        String url = "http://localhost:8080/api/module/" + module.getId() + "/resources/" + questionnary.getId() + "/qcm";
+        CreateQuestionRequest question = new CreateQuestionRequest(qcmName, "description du cours", "reponse a la question", EQuestion.QCM);
+        String url = "http://localhost:8080/api/module/" + module.getId() + "/resources/" + questionnary.getId() + "/questions";
         String token = SpringIntegration.tokenHashMap.get(userApi.getUsername());
-        executePost(url, qcm, token);
+        executePost(url, question, token);
         System.out.println("http: "+  EntityUtils.toString(latestHttpResponse.getEntity()));
         EntityUtils.consume(latestHttpResponse.getEntity());
     }
@@ -107,8 +102,8 @@ public class AddQuestionStepDefs extends SpringIntegration {
         Questionnary questionnary = questionnaryRepository.findByName(questionnaireName).get();
         Module module = moduleRepository.findByName(moduleName).get();
 
-        CreateNewOpenRequest openRequest = new CreateNewOpenRequest(openName, "description du cours", "reponse a la question");
-        String url = "http://localhost:8080/api/module/" + module.getId() + "/resources/" + questionnary.getId() + "/open_question";
+        CreateQuestionRequest openRequest = new CreateQuestionRequest(openName, "description du cours", "reponse a la question", EQuestion.OPEN);
+        String url = "http://localhost:8080/api/module/" + module.getId() + "/resources/" + questionnary.getId() + "/questions";
         String token = SpringIntegration.tokenHashMap.get(userApi.getUsername());
         executePost(url, openRequest, token);
         System.out.println("http: "+  EntityUtils.toString(latestHttpResponse.getEntity()));
@@ -145,7 +140,7 @@ public class AddQuestionStepDefs extends SpringIntegration {
 
     @Then("{string} can succesfully get the QCM {string} from the questionnaire {string} of the module {string}")
     public void canSuccesfullyGetTheQCMFromTheQuestionnaireOfTheModule(String arg0, String arg1, String arg2, String arg3) throws JsonProcessingException {
-        var qcm = ObjMapper.readValue(latestJson, CreateNewQCMRequest.class);
+        var qcm = ObjMapper.readValue(latestJson, CreateQuestionRequest.class);
         assertTrue(qcm.getName().equalsIgnoreCase(arg1));
     }
 
@@ -164,7 +159,7 @@ public class AddQuestionStepDefs extends SpringIntegration {
 
     @Then("{string} can succesfully get the OpenQuestion {string} from the questionnaire {string} of the module {string}")
     public void canSuccesfullyGetTheOpenQuestionFromTheQuestionnaireOfTheModule(String arg0, String arg1, String arg2, String arg3) throws JsonProcessingException {
-        var open = ObjMapper.readValue(latestJson, CreateNewOpenRequest.class);
+        var open = ObjMapper.readValue(latestJson, CreateQuestionRequest.class);
         assertTrue(open.getName().equalsIgnoreCase(arg1));
     }
 
@@ -199,10 +194,10 @@ public class AddQuestionStepDefs extends SpringIntegration {
         Module module = moduleRepository.findByName(moduleName).get();
 
         if(questionRepository.findByName(qcmName).isEmpty()) {
-            CreateNewQCMRequest qcm = new CreateNewQCMRequest(qcmName, "description du cours", "reponse a la question");
-            String url = "http://localhost:8080/api/module/" + module.getId() + "/resources/" + questionnary.getId() + "/qcm";
+            CreateQuestionRequest question = new CreateQuestionRequest(qcmName, "description du cours", "reponse a la question", EQuestion.QCM);
+            String url = "http://localhost:8080/api/module/" + module.getId() + "/resources/" + questionnary.getId() + "/questions";
             String token = SpringIntegration.tokenHashMap.get(userName);
-            executePost(url, qcm, token);
+            executePost(url, question, token);
             System.out.println("http already : " + EntityUtils.toString(latestHttpResponse.getEntity()));
             EntityUtils.consume(latestHttpResponse.getEntity());
         }
@@ -215,8 +210,8 @@ public class AddQuestionStepDefs extends SpringIntegration {
         Module module = moduleRepository.findByName(moduleName).get();
 
         if(questionRepository.findByName(openName).isEmpty()) {
-            CreateNewOpenRequest openRequest = new CreateNewOpenRequest(openName, "description du cours", "reponse a la question");
-            String url = "http://localhost:8080/api/module/" + module.getId() + "/resources/" + questionnary.getId() + "/open_question";
+            CreateQuestionRequest openRequest = new CreateQuestionRequest(openName, "description du cours", "reponse a la question", EQuestion.OPEN);
+            String url = "http://localhost:8080/api/module/" + module.getId() + "/resources/" + questionnary.getId() + "/questions";
             String token = SpringIntegration.tokenHashMap.get(userApi.getUsername());
             executePost(url, openRequest, token);
             System.out.println("http already : " + EntityUtils.toString(latestHttpResponse.getEntity()));
