@@ -73,7 +73,14 @@ public class AddCourseStepDefs extends SpringIntegration {
             assertEquals(200, response.getStatusLine().getStatusCode());
 
             UserApiResponse resp = ObjMapper.readValue(bodyResponseAuthServer,UserApiResponse.class); //TODO Récup le user depuis le server d'auth
-            userApiRepository.save(new UserApi(resp.getId(), resp.getUsername()));
+
+            UserApi userApi = new UserApi(resp.getId(), resp.getUsername());
+            userApi.setRoles(new HashSet<>() {{
+                add(roleRepository.findByName(ERole.ROLE_TEACHER).
+                        orElseThrow(() -> new RuntimeException("Error: Role is not found.")));
+            }});
+
+            userApiRepository.save(userApi);
         }
 
     }
@@ -99,11 +106,16 @@ public class AddCourseStepDefs extends SpringIntegration {
             assertEquals(200, response.getStatusLine().getStatusCode());
 
             UserApiResponse resp = ObjMapper.readValue(bodyResponseAuthServer,UserApiResponse.class); //TODO Récup le user depuis le server d'auth
-            userApiRepository.save(new UserApi(resp.getId(), resp.getUsername()));
+
+            UserApi userApi = new UserApi(resp.getId(), resp.getUsername());
+            userApi.setRoles(new HashSet<>() {{
+                add(roleRepository.findByName(ERole.ROLE_STUDENT).
+                        orElseThrow(() -> new RuntimeException("Error: Role is not found.")));
+            }});
+            userApiRepository.save(userApi);
         }
 
     }
-
 
     @And("a course named {string} with a description {string}")
     public void aCourseWithName(String arg0, String arg1) {
