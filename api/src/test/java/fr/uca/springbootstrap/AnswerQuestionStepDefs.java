@@ -2,18 +2,13 @@ package fr.uca.springbootstrap;
 
 import fr.uca.springbootstrap.controllers.AuthController;
 import fr.uca.springbootstrap.models.modules.Module;
-import fr.uca.springbootstrap.models.modules.questions.QCM;
-import fr.uca.springbootstrap.models.modules.questions.QCMAttempt;
-import fr.uca.springbootstrap.models.modules.questions.QCMResponse;
-import fr.uca.springbootstrap.models.modules.questions.Questionnary;
+import fr.uca.springbootstrap.models.modules.questions.*;
 import fr.uca.springbootstrap.models.users.UserApi;
-import fr.uca.springbootstrap.payload.request.AnswerQCMRequest;
+import fr.uca.springbootstrap.payload.request.AnswerQuestionRequest;
 import fr.uca.springbootstrap.repository.*;
-import io.cucumber.java.bs.A;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
-import org.apache.http.util.EntityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -112,8 +107,8 @@ public class AnswerQuestionStepDefs extends SpringIntegration {
         String url = "http://localhost:8080/api"
                 + "/module/" + module.getId()
                 + "/resources/" + questionnary.getId()
-                + "/qcm/" + qcm.getId();
-        AnswerQCMRequest re = new AnswerQCMRequest(qcmResponse.getId(), qcmResponse.getDescription());
+                + "/questions/" + qcm.getId();
+        AnswerQuestionRequest re = new AnswerQuestionRequest(qcmResponse.getId(), qcmResponse.getDescription(), EQuestion.QCM);
         executePost(url, re, token);
     }
 
