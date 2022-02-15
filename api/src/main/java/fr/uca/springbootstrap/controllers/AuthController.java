@@ -1,6 +1,7 @@
 package fr.uca.springbootstrap.controllers;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -8,6 +9,7 @@ import java.util.stream.Collectors;
 
 import javax.validation.Valid;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lateam.payload.request.LoginRequest;
 import com.lateam.payload.request.SignupRequest;
@@ -17,6 +19,7 @@ import fr.uca.springbootstrap.models.users.ERole;
 import fr.uca.springbootstrap.models.users.Role;
 import fr.uca.springbootstrap.models.users.User;
 import fr.uca.springbootstrap.security.services.jwt.JwtUtils;
+import io.jsonwebtoken.Jwt;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
@@ -68,18 +71,33 @@ public class AuthController {
     }
 
     @PostMapping("/signin")
-    public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
-        String jwt = generateJwt(loginRequest.getUsername(), loginRequest.getPassword());
-        UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
-        List<String> roles = userDetails.getAuthorities().stream()
-                .map(item -> item.getAuthority())
-                .collect(Collectors.toList());
+    public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) throws IOException {
 
-        return ResponseEntity.ok(new JwtResponse(jwt,
-                userDetails.getId(),
-                userDetails.getUsername(),
-                userDetails.getEmail(),
-                roles));
+        HttpPost request = new HttpPost("http://localhost:8081/api/auth/signin");
+        request.addHeader("content-type", "application/json");
+
+        request.setEntity(new StringEntity(ObjMapper.writeValueAsString(loginRequest)));
+
+        HttpResponse response =  httpClient.execute(request);
+        String bodyResponseAuthServer = EntityUtils.toString(response.getEntity());
+
+        System.out.println(bodyResponseAuthServer);
+
+        JwtResponse jwtResponse = ObjMapper.readValue(bodyResponseAuthServer, JwtResponse.class);
+
+        return ResponseEntity.ok(jwtResponse);
+
+//        String jwt = generateJwt(loginRequest.getUsername(), loginRequest.getPassword());
+//        UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+//        List<String> roles = userDetails.getAuthorities().stream()
+//                .map(item -> item.getAuthority())
+//                .collect(Collectors.toList());
+
+//        return ResponseEntity.ok(new JwtResponse(jwt,
+//                userDetails.getId(),
+//                userDetails.getUsername(),
+//                userDetails.getEmail(),
+//                roles));
     }
 
     public User createUser(String userName, String email, String password, Set<String> strRoles) {
