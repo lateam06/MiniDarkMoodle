@@ -2,11 +2,13 @@ package fr.uca.springbootstrap.controllers;
 
 import com.lateam.payload.response.MessageResponse;
 import fr.uca.springbootstrap.models.modules.Module;
+import fr.uca.springbootstrap.models.modules.Resource;
 import fr.uca.springbootstrap.models.modules.questions.*;
 import fr.uca.springbootstrap.models.users.UserApi;
 import fr.uca.springbootstrap.payload.request.AnswerQuestionRequest;
 
 import fr.uca.springbootstrap.payload.request.CreateQuestionRequest;
+import fr.uca.springbootstrap.payload.response.AllQuestionsResponse;
 import fr.uca.springbootstrap.payload.response.ResultResponse;
 import fr.uca.springbootstrap.repository.*;
 
@@ -19,6 +21,8 @@ import org.springframework.web.bind.annotation.*;
 import javax.persistence.DiscriminatorValue;
 import javax.validation.Valid;
 import java.security.Principal;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -185,9 +189,24 @@ public class QuestionController {
     @GetMapping("/{moduleId}/resources/{resourcesId}/questions")
     public ResponseEntity<?> getAllQuestion(Principal principal, @PathVariable long moduleId, @PathVariable long resourcesId) {
 
-        // TODO
+        var responseCheck = checkModuleQuestionnaryUser(principal, moduleId, resourcesId);
+        if (responseCheck != null)
+            return responseCheck;
 
-        return null;
+        Questionnary questionnary = questionnaryRepository.findById(resourcesId).get();
+
+        if (questionnary.getQuestionSet().isEmpty()) {
+            return ResponseEntity.badRequest().body("Error: the questionnary doesn't contain any questions.");
+        }
+
+        List<String> questionNames = new ArrayList<>();
+        for (Question question : questionnary.getQuestionSet()) {
+            questionNames.add(question.getName());
+        }
+
+        AllQuestionsResponse questionsResponse = new AllQuestionsResponse();
+        questionsResponse.setQuestionNames(questionNames);
+        return ResponseEntity.ok(questionsResponse);
     }
 
     @PostMapping("/{moduleId}/resources/{resourcesId}/questions")
