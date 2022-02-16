@@ -2,6 +2,8 @@ package fr.uca.springbootstrap.models.modules.questions;
 
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
+import javax.validation.constraints.NotNull;
+import java.util.Objects;
 
 @Entity
 @DiscriminatorValue("code_runners")
@@ -9,12 +11,13 @@ public class CodeRunner extends Question{
 
     private String testCode;
 
-    private String testResponse;
+    @NotNull
+    private String response;
 
-    private String studentResponse;
-
-    public CodeRunner(String name, String description) {
+    public CodeRunner(String name, String description, String response, String testCode) {
         super(name, description);
+        this.testCode = testCode;
+        this.response = response;
     }
 
     public CodeRunner() {
@@ -28,22 +31,11 @@ public class CodeRunner extends Question{
         this.testCode = testCode;
     }
 
-    public String getTestResponse() {
-        return testResponse;
+    public String getResponse() {
+        return response;
     }
 
-    public void setTestResponse(String testResponse) {
-        this.testResponse = testResponse;
+    public void setResponse(String response) {
+        this.response = response;
     }
-
-    public String getStudentResponse() {
-        return studentResponse;
-    }
-
-    public void setStudentResponse(String studentResponse) {
-        this.studentResponse = studentResponse;
-    }
-
-
-
 }

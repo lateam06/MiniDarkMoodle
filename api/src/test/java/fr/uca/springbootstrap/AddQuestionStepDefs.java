@@ -8,6 +8,7 @@ import fr.uca.springbootstrap.controllers.AuthController;
 import fr.uca.springbootstrap.models.modules.Module;
 import fr.uca.springbootstrap.repository.*;
 import io.cucumber.java.en.And;
+import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import org.apache.http.util.EntityUtils;
@@ -73,7 +74,7 @@ public class AddQuestionStepDefs extends SpringIntegration {
         Questionnary questionnary = questionnaryRepository.findByName(questionnaireName).get();
         Module module = moduleRepository.findByName(moduleName).get();
 
-        CreateQuestionRequest question = new CreateQuestionRequest(qcmName, "description du cours", "reponse a la question", EQuestion.QCM);
+        CreateQuestionRequest question = new CreateQuestionRequest(qcmName, "description du cours", "reponse a la question", EQuestion.QCM, "");
         String url = "http://localhost:8080/api/module/" + module.getId() + "/resources/" + questionnary.getId() + "/questions";
         String token = SpringIntegration.tokenHashMap.get(userApi.getUsername());
         executePost(url, question, token);
@@ -102,7 +103,7 @@ public class AddQuestionStepDefs extends SpringIntegration {
         Questionnary questionnary = questionnaryRepository.findByName(questionnaireName).get();
         Module module = moduleRepository.findByName(moduleName).get();
 
-        CreateQuestionRequest openRequest = new CreateQuestionRequest(openName, "description du cours", "reponse a la question", EQuestion.OPEN);
+        CreateQuestionRequest openRequest = new CreateQuestionRequest(openName, "description du cours", "reponse a la question", EQuestion.OPEN, "");
         String url = "http://localhost:8080/api/module/" + module.getId() + "/resources/" + questionnary.getId() + "/questions";
         String token = SpringIntegration.tokenHashMap.get(userApi.getUsername());
         executePost(url, openRequest, token);
@@ -194,7 +195,7 @@ public class AddQuestionStepDefs extends SpringIntegration {
         Module module = moduleRepository.findByName(moduleName).get();
 
         if(questionRepository.findByName(qcmName).isEmpty()) {
-            CreateQuestionRequest question = new CreateQuestionRequest(qcmName, "description du cours", "reponse a la question", EQuestion.QCM);
+            CreateQuestionRequest question = new CreateQuestionRequest(qcmName, "description du cours", "reponse a la question", EQuestion.QCM, "");
             String url = "http://localhost:8080/api/module/" + module.getId() + "/resources/" + questionnary.getId() + "/questions";
             String token = SpringIntegration.tokenHashMap.get(userName);
             executePost(url, question, token);
@@ -210,7 +211,7 @@ public class AddQuestionStepDefs extends SpringIntegration {
         Module module = moduleRepository.findByName(moduleName).get();
 
         if(questionRepository.findByName(openName).isEmpty()) {
-            CreateQuestionRequest openRequest = new CreateQuestionRequest(openName, "description du cours", "reponse a la question", EQuestion.OPEN);
+            CreateQuestionRequest openRequest = new CreateQuestionRequest(openName, "description du cours", "reponse a la question", EQuestion.OPEN, "");
             String url = "http://localhost:8080/api/module/" + module.getId() + "/resources/" + questionnary.getId() + "/questions";
             String token = SpringIntegration.tokenHashMap.get(userApi.getUsername());
             executePost(url, openRequest, token);
@@ -232,6 +233,4 @@ public class AddQuestionStepDefs extends SpringIntegration {
     public void canNotGetTheQCMFromTheQuestionnaireOfTheModule(String userName, String qcmName, String questionnaireName, String moduleName) {
         assertTrue(latestHttpResponse.getStatusLine().getStatusCode() >= 400);
     }
-
-
 }
