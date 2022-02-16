@@ -54,6 +54,7 @@ public class AddQuestionnaireStepdefs extends SpringIntegration {
     @And("a questionnaire with name {string}")
     public void aQuestionnaireWithName(String arg0) {
         Questionnary questionnary = questionnaryRepository.findByName(arg0).orElse(new Questionnary(arg0));
+        questionnary.setVisibility(true);
         resourcesRepository.save(questionnary);
     }
 
@@ -98,34 +99,5 @@ public class AddQuestionnaireStepdefs extends SpringIntegration {
         assertEquals(arg3.compareTo(resp.getDescription()), 0);
     }
 
-    @And("a CodeRunner Question {string}")
-    public void aCodeRunnerQuestion(String arg0) {
-        Optional<CodeRunner> ocode = codeRunnerRepository.findByName(arg0);
-        if (ocode.isEmpty()) {
-            CodeRunner cr = new CodeRunner();
-            cr.setName(arg0);
-            cr.setDescription("Calculez la factoriel de n");
-            cr.setTestCode("print(fact(6))");
-            cr.setTestResponse("720");
-            questionRepository.save(cr);
-        }
 
-
-    }
-
-    @And("{string} wants to add a CodeRunner {string} to the questionnaire {string} from the module {string}")
-    public void wantsToAddACodeRunnerToTheQuestionnaireFromTheModule(String arg0, String arg1, String arg2, String arg3) throws IOException {
-        Module module = moduleRepository.findByName(arg3).get();
-        Resource resource = resourcesRepository.findByName(arg2).get();
-        CodeRunner cr = codeRunnerRepository.findByName(arg1).get();
-        CreateQuestionRequest request = new CreateQuestionRequest(cr.getName(), cr.getDescription(), cr.getTestResponse(), EQuestion.CODE);
-        request.setCodeRunner(cr);
-        String jwt = SpringIntegration.tokenHashMap.get(arg0);
-        String url = "http://localhost:8080/api/module/" + module.getId() + "/resources/" + resource.getId() + "/questions";
-
-        executePost(url, request, jwt);
-
-        assertEquals(latestHttpResponse.getStatusLine().getStatusCode(),200);
-        EntityUtils.consume(latestHttpResponse.getEntity());
-    }
 }

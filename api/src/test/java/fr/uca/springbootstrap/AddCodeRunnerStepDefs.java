@@ -3,18 +3,22 @@ package fr.uca.springbootstrap;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import fr.uca.springbootstrap.controllers.AuthController;
 import fr.uca.springbootstrap.models.modules.Module;
+import fr.uca.springbootstrap.models.modules.Resource;
 import fr.uca.springbootstrap.models.modules.questions.CodeRunner;
 import fr.uca.springbootstrap.models.modules.questions.EQuestion;
 import fr.uca.springbootstrap.models.modules.questions.Question;
 import fr.uca.springbootstrap.models.modules.questions.Questionnary;
 import fr.uca.springbootstrap.models.users.UserApi;
+import fr.uca.springbootstrap.payload.request.AnswerQuestionRequest;
 import fr.uca.springbootstrap.payload.request.CreateQuestionRequest;
+import fr.uca.springbootstrap.payload.response.ResultResponse;
 import fr.uca.springbootstrap.repository.*;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import org.apache.http.util.EntityUtils;
+import org.python.antlr.op.Mod;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
@@ -50,6 +54,10 @@ public class AddCodeRunnerStepDefs extends SpringIntegration {
 
     @Autowired
     QuestionRepository questionRepository;
+
+
+    @Autowired
+    ResultRepository resultRepository;
 
     public static String generateQuestionnaryUrl(long moduleId, long questionnaryId) {
         return BASE_URL + "module/" + moduleId + "/resources/" + questionnaryId;
@@ -179,5 +187,74 @@ public class AddCodeRunnerStepDefs extends SpringIntegration {
         CodeRunner cr = codeRunnerRepository.findByName(crName).get();
 
         assertEquals(newTestCode, cr.getTestCode());
+    }
+
+
+    @And("a CodeRunner Question {string}")
+    public void aCodeRunnerQuestion(String arg0) {
+        Optional<CodeRunner> ocode = codeRunnerRepository.findByName(arg0);
+        if (ocode.isEmpty()) {
+            CodeRunner cr = new CodeRunner();
+            cr.setName(arg0);
+            cr.setDescription("Calculez la factoriel de n");
+            cr.setTestCode("print(fact(6))");
+            cr.setResponse("720");
+            questionRepository.save(cr);
+        }
+
+
+    }
+
+    @And("{string} wants to add a CodeRunner {string} to the questionnaire {string} from the module {string}")
+    public void wantsToAddACodeRunnerToTheQuestionnaireFromTheModule(String arg0, String arg1, String arg2, String arg3) throws IOException {
+        Module module = moduleRepository.findByName(arg3).get();
+        Resource resource = resourcesRepository.findByName(arg2).get();
+        CodeRunner cr = codeRunnerRepository.findByName(arg1).get();
+        CreateQuestionRequest request = new CreateQuestionRequest(cr.getName(), cr.getDescription(), cr.getResponse(), EQuestion.CODE, cr.getTestCode());
+        String jwt = SpringIntegration.tokenHashMap.get(arg0);
+        String url = "http://localhost:8080/api/module/" + module.getId() + "/resources/" + resource.getId() + "/questions";
+
+        executePost(url, request, jwt);
+
+        assertEquals(200, latestHttpResponse.getStatusLine().getStatusCode());
+        EntityUtils.consume(latestHttpResponse.getEntity());
+    }
+
+    @And("{string} wants to answer the CodeRunner {string} of {string} from {string}")
+    public void wantsToAnswerTheCodeRunnerOfFrom(String arg0, String arg1, String arg2, String arg3) throws IOException {
+        CodeRunner cr = codeRunnerRepository.findByName(arg1).get();
+        Questionnary q = questionnaryRepository.findByName(arg2).get();
+        String jwt = SpringIntegration.tokenHashMap.get(arg0);
+        Module module = moduleRepository.findByName(arg3).get();
+
+        String url = "http://localhost:8080/api/module/" + module.getId() + "/resources/" + q.getId() + "/questions/" + cr.getId();
+        String studentCode = "def fact(n):\n\tif n == 1 :\n\t\treturn 1\n\telse:\n\t\treturn n* fact(n-1)";
+        AnswerQuestionRequest request = new AnswerQuestionRequest(cr.getId(), studentCode, EQuestion.CODE);
+
+        EntityUtils.consume(latestHttpResponse.getEntity());
+        executePost(url,request,jwt);
+        assertEquals(200, latestHttpResponse.getStatusLine().getStatusCode());
+        EntityUtils.consume(latestHttpResponse.getEntity());
+    }
+
+    @When("{string} validate his questionnary  with the code runner {string} of the module {string}")
+    public void validateHisQuestionnaryWithTheCodeRunnerOfTheModule(String arg0, String arg1, String arg2) throws IOException {
+        UserApi student = userRepository.findByUsername(arg0).get();
+        Questionnary quest = questionnaryRepository.findByName(arg1).get();
+        Module mod = moduleRepository.findByName(arg2).get();
+        String token = SpringIntegration.tokenHashMap.get(student.getUsername());
+        System.out.println(token);
+        executePost("http://localhost:8080/api/module/" + mod.getId() + "/resources/" + quest.getId(), token);
+
+
+    }
+
+    @Then("{string} get a {int} because his reponse is true")
+    public void getABecauseHisReponseIsTrue(String arg0, int arg1) throws JsonProcessingException {
+        ResultResponse res = ObjMapper.readValue(latestJson, ResultResponse.class);
+        System.out.println(res);
+        assertEquals(arg1, res.getGrade());
+        resultRepository.deleteAll();
+
     }
 }

@@ -3,12 +3,20 @@ Feature: CodeRunner
   Background:
     Given a teacher named "Arnaud"
     * "Arnaud" is connected
+    * a teacher named "Marcel"
+    * "Marcel" is connected
+    And a module named "le C pour les nuls"
     And a module named "Programming Challenge"
+    And a questionnaire with name "questionnaire"
     * "Arnaud" is the teacher registered to the module "Programming Challenge"
     * a questionnaire with name "Algos de graphes"
     * "Arnaud" has registered the questionnaire "Algos de graphes" to the module "Programming Challenge"
+    * a CodeRunner Question "factoriel en python"
     And a student named "Sami"
     * "Sami" is connected
+    And a student named "Louis"
+    * "Louis" is connected
+
 
   # ADD
     Scenario: Teacher add a code question on a questionnaire of his module
@@ -105,9 +113,12 @@ Feature: CodeRunner
       Then the code question "Find Bellman-Ford" from "Algos de graphes" of "Programming Challenge" testCode is "print(bm(L))"
 
 
-
-  Scenario: the teacher add the Student tot the module, add the Questionnary and the question
+# ATTEMPT CODE RUNNER
+  Scenario: the teacher add the Student to the module, add the Questionnary and the question
     Given "Marcel" is the teacher registered to the module "le C pour les nuls"
+    And "Marcel" has registered "Louis" on the module "le C pour les nuls"
     When "Marcel" wants to add the questionnaire "questionnaire" to the module "le C pour les nuls"
     And "Marcel" wants to add a CodeRunner "factoriel en python" to the questionnaire "questionnaire" from the module "le C pour les nuls"
     And "Louis" wants to answer the CodeRunner "factoriel en python" of "questionnaire" from "le C pour les nuls"
+    When "Louis" validate his questionnary  with the code runner "questionnaire" of the module "le C pour les nuls"
+    Then "Louis" get a 1 because his reponse is true

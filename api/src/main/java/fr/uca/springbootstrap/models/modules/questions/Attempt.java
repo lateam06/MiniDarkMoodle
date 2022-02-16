@@ -1,6 +1,7 @@
 package fr.uca.springbootstrap.models.modules.questions;
 
 import javax.persistence.*;
+import java.util.Objects;
 
 @Entity
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
@@ -15,12 +16,13 @@ public class Attempt {
 
     protected Long userId;
 
-    protected Long questionId;
-
+    @ManyToOne
+    @JoinColumn(name = "question_id")
+    protected Question question;
     protected String studentAttempt;
 
-    public Attempt(Long questionId, Long userId) {
-        this.questionId = questionId;
+    public Attempt(Question question, Long userId) {
+        this.question = question;
         this.userId = userId;
     }
 
@@ -55,8 +57,24 @@ public class Attempt {
         this.userId = userId;
     }
 
-    public void setQuestionId(Long questionId) {
-        this.questionId = questionId;
+    public Question getQuestion() {
+        return question;
     }
 
+    public void setQuestion(Question question) {
+        this.question = question;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Attempt attempt = (Attempt) o;
+        return Objects.equals(id, attempt.id) && Objects.equals(userId, attempt.userId) && Objects.equals(question, attempt.question);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, userId, question);
+    }
 }
