@@ -32,7 +32,7 @@ import java.util.Set;
 
 @RestController
 @CrossOrigin(origins = "*", maxAge = 3600)
-@RequestMapping("/api/module")
+@RequestMapping("/api/modules")
 public class QuestionController {
 
     @Autowired

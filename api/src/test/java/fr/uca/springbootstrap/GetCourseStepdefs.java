@@ -44,14 +44,13 @@ public class GetCourseStepdefs extends SpringIntegration  {
         courseRepository.save(course);
     }
 
-
     @And("the course {string} has been added by {string} into {string}")
     public void theCourseHasBeenAddedByInto(String arg0, String arg1, String arg2) throws IOException {
         UserApi userApi = userRepository.findByUsername(arg1).get();
         String jwt = SpringIntegration.tokenHashMap.get(arg1);
         Module module = moduleRepository.findByName(arg2).get();
         Course course = courseRepository.findByName(arg0).get();
-        executePut("http://localhost:8080/api/module/" + module.getId() + "/resources/" + course.getId(), jwt);
+        executePut("http://localhost:8080/api/modules/" + module.getId() + "/resources/" + course.getId(), jwt);
     }
 
     @When("{string} wants to add the course a second time {string} to the module {string}")
@@ -60,19 +59,18 @@ public class GetCourseStepdefs extends SpringIntegration  {
         String jwt = SpringIntegration.tokenHashMap.get(arg0);
         Module module = moduleRepository.findByName(arg2).get();
         Course course = courseRepository.findByName(arg1).get();
-        executePut("http://localhost:8080/api/module/" + module.getId() + "/resources/" + course.getId(), jwt);
+        executePut("http://localhost:8080/api/modules/" + module.getId() + "/resources/" + course.getId(), jwt);
     }
+
     @Then("the course is not added and the return status of the request is {int}")
     public void theCourseIsNotAddedAndTheReturnStatusOfTheRequestIs(int status) {
         assertEquals(status, latestHttpResponse.getStatusLine().getStatusCode());
     }
 
-
     @And("a course {string} has already been added by {string} in the module {string}")
     public void aCourseHasAlreadyBeenAddedByInTheModule(String arg0, String arg1, String arg2) {
         Course course = courseRepository.findByName(arg0).get();
         Module module = moduleRepository.findByName(arg2).get();
-        System.out.println(module.getResources());
         assertTrue(module.getResources().contains(course));
     }
 
@@ -82,7 +80,7 @@ public class GetCourseStepdefs extends SpringIntegration  {
         Module module = moduleRepository.findByName(arg2).get();
         String jwt = SpringIntegration.tokenHashMap.get(arg0);
 
-        String url = "http://localhost:8080/api/module/" + module.getId() + "/resources/" + course.getId();
+        String url = "http://localhost:8080/api/modules/" + module.getId() + "/resources/" + course.getId();
 
 
         executeGet(url,jwt);
@@ -96,7 +94,7 @@ public class GetCourseStepdefs extends SpringIntegration  {
         Course course = courseRepository.findByName(arg1).get();
         Module module = moduleRepository.findByName(arg2).get();
         String jwt = SpringIntegration.tokenHashMap.get(arg0);
-        String url = "http://localhost:8080/api/module/" + module.getId() + "/resources/" + course.getId();
+        String url = "http://localhost:8080/api/modules/" + module.getId() + "/resources/" + course.getId();
 
         executeGet(url,jwt);
         Course resp = ObjMapper.readValue(latestJson,Course.class);
@@ -111,7 +109,7 @@ public class GetCourseStepdefs extends SpringIntegration  {
         String jwt = SpringIntegration.tokenHashMap.get(arg0);
         Module module = moduleRepository.findByName(arg2).get();
         courseRepository.save(cours);
-        executePut("http://localhost:8080/api/module/" + module.getId() + "/resources/" + cours.getId(),jwt);
+        executePut("http://localhost:8080/api/modules/" + module.getId() + "/resources/" + cours.getId(),jwt);
     }
 
 
@@ -120,8 +118,7 @@ public class GetCourseStepdefs extends SpringIntegration  {
         Course course = courseRepository.findByName(arg1).get();
         Module module = moduleRepository.findByName(arg2).get();
         String jwt = SpringIntegration.tokenHashMap.get(arg0);
-        String url = "http://localhost:8080/api/module/" + module.getId() + "/resources/" + course.getId();
-        EntityUtils.consume(latestHttpResponse.getEntity());
+        String url = "http://localhost:8080/api/modules/" + module.getId() + "/resources/" + course.getId();
         executeGet(url,jwt);
         Course resp = ObjMapper.readValue(latestJson,Course.class);
 

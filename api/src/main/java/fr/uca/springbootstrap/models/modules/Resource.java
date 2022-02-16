@@ -30,7 +30,6 @@ public class Resource {
     }
 
     public Resource(String name) {
-        //TODO ajouter le text ou la question associé etc ...
         this.name = name;
     }
 
