@@ -265,52 +265,7 @@ public class QuestionController {
     public ResponseEntity<?> updateQuestion(Principal principal, @PathVariable long moduleId, @PathVariable long resourcesId, @PathVariable long questionId,
                                             @Valid @RequestBody CreateQuestionRequest cnoRequest) {
 
-        var responseCheck = checkModuleQuestionnaryUser(principal, moduleId, resourcesId);
-        if (responseCheck != null)
-            return responseCheck;
-
-        Questionnary questionnary = questionnaryRepository.findById(resourcesId).get();
-        Optional<Question> oQuestion = questionRepository.findById(questionId);
-
-
-        Set<Question> questions = questionnary.getQuestionSet();
-        Question actorQuestion = questionRepository.findByName(oQuestion.get().getName()).get();
-
-        if (!questions.contains(actorQuestion)) {
-            return ResponseEntity.badRequest().body("Error: This question doesn't exist here you can add it");
-        }
-
-        switch (cnoRequest.getQuestionType()) {
-            case QCM:
-                QCM qcmUpdated = new QCM(cnoRequest.getName(), cnoRequest.getDescription(), cnoRequest.getResponse());
-                questionnary.getQuestionSet().remove(actorQuestion);
-                questionnary.getQuestionSet().add(qcmUpdated);
-                qcmRepository.save(qcmUpdated);
-                questionnaryRepository.save(questionnary);
-
-                break;
-
-            case OPEN:
-                OpenQuestion oqUpdated = new OpenQuestion(cnoRequest.getName(), cnoRequest.getDescription(), cnoRequest.getResponse());
-                questionnary.getQuestionSet().remove(actorQuestion);
-                questionnary.getQuestionSet().add(oqUpdated);
-                openQuestionRepository.save(oqUpdated);
-                questionnaryRepository.save(questionnary);
-
-                break;
-
-            case CODE:
-
-                CodeRunner crUpdated = new CodeRunner(cnoRequest.getName(), cnoRequest.getDescription());
-                questionnary.getQuestionSet().remove(actorQuestion);
-                questionnary.getQuestionSet().add(crUpdated);
-                codeRunnerRepository.save(crUpdated);
-                questionnaryRepository.save(questionnary);
-
-                break;
-        }
-
-        return ResponseEntity.ok(new MessageResponse("Question updated successfully"));
+        return null;
     }
 
     @DeleteMapping("/{moduleId}/resources/{resourcesId}/questions/{questionId}")
