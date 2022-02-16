@@ -102,12 +102,7 @@ public class ResourceController {
         if (!module.getParticipants().contains(user))
             return ResponseEntity.badRequest().body("Error: you're not registered in this module.");
 
-        var arr = new AllResourcesResponse();
-        for (Resource r : module.getResources()) {
-            arr.getResources().add(new ResourceResponse(r.getId(), r.getName(), r.getDescription(), r.getClass().getAnnotation(DiscriminatorValue.class).value()));
-        }
-
-        return ResponseEntity.ok(arr);
+        return ResponseEntity.ok(new AllResourcesResponse(module));
     }
 
     @PostMapping("/{moduleId}/resources")
