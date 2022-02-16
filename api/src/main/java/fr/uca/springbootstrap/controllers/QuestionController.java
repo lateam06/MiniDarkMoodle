@@ -209,8 +209,7 @@ public class QuestionController {
                 OpenQuestion open = openQuestionRepository.findByName(cnoRequest.getName())
                         .orElse(new OpenQuestion());
 
-                if(questionnary.getQuestionSet().contains(open))
-                    questionnary.getQuestionSet().remove(open);
+                questionnary.getQuestionSet().remove(open);
 
                 open.setName(cnoRequest.getName());
                 open.setDescription(cnoRequest.getDescription());
@@ -226,8 +225,7 @@ public class QuestionController {
                 QCM qcm = qcmRepository.findByName(cnoRequest.getName())
                         .orElse(new QCM());
 
-                if(questionnary.getQuestionSet().contains(qcm))
-                    questionnary.getQuestionSet().remove(qcm);
+                questionnary.getQuestionSet().remove(qcm);
 
                 qcm.setName(cnoRequest.getName());
                 qcm.setDescription(cnoRequest.getDescription());
@@ -242,8 +240,7 @@ public class QuestionController {
                 CodeRunner cr = codeRunnerRepository.findByName(cnoRequest.getName())
                         .orElse(new CodeRunner());
 
-                if(questionnary.getQuestionSet().contains(cr))
-                    questionnary.getQuestionSet().remove(cr);
+                questionnary.getQuestionSet().remove(cr);
 
                 cr.setName(cnoRequest.getName());
                 cr.setDescription(cnoRequest.getDescription());
@@ -306,8 +303,7 @@ public class QuestionController {
                 cr.setTestCode(cnoRequest.getTestCode());
                 cr.setResponse(cnoRequest.getResponse());
 
-                if (questionnary.getQuestionSet().contains(cr))
-                    questionnary.getQuestionSet().remove(cr);
+                questionnary.getQuestionSet().remove(cr);
                 questionnary.getQuestionSet().add(cr);
                 codeRunnerRepository.save(cr);
                 return ResponseEntity.ok("The question has been added/updated.\n" + cr.getId() + " - " + cr.getName() + " - " + cr.getResponse());
@@ -318,8 +314,7 @@ public class QuestionController {
                 oq.setDescription(cnoRequest.getDescription());
                 oq.setResponse(cnoRequest.getResponse());
 
-                if (questionnary.getQuestionSet().contains(oq))
-                    questionnary.getQuestionSet().remove(oq);
+                questionnary.getQuestionSet().remove(oq);
                 questionnary.getQuestionSet().add(oq);
                 openQuestionRepository.save(oq);
                 return ResponseEntity.ok("The question has been added/updated.\n" + oq.getId() + " - " + oq.getName() + " - " + oq.getResponse());
@@ -330,9 +325,9 @@ public class QuestionController {
                 qcm.setDescription(cnoRequest.getDescription());
                 qcm.setResponse(cnoRequest.getResponse());
 
-                if (questionnary.getQuestionSet().contains(qcm))
-                    questionnary.getQuestionSet().remove(qcm);
+                questionnary.getQuestionSet().remove(qcm);
                 questionnary.getQuestionSet().add(qcm);
+                qcmRepository.save(qcm);
                 return ResponseEntity.ok("The question has been added/updated.\n" + qcm.getId() + " - " + qcm.getName() + " - " + qcm.getResponse());
             default:
                 return ResponseEntity.badRequest().body("The chosen question has an invalid discriminator.");

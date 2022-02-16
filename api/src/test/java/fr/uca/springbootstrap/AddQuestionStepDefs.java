@@ -194,14 +194,12 @@ public class AddQuestionStepDefs extends SpringIntegration {
         Questionnary questionnary = questionnaryRepository.findByName(questionnaireName).get();
         Module module = moduleRepository.findByName(moduleName).get();
 
-        if(questionRepository.findByName(qcmName).isEmpty()) {
-            CreateQuestionRequest question = new CreateQuestionRequest(qcmName, "description du cours", "reponse a la question", EQuestion.QCM, "");
-            String url = "http://localhost:8080/api/module/" + module.getId() + "/resources/" + questionnary.getId() + "/questions";
-            String token = SpringIntegration.tokenHashMap.get(userName);
-            executePost(url, question, token);
-            System.out.println("http already : " + EntityUtils.toString(latestHttpResponse.getEntity()));
-            EntityUtils.consume(latestHttpResponse.getEntity());
-        }
+        CreateQuestionRequest question = new CreateQuestionRequest(qcmName, "description du cours", "reponse a la question", EQuestion.QCM, "");
+        String url = "http://localhost:8080/api/module/" + module.getId() + "/resources/" + questionnary.getId() + "/questions";
+        String token = SpringIntegration.tokenHashMap.get(userName);
+        executePost(url, question, token);
+        System.out.println("http already : " + EntityUtils.toString(latestHttpResponse.getEntity()));
+        EntityUtils.consume(latestHttpResponse.getEntity());
     }
 
     @And("{string} has already registered an Open {string} to the questionnaire {string} of the module {string}")
@@ -232,5 +230,93 @@ public class AddQuestionStepDefs extends SpringIntegration {
     @Then("{string} can not get the QCM {string} from the questionnaire {string} of the module {string}")
     public void canNotGetTheQCMFromTheQuestionnaireOfTheModule(String userName, String qcmName, String questionnaireName, String moduleName) {
         assertTrue(latestHttpResponse.getStatusLine().getStatusCode() >= 400);
+    }
+
+    @When("{string} wants to modify the QCM {string} from the questionnaire {string} of the module {string} and set the response to {string}")
+    public void wantsToModifyTheQCMFromTheQuestionnaireOfTheModuleAndSetTheResponseTo(String userName, String qcmName, String questionnaireName, String moduleName, String newResponse) throws IOException {
+        UserApi userApi = userRepository.findByUsername(userName).get();
+        Questionnary questionnary = questionnaryRepository.findByName(questionnaireName).get();
+        Module module = moduleRepository.findByName(moduleName).get();
+        QCM qcm = qcmRepository.findByName(qcmName).get();
+
+        CreateQuestionRequest question = new CreateQuestionRequest(qcm.getName(), qcm.getDescription(), newResponse, EQuestion.QCM, "");
+        String url = "http://localhost:8080/api/module/" + module.getId() + "/resources/" + questionnary.getId() + "/questions/" + qcm.getId();
+        String token = SpringIntegration.tokenHashMap.get(userName);
+        executePut(url, question, token);
+    }
+
+    @Then("The response of the QCM {string} from the questionnaire {string} of the module {string} is {string}")
+    public void canSuccesfullyTheResponseOfTheQCMFromTheQuestionnaireOfTheModuleIs(String qcmName, String questionnaireName, String moduleName, String newResponse) {
+        Questionnary questionnary = questionnaryRepository.findByName(questionnaireName).get();
+        QCM qcm = qcmRepository.findByName(qcmName).get();
+
+        assertEquals(newResponse, qcm.getResponse());
+        assertTrue(questionnary.getQuestionSet().contains(qcm));
+    }
+
+    @When("{string} wants to modify the Open {string} from the questionnaire {string} of the module {string} and set the response to {string}")
+    public void wantsToModifyTheOpenFromTheQuestionnaireOfTheModuleAndSetTheResponseTo(String userName, String openName, String questionnaireName, String moduleName, String newResponse) throws IOException {
+        UserApi userApi = userRepository.findByUsername(userName).get();
+        Questionnary questionnary = questionnaryRepository.findByName(questionnaireName).get();
+        Module module = moduleRepository.findByName(moduleName).get();
+        OpenQuestion open = openQuestionRepository.findByName(openName).get();
+
+        CreateQuestionRequest question = new CreateQuestionRequest(open.getName(), open.getDescription(), newResponse, EQuestion.OPEN, "");
+        String url = "http://localhost:8080/api/module/" + module.getId() + "/resources/" + questionnary.getId() + "/questions/" + open.getId();
+        String token = SpringIntegration.tokenHashMap.get(userApi.getUsername());
+        executePut(url, question, token);
+    }
+
+    @Then("The response of the Open {string} from the questionnaire {string} of the module {string} is {string}")
+    public void canSuccesfullyTheResponseOfTheOpenFromTheQuestionnaireOfTheModuleIs(String openName, String questionnaireName, String moduleName, String newResponse) {
+        Questionnary questionnary = questionnaryRepository.findByName(questionnaireName).get();
+        OpenQuestion open = openQuestionRepository.findByName(openName).get();
+
+        assertEquals(newResponse, open.getResponse());
+        assertTrue(questionnary.getQuestionSet().contains(open));
+    }
+
+    @When("{string} wants to modify the QCM {string} from the questionnaire {string} of the module {string} and set the description to {string}")
+    public void wantsToModifyTheQCMFromTheQuestionnaireOfTheModuleAndSetTheDescriptionTo(String userName, String qcmName, String questionnaireName, String moduleName, String newDescription) throws IOException {
+        UserApi userApi = userRepository.findByUsername(userName).get();
+        Questionnary questionnary = questionnaryRepository.findByName(questionnaireName).get();
+        Module module = moduleRepository.findByName(moduleName).get();
+        QCM qcm = qcmRepository.findByName(qcmName).get();
+
+        CreateQuestionRequest question = new CreateQuestionRequest(qcm.getName(), newDescription, qcm.getResponse(), EQuestion.QCM, "");
+        String url = "http://localhost:8080/api/module/" + module.getId() + "/resources/" + questionnary.getId() + "/questions/" + qcm.getId();
+        String token = SpringIntegration.tokenHashMap.get(userName);
+        executePut(url, question, token);
+    }
+
+    @Then("The description of the QCM {string} from the questionnaire {string} of the module {string} is {string}")
+    public void canSuccesfullyTheDescriptionOfTheQCMFromTheQuestionnaireOfTheModuleIs(String qcmName, String questionnaireName, String moduleName, String newDescription) {
+        Questionnary questionnary = questionnaryRepository.findByName(questionnaireName).get();
+        QCM qcm = qcmRepository.findByName(qcmName).get();
+
+        assertEquals(newDescription, qcm.getDescription());
+        assertTrue(questionnary.getQuestionSet().contains(qcm));
+    }
+
+    @When("{string} wants to modify the Open {string} from the questionnaire {string} of the module {string} and set the description to {string}")
+    public void wantsToModifyTheOpenFromTheQuestionnaireOfTheModuleAndSetTheDescriptionTo(String userName, String openName, String questionnaireName, String moduleName, String newDescription) throws IOException {
+        UserApi userApi = userRepository.findByUsername(userName).get();
+        Questionnary questionnary = questionnaryRepository.findByName(questionnaireName).get();
+        Module module = moduleRepository.findByName(moduleName).get();
+        OpenQuestion qcm = openQuestionRepository.findByName(openName).get();
+
+        CreateQuestionRequest question = new CreateQuestionRequest(qcm.getName(), newDescription, qcm.getResponse(), EQuestion.OPEN, "");
+        String url = "http://localhost:8080/api/module/" + module.getId() + "/resources/" + questionnary.getId() + "/questions/" + qcm.getId();
+        String token = SpringIntegration.tokenHashMap.get(userName);
+        executePut(url, question, token);
+    }
+
+    @Then("The description of the Open {string} from the questionnaire {string} of the module {string} is {string}")
+    public void canSuccesfullyTheDescriptionOfTheOpenFromTheQuestionnaireOfTheModuleIs(String openName, String questionnaireName, String moduleName, String newDescription) {
+        Questionnary questionnary = questionnaryRepository.findByName(questionnaireName).get();
+        OpenQuestion open = openQuestionRepository.findByName(openName).get();
+
+        assertEquals(newDescription, open.getDescription());
+        assertTrue(questionnary.getQuestionSet().contains(open));
     }
 }
