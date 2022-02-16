@@ -52,7 +52,7 @@ public class ValidateQuestionnaireStepdefs extends SpringIntegration  {
         Questionnary quest = questionnaryRepository.findByName(arg1).get();
         Module mod = moduleRepository.findByName(arg2).get();
         String token = SpringIntegration.tokenHashMap.get(student.getUsername());
-        executePost("http://localhost:8080/api/module/"+mod.getId()+"/resources/"+quest.getId(),token);
+        executePost("http://localhost:8080/api/modules/"+mod.getId()+"/resources/"+quest.getId(),token);
     }
 
     @Then("he gets a {int} because he's bad")

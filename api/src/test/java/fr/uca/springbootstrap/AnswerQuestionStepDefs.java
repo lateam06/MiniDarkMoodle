@@ -105,7 +105,7 @@ public class AnswerQuestionStepDefs extends SpringIntegration {
         String token  = SpringIntegration.tokenHashMap.get(arg0);
 
         String url = "http://localhost:8080/api"
-                + "/module/" + module.getId()
+                + "/modules/" + module.getId()
                 + "/resources/" + questionnary.getId()
                 + "/questions/" + qcm.getId();
         AnswerQuestionRequest re = new AnswerQuestionRequest(qcmResponse.getId(), qcmResponse.getDescription(), EQuestion.QCM);

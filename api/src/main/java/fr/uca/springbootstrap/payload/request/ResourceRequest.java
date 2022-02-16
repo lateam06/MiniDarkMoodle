@@ -4,6 +4,7 @@ import fr.uca.springbootstrap.models.modules.courses.Text;
 import fr.uca.springbootstrap.models.modules.questions.Question;
 
 import javax.validation.constraints.NotBlank;
+import java.util.List;
 import java.util.Set;
 
 public class ResourceRequest {
@@ -21,12 +22,12 @@ public class ResourceRequest {
     private Boolean visibility;
 
 
-    private Set<Text> texts;
+    private List<Text> texts;
 
     private Set<Question> questionSet;
 
 
-    public ResourceRequest(String name, String type, String description, Boolean visibility, Set<Text> texts, Set<Question> questionSet) {
+    public ResourceRequest(String name, String type, String description, Boolean visibility, List<Text> texts, Set<Question> questionSet) {
         this.name = name;
         this.type = type;
         this.description = description;
@@ -64,7 +65,7 @@ public class ResourceRequest {
         return type;
     }
 
-    public Set<Text> getTexts() {
+    public List<Text> getTexts() {
         return texts;
     }
 

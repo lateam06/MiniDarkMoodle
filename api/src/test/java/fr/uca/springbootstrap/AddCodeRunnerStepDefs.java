@@ -60,7 +60,7 @@ public class AddCodeRunnerStepDefs extends SpringIntegration {
     ResultRepository resultRepository;
 
     public static String generateQuestionnaryUrl(long moduleId, long questionnaryId) {
-        return BASE_URL + "module/" + moduleId + "/resources/" + questionnaryId;
+        return BASE_URL + "modules/" + moduleId + "/resources/" + questionnaryId;
     }
 
     @When("{string} wants to add the code question named {string} with testCode {string} and response {string} on {string} of {string}")
