@@ -6,7 +6,10 @@ import fr.uca.springbootstrap.models.modules.Module;
 import fr.uca.springbootstrap.models.modules.Resource;
 import fr.uca.springbootstrap.models.modules.courses.Course;
 import fr.uca.springbootstrap.models.modules.questions.Questionnary;
+import fr.uca.springbootstrap.models.users.UserApi;
 import fr.uca.springbootstrap.payload.request.ResourceRequest;
+import fr.uca.springbootstrap.payload.response.AllResourcesResponse;
+import fr.uca.springbootstrap.payload.response.ResourceResponse;
 import fr.uca.springbootstrap.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -84,11 +87,27 @@ public class ResourceController {
     }
 
     @GetMapping("/{moduleId}/resources")
-    public ResponseEntity<?> getAllResourcesOfModule(@PathVariable long moduleId) {
+    public ResponseEntity<?> getAllResourcesOfModule(Principal principal, @PathVariable long moduleId) {
+        Optional<Module> optionalModule = moduleRepository.findById(moduleId);
 
-        // TODO
+        if (optionalModule.isEmpty())
+            return ResponseEntity.badRequest().body("Error: this module doesn't exists.");
+        Module module = optionalModule.get();
 
-        return null;
+        Optional<UserApi> optionalUserApi = userRepository.findByUsername(principal.getName());
+        if (optionalUserApi.isEmpty())
+            return ResponseEntity.badRequest().body("Error: you do not exists in the api user database.");
+
+        UserApi user = optionalUserApi.get();
+        if (!module.getParticipants().contains(user))
+            return ResponseEntity.badRequest().body("Error: you're not registered in this module.");
+
+        var arr = new AllResourcesResponse();
+        for (Resource r : module.getResources()) {
+            arr.getResources().add(new ResourceResponse(r.getId(), r.getName(), r.getDescription()));
+        }
+
+        return ResponseEntity.ok(arr);
     }
 
     @PostMapping("/{moduleId}/resources")
@@ -109,7 +128,7 @@ public class ResourceController {
                 m.getResources().add(c);
                 courseRepository.save(c);
 
-
+                return ResponseEntity.accepted().body(new ResourceResponse(c.getId(), c.getName(), c.getDescription()));
             } else if (body.getType().compareTo("questionnaries") == 0) {
                 Questionnary q = new Questionnary();
                 q.setName(body.getName());
@@ -119,10 +138,12 @@ public class ResourceController {
                 m.getResources().add(q);
                 questionnaryRepository.save(q);
 
+                return ResponseEntity.accepted().body(new ResourceResponse(q.getId(), q.getName(), q.getDescription()));
             }
-            return ResponseEntity.accepted().build();
+            else {
+                return ResponseEntity.badRequest().body("Error: Unknown ressource type.");
+            }
         }
-
     }
 
     @PutMapping("/{moduleId}/resources/{resourcesId}")
