@@ -62,7 +62,6 @@ public class AddQuestionStepDefs extends SpringIntegration {
 
         String jwt = SpringIntegration.tokenHashMap.get(teacherName);
         executePut(Questionnary.generateUrl(module.getId(), questionnary.getId()), jwt);
-        EntityUtils.consume(latestHttpResponse.getEntity());
 
         module = moduleRepository.findByName(moduleName).get();
         assertTrue(module.getResources().contains(questionnary));
@@ -78,7 +77,6 @@ public class AddQuestionStepDefs extends SpringIntegration {
         String url = "http://localhost:8080/api/module/" + module.getId() + "/resources/" + questionnary.getId() + "/questions";
         String token = SpringIntegration.tokenHashMap.get(userApi.getUsername());
         executePost(url, question, token);
-        EntityUtils.consume(latestHttpResponse.getEntity());
     }
 
     @Then("the QCM {string} is not added to the questionnaire {string} and the return status of the request is error")
@@ -106,7 +104,6 @@ public class AddQuestionStepDefs extends SpringIntegration {
         String url = "http://localhost:8080/api/module/" + module.getId() + "/resources/" + questionnary.getId() + "/questions";
         String token = SpringIntegration.tokenHashMap.get(userApi.getUsername());
         executePost(url, openRequest, token);
-        EntityUtils.consume(latestHttpResponse.getEntity());
     }
 
     @Then("the Open {string} is added to the questionnaire {string} of the module {string}")
@@ -134,7 +131,6 @@ public class AddQuestionStepDefs extends SpringIntegration {
         String url = "http://localhost:8080/api/module/" + module.getId() + "/resources/" + questionnary.getId() + "/questions/" + qcm.getId();
         String token = SpringIntegration.tokenHashMap.get(userName);
         executeGet(url, token);
-        EntityUtils.consume(latestHttpResponse.getEntity());
     }
 
     @Then("{string} can succesfully get the QCM {string} from the questionnaire {string} of the module {string}")
@@ -153,7 +149,6 @@ public class AddQuestionStepDefs extends SpringIntegration {
         String url = "http://localhost:8080/api/module/" + module.getId() + "/resources/" + questionnary.getId() + "/questions/" + open.getId();
         String token = SpringIntegration.tokenHashMap.get(userName);
         executeGet(url, token);
-        EntityUtils.consume(latestHttpResponse.getEntity());
     }
 
     @Then("{string} can succesfully get the OpenQuestion {string} from the questionnaire {string} of the module {string}")
@@ -175,7 +170,6 @@ public class AddQuestionStepDefs extends SpringIntegration {
         String token = SpringIntegration.tokenHashMap.get(userName);
         executeDelete(url, token);
         System.out.println("http deleted : "+  EntityUtils.toString(latestHttpResponse.getEntity()));
-        EntityUtils.consume(latestHttpResponse.getEntity());
     }
 
     @Then("the Question {string} is deleted from the questionnaire {string} of the module {string}")
@@ -196,7 +190,6 @@ public class AddQuestionStepDefs extends SpringIntegration {
         String url = "http://localhost:8080/api/module/" + module.getId() + "/resources/" + questionnary.getId() + "/questions";
         String token = SpringIntegration.tokenHashMap.get(userName);
         executePost(url, question, token);
-        EntityUtils.consume(latestHttpResponse.getEntity());
     }
 
     @And("{string} has already registered an Open {string} to the questionnaire {string} of the module {string}")
@@ -210,7 +203,6 @@ public class AddQuestionStepDefs extends SpringIntegration {
             String url = "http://localhost:8080/api/module/" + module.getId() + "/resources/" + questionnary.getId() + "/questions";
             String token = SpringIntegration.tokenHashMap.get(userApi.getUsername());
             executePost(url, openRequest, token);
-            EntityUtils.consume(latestHttpResponse.getEntity());
         }
     }
 

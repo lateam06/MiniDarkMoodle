@@ -55,7 +55,6 @@ public class ModuleTestStepDefs extends SpringIntegration {
         UserApi userApi = userRepository.findByUsername(arg0).get();
         String jwt = SpringIntegration.tokenHashMap.get(arg0);
         executePost("http://localhost:8080/api/module/" + module.getId() + "/participants/" + userApi.getId(), jwt);
-        EntityUtils.consume(latestHttpResponse.getEntity());
     }
 
     @When("{string} wants to create a new Module {string}")
@@ -64,7 +63,6 @@ public class ModuleTestStepDefs extends SpringIntegration {
         String jwt = SpringIntegration.tokenHashMap.get(arg0);
 
         executePost("http://localhost:8080/api/module", createModuleRequest, jwt);
-        EntityUtils.consume(latestHttpResponse.getEntity());
         assertTrue(moduleRepository.findByName(arg1).isPresent());
     }
 
@@ -74,7 +72,6 @@ public class ModuleTestStepDefs extends SpringIntegration {
         UserApi userApi = userRepository.findByUsername(userName).get();
         String jwt = SpringIntegration.tokenHashMap.get(teacherName);
         executePost("http://localhost:8080/api/module/" + module.getId() + "/participants/" + userApi.getId(), jwt);
-        EntityUtils.consume(latestHttpResponse.getEntity());
     }
 
     @When("{string} wants to get all resources of the module {string}")

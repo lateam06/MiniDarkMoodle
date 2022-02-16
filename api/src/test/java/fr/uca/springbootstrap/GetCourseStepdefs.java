@@ -120,7 +120,6 @@ public class GetCourseStepdefs extends SpringIntegration  {
         Module module = moduleRepository.findByName(arg2).get();
         String jwt = SpringIntegration.tokenHashMap.get(arg0);
         String url = "http://localhost:8080/api/module/" + module.getId() + "/resources/" + course.getId();
-        EntityUtils.consume(latestHttpResponse.getEntity());
         executeGet(url,jwt);
         Course resp = ObjMapper.readValue(latestJson,Course.class);
 
