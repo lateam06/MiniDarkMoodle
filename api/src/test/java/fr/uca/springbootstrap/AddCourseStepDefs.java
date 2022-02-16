@@ -193,7 +193,7 @@ public class AddCourseStepDefs extends SpringIntegration {
     public void addsTheCourseObjectToThePostRequestToTheModule(String arg0, String courseName, String arg1) throws IOException {
         String jwt = SpringIntegration.tokenHashMap.get(arg0);
         Module mod = moduleRepository.findByName(arg1).get();
-        Course course = new Course(courseName);
+        Course course = courseRepository.findByName(courseName).orElse(new Course(courseName));
         String disc = course.getClass().getAnnotation(DiscriminatorValue.class).value();
         ResourceRequest re = new ResourceRequest(course.getName(), disc, course.getDescription(), true, null, null);
         executePost("http://localhost:8080/api/modules/" + mod.getId() + "/resources", re, jwt);
