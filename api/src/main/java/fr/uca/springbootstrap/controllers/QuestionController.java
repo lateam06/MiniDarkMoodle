@@ -416,12 +416,12 @@ public class QuestionController {
 
         StudentAttemptsResponse resp = new StudentAttemptsResponse();
         resp.setStudentAttempts(getStudentAttempts(questionnary, userApi));
-        resp.setStudent(userApi);
+        resp.setStudentName(userApi.getUsername());
 
         return ResponseEntity.ok(resp);
     }
 
-    @GetMapping("/{moduleId}/resources/{questionnaryId}/attempts ")
+    @GetMapping("/{moduleId}/resources/{questionnaryId}/attempts")
     @PreAuthorize("hasRole('TEACHER')")
     public ResponseEntity<?> getAllStudentResponse(Principal principal, @PathVariable long moduleId, @PathVariable long questionnaryId) {
 
@@ -438,27 +438,55 @@ public class QuestionController {
         Module module = moduleRepository.findById(moduleId).get();
         Set<UserApi> participants = module.getParticipants();
 
-        //List<String> attemptsResponseList = new ArrayList<>();
+        List<String> attemptsResponseList = new ArrayList<>();
         List<String> studentsNames = new ArrayList<>();
+        List<Long> studentsId = new ArrayList<>();
 
-        for (UserApi participant : participants) {
+        /*for (UserApi participant : participants) {
             for (Role role : participant.getRoles()) {
                 if (role.getName().compareTo(ERole.ROLE_STUDENT) == 0) {
                     studentsNames.add(participant.getUsername());
-                    //attemptsResponseList.add(getStudentAttempts(questionnary, participant));
-                   /* for (Question question : questionnary.getQuestionSet()) {
+                    for (Question question : questionnary.getQuestionSet()) {
                         for (Attempt attempt : question.getAttempts()) {
                             if (attempt.getUserId().equals(participant.getId())) {
                                 attemptsResponseList.add(attempt.getStudentAttempt());
                             }
                         }
-                    }*/
+                    }
+                }
+            }
+        }*/
+
+
+
+        for (UserApi participant : participants) {
+
+            for (Role role : participant.getRoles()) {
+
+                if (role.getName().compareTo(ERole.ROLE_STUDENT) == 0) {
+
+                    studentsId.add(participant.getId());
+                    studentsNames.add(participant.getUsername());
                 }
             }
         }
 
+        for (Question question : questionnary.getQuestionSet()) {
+            System.out.println(question.getName());
+            System.out.println(question.getAttempts().size());
+            for (Attempt attempt : question.getAttempts()) {
+                System.out.println(attempt.getId());
+                if (studentsId.contains(attempt.getUserId())) {
+                    System.out.println(attempt.getStudentAttempt());
+                    System.out.println("match");
+                    attemptsResponseList.add(attempt.getStudentAttempt());
+                }
+            }
+        }
+
+
         StudentAttemptsCollectionResponse resp = new StudentAttemptsCollectionResponse();
-        //resp.setStudentAttemptsResponseList(attemptsResponseList);
+        resp.setStudentAttemptsResponseList(attemptsResponseList);
         resp.setStudentsNames(studentsNames);
         return ResponseEntity.ok(resp);
     }

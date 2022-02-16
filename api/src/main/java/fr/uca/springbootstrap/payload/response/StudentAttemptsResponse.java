@@ -6,7 +6,7 @@ import java.util.List;
 
 public class StudentAttemptsResponse {
 
-    UserApi student;
+    String studentName;
     List<String> studentAttempts;
 
     public StudentAttemptsResponse() {
@@ -20,11 +20,11 @@ public class StudentAttemptsResponse {
         this.studentAttempts = studentAttempts;
     }
 
-    public UserApi getStudent() {
-        return student;
+    public String getStudentName() {
+        return studentName;
     }
 
-    public void setStudent(UserApi student) {
-        this.student = student;
+    public void setStudentName(String studentName) {
+        this.studentName = studentName;
     }
 }

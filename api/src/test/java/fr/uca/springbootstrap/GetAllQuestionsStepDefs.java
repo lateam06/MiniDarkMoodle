@@ -39,7 +39,7 @@ public class GetAllQuestionsStepDefs extends SpringIntegration{
         Questionnary questionnary = questionnaryRepository.findByName(questionnaireName).get();
         Module module = moduleRepository.findByName(moduleName).get();
 
-        String url = "http://localhost:8080/api/module/" + module.getId() +  "/resources/" + questionnary.getId() + "/questions";
+        String url = "http://localhost:8080/api/modules/" + module.getId() +  "/resources/" + questionnary.getId() + "/questions";
         String token = SpringIntegration.tokenHashMap.get(userName);
         executeGet(url, token);
     }
