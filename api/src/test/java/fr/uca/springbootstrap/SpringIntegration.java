@@ -90,6 +90,7 @@ public class SpringIntegration {
 
         request.setEntity(new StringEntity(ObjMapper.writeValueAsString(obj)));
         latestHttpResponse = httpClient.execute(request);
+        latestJson = EntityUtils.toString(latestHttpResponse.getEntity());
     }
 
     HttpEntity<Object> buildHeaderFromToken(String token) {
@@ -101,6 +102,10 @@ public class SpringIntegration {
     }
 
     void executeDelete(String url, String jwt) throws IOException{
+        if (latestHttpResponse != null) {
+            EntityUtils.consume(latestHttpResponse.getEntity());
+        }
+
         HttpDelete request= new HttpDelete(url);
         request.addHeader("content-type", "application/json");
         if (jwt != null) {

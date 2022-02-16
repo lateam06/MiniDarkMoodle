@@ -44,7 +44,6 @@ public class GetCourseStepdefs extends SpringIntegration  {
         courseRepository.save(course);
     }
 
-
     @And("the course {string} has been added by {string} into {string}")
     public void theCourseHasBeenAddedByInto(String arg0, String arg1, String arg2) throws IOException {
         UserApi userApi = userRepository.findByUsername(arg1).get();
@@ -62,11 +61,11 @@ public class GetCourseStepdefs extends SpringIntegration  {
         Course course = courseRepository.findByName(arg1).get();
         executePut("http://localhost:8080/api/module/" + module.getId() + "/resources/" + course.getId(), jwt);
     }
+
     @Then("the course is not added and the return status of the request is {int}")
     public void theCourseIsNotAddedAndTheReturnStatusOfTheRequestIs(int status) {
         assertEquals(status, latestHttpResponse.getStatusLine().getStatusCode());
     }
-
 
     @And("a course {string} has already been added by {string} in the module {string}")
     public void aCourseHasAlreadyBeenAddedByInTheModule(String arg0, String arg1, String arg2) {
