@@ -1,6 +1,5 @@
 package fr.uca.springbootstrap.payload.request;
 
-import fr.uca.springbootstrap.models.modules.questions.CodeRunner;
 import fr.uca.springbootstrap.models.modules.questions.EQuestion;
 import fr.uca.springbootstrap.models.modules.questions.Question;
 
@@ -18,19 +17,21 @@ public class CreateQuestionRequest {
     private String description;
 
     private String response;
+    private String testCode;
+
     private EQuestion questionType;
 
-    private CodeRunner codeRunner;
 
     public CreateQuestionRequest() {
 
     }
 
-    public CreateQuestionRequest(String name, String description, String response, EQuestion questionType) {
+    public CreateQuestionRequest(String name, String description, String response, EQuestion questionType, String testCode) {
         this.name = name;
         this.description = description;
         this.response = response;
         this.questionType = questionType;
+        this.testCode = testCode;
     }
 
     public String getName() {
@@ -65,11 +66,11 @@ public class CreateQuestionRequest {
         this.questionType = questionType;
     }
 
-    public CodeRunner getCodeRunner() {
-        return codeRunner;
+    public String getTestCode() {
+        return testCode;
     }
 
-    public void setCodeRunner(CodeRunner codeRunner) {
-        this.codeRunner = codeRunner;
+    public void setTestCode(String testCode) {
+        this.testCode = testCode;
     }
 }

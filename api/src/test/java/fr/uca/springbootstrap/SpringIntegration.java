@@ -53,6 +53,20 @@ public class SpringIntegration {
         latestJson = EntityUtils.toString(latestHttpResponse.getEntity());
     }
 
+    void executePut(String url, Object obj, String jwt) throws IOException {
+        if (latestHttpResponse != null) {
+            EntityUtils.consume(latestHttpResponse.getEntity());
+        }
+        HttpPut request = new HttpPut(url);
+        request.addHeader("content-type", "application/json");
+        if (jwt != null) {
+            request.addHeader("Authorization", "Bearer " + jwt);
+        }
+
+        request.setEntity(new StringEntity(ObjMapper.writeValueAsString(obj)));
+        latestHttpResponse = httpClient.execute(request);
+    }
+
     void executePost(String url, String jwt) throws IOException {
         HttpPost request = new HttpPost(url);
         request.addHeader("content-type", "application/json");

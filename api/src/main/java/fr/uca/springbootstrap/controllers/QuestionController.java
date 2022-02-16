@@ -171,12 +171,16 @@ public class QuestionController {
         switch (discriminator) {
             case "qcms":
                 QCM qcm = qcmRepository.findById(question.getId()).get();
-                var qcmr = new CreateQuestionRequest(qcm.getName(), qcm.getDescription(), qcm.getResponse(), EQuestion.QCM);
+                var qcmr = new CreateQuestionRequest(qcm.getName(), qcm.getDescription(), qcm.getResponse(), EQuestion.QCM, "");
                 return ResponseEntity.ok(qcmr);
             case "open_questions":
                 OpenQuestion op = openQuestionRepository.findById(question.getId()).get();
-                var opr = new CreateQuestionRequest(op.getName(), op.getDescription(), op.getResponse(), EQuestion.OPEN);
+                var opr = new CreateQuestionRequest(op.getName(), op.getDescription(), op.getResponse(), EQuestion.OPEN, "");
                 return ResponseEntity.ok(opr);
+            case "code_runners":
+                CodeRunner cr = codeRunnerRepository.findById(question.getId()).get();
+                var crr = new CreateQuestionRequest(cr.getName(), cr.getDescription(), cr.getResponse(), EQuestion.CODE, cr.getTestCode());
+                return ResponseEntity.ok(crr);
             default:
                 return ResponseEntity.ok(question);
         }
@@ -199,19 +203,17 @@ public class QuestionController {
             return responseCheck;
 
         Questionnary questionnary = questionnaryRepository.findById(resourcesId).get();
-        Optional<Question> oQuestion = questionRepository.findByName(cnoRequest.getName());
-        if (oQuestion.isEmpty() && resourcesRepository.findByName(cnoRequest.getName()).isPresent()) {
-            return ResponseEntity.badRequest().body("Error: a question has already on this name");
-        }
 
         switch (cnoRequest.getQuestionType()) {
             case OPEN:
                 OpenQuestion open = openQuestionRepository.findByName(cnoRequest.getName())
-                        .orElse(new OpenQuestion(cnoRequest.getName(), cnoRequest.getDescription(), cnoRequest.getResponse()));
+                        .orElse(new OpenQuestion());
 
-                if (questionnary.getQuestionSet().contains(open)) {
-                    return ResponseEntity.badRequest().body("Error: this open question is already on the questionnaire");
-                }
+                questionnary.getQuestionSet().remove(open);
+
+                open.setName(cnoRequest.getName());
+                open.setDescription(cnoRequest.getDescription());
+                open.setResponse(cnoRequest.getResponse());
 
                 questionnary.getQuestionSet().add(open);
                 openQuestionRepository.save(open);
@@ -221,11 +223,13 @@ public class QuestionController {
             case QCM:
 
                 QCM qcm = qcmRepository.findByName(cnoRequest.getName())
-                        .orElse(new QCM(cnoRequest.getName(), cnoRequest.getDescription(), cnoRequest.getResponse()));
+                        .orElse(new QCM());
 
-                if (questionnary.getQuestionSet().contains(qcm)) {
-                    return ResponseEntity.badRequest().body("Error: this qcm is already on the questionnaire");
-                }
+                questionnary.getQuestionSet().remove(qcm);
+
+                qcm.setName(cnoRequest.getName());
+                qcm.setDescription(cnoRequest.getDescription());
+                qcm.setResponse(cnoRequest.getResponse());
 
                 questionnary.getQuestionSet().add(qcm);
                 qcmRepository.save(qcm);
@@ -233,20 +237,19 @@ public class QuestionController {
 
                 break;
             case CODE:
-                    CodeRunner code = codeRunnerRepository.findByName(cnoRequest.getName()).orElse(cnoRequest.getCodeRunner());
-                    if(code == null){
-                        return ResponseEntity.badRequest().body(new MessageResponse("Specify a code runner in the request!"));
-                    }
-                    else{
-                        if(questionnary.getQuestionSet().contains(code)){
-                            return ResponseEntity.badRequest().body("Error: this Code Runner is already in the questionnaire");
-                        }
+                CodeRunner cr = codeRunnerRepository.findByName(cnoRequest.getName())
+                        .orElse(new CodeRunner());
 
-                    }
-                    questionnary.getQuestionSet().add(code);
-                    codeRunnerRepository.save(code);
-                    questionnaryRepository.save(questionnary);
+                questionnary.getQuestionSet().remove(cr);
 
+                cr.setName(cnoRequest.getName());
+                cr.setDescription(cnoRequest.getDescription());
+                cr.setResponse(cnoRequest.getResponse());
+                cr.setTestCode(cnoRequest.getTestCode());
+
+                questionnary.getQuestionSet().add(cr);
+                codeRunnerRepository.save(cr);
+                questionnaryRepository.save(questionnary);
                 break;
         }
 
@@ -255,12 +258,80 @@ public class QuestionController {
 
     @PutMapping("/{moduleId}/resources/{resourcesId}/questions/{questionId}")
     @PreAuthorize("hasRole('TEACHER')")
-    public ResponseEntity<?> updateQuestion(Principal principal, @PathVariable long moduleId, @PathVariable long resourcesId,
+    public ResponseEntity<?> updateQuestion(Principal principal, @PathVariable long moduleId, @PathVariable long resourcesId, @PathVariable long questionId,
                                             @Valid @RequestBody CreateQuestionRequest cnoRequest) {
+        var responseCheck = checkModuleQuestionnaryUser(principal, moduleId, resourcesId);
+        if (responseCheck != null)
+            return responseCheck;
 
-        // TODO
+        Questionnary questionnary = questionnaryRepository.findById(resourcesId).get();
+        Optional<Question> optionalQuestion = questionRepository.findById(questionId);
 
-        return null;
+        if (optionalQuestion.isEmpty()) {
+            return ResponseEntity.badRequest().body("Error: the question doesn't exists.");
+        }
+        Question question = optionalQuestion.get();
+
+        if (!questionnary.getQuestionSet().contains(question)) {
+            return ResponseEntity.badRequest().body("Error: this question isn't in this module.");
+        }
+
+        if (optionalQuestion.isPresent()) {
+            String discriminator = optionalQuestion.get().getClass().getAnnotation(DiscriminatorValue.class).value();
+            switch (discriminator) {
+                case "qcms":
+                    if (cnoRequest.getQuestionType() != EQuestion.QCM)
+                        return ResponseEntity.badRequest().body("The question exists but you gave an incorrect EType.\nExpected QCM but gave " + cnoRequest.getQuestionType().toString());
+                    break;
+                case "open_questions":
+                    if (cnoRequest.getQuestionType() != EQuestion.OPEN)
+                        return ResponseEntity.badRequest().body("The question exists but you gave an incorrect EType.\nExpected OPEN but gave " + cnoRequest.getQuestionType().toString());
+                    break;
+                case "code_runners":
+                    if (cnoRequest.getQuestionType() != EQuestion.CODE)
+                        return ResponseEntity.badRequest().body("The question exists but you gave an incorrect EType.\nExpected CODE but gave " + cnoRequest.getQuestionType().toString());
+                    break;
+            }
+        }
+
+        switch(cnoRequest.getQuestionType()) {
+            case CODE:
+                CodeRunner cr = codeRunnerRepository.findById(questionId).orElse(new CodeRunner());
+
+                cr.setName(cnoRequest.getName());
+                cr.setDescription(cnoRequest.getDescription());
+                cr.setTestCode(cnoRequest.getTestCode());
+                cr.setResponse(cnoRequest.getResponse());
+
+                questionnary.getQuestionSet().remove(cr);
+                questionnary.getQuestionSet().add(cr);
+                codeRunnerRepository.save(cr);
+                return ResponseEntity.ok("The question has been added/updated.\n" + cr.getId() + " - " + cr.getName() + " - " + cr.getResponse());
+            case OPEN:
+                OpenQuestion oq = openQuestionRepository.findById(questionId).orElse(new OpenQuestion());
+
+                oq.setName(cnoRequest.getName());
+                oq.setDescription(cnoRequest.getDescription());
+                oq.setResponse(cnoRequest.getResponse());
+
+                questionnary.getQuestionSet().remove(oq);
+                questionnary.getQuestionSet().add(oq);
+                openQuestionRepository.save(oq);
+                return ResponseEntity.ok("The question has been added/updated.\n" + oq.getId() + " - " + oq.getName() + " - " + oq.getResponse());
+            case QCM:
+                QCM qcm = qcmRepository.findById(questionId).orElse(new QCM());
+
+                qcm.setName(cnoRequest.getName());
+                qcm.setDescription(cnoRequest.getDescription());
+                qcm.setResponse(cnoRequest.getResponse());
+
+                questionnary.getQuestionSet().remove(qcm);
+                questionnary.getQuestionSet().add(qcm);
+                qcmRepository.save(qcm);
+                return ResponseEntity.ok("The question has been added/updated.\n" + qcm.getId() + " - " + qcm.getName() + " - " + qcm.getResponse());
+            default:
+                return ResponseEntity.badRequest().body("The chosen question has an invalid discriminator.");
+        }
     }
 
     @DeleteMapping("/{moduleId}/resources/{resourcesId}/questions/{questionId}")
@@ -357,7 +428,7 @@ public class QuestionController {
                 Optional<CodeRunner> orunner = codeRunnerRepository.findById(questionId);
                 CodeRunner runner = orunner.get();
 
-                runner.setStudentResponse(answer.getResponse());
+                //runner.setStudentResponse(answer.getResponse());
                 codeRunnerRepository.save(runner);
 
                 break;
@@ -398,8 +469,6 @@ public class QuestionController {
 
         return ResponseEntity.accepted().body(new ResultResponse(result.getRate()));
     }
-
-
 
 //    @GetMapping("/{moduleId}/resources/{questionnaryId}/result/{userid}")
 //    @PreAuthorize("hasRole('TEACHER')")
