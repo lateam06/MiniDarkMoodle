@@ -42,8 +42,11 @@ Feature: UserInteraction
     Given "Eric Zemmour" (mail : "zemmour@test.fr") is already registered with password "password123" and role "teacher"
     When "Eric Zemmour" wants to sign in with password "password123"
     Then "Eric Zemmour" is connected
+    And response status is 200
     When "Eric Zemmour" wants to sign in with password "password123"
     Then "Eric Zemmour" is connected
+    And response status is 200
     When "Eric Zemmour" wants to sign in with password "password123"
     When "Eric Zemmour" wants to sign in with password "password123"
     Then "Eric Zemmour" is connected
+    And response status is 200
