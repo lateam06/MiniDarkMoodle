@@ -10,6 +10,7 @@ import fr.uca.springbootstrap.payload.request.AnswerQuestionRequest;
 import fr.uca.springbootstrap.payload.request.CreateQuestionRequest;
 import fr.uca.springbootstrap.payload.response.AllQuestionsResponse;
 import fr.uca.springbootstrap.payload.response.ResultResponse;
+import fr.uca.springbootstrap.payload.response.StudentAttemptsResponse;
 import fr.uca.springbootstrap.repository.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -299,13 +300,46 @@ public class QuestionController {
      * ##########################################
      */
 
-    @GetMapping("/{moduleId}/resources/{questionnaryId}/result/{userid}")
+    @GetMapping("/{moduleId}/resources/{questionnaryId}/attempts/{userid}")
     @PreAuthorize("hasRole('TEACHER')")
     public ResponseEntity<?> getStudentResponse(Principal principal, @PathVariable long moduleId, @PathVariable long questionnaryId, @PathVariable long userid) {
 
-        // TODO
+        var responseCheck = checkModuleQuestionnaryUser(principal, moduleId, questionnaryId);
+        if (responseCheck != null)
+            return responseCheck;
 
-        return null;
+        Questionnary questionnary = questionnaryRepository.findById(questionnaryId).get();
+
+        if (questionnary.getQuestionSet().isEmpty()) {
+            return ResponseEntity.badRequest().body("Error: this questionnary doesn't contain any questions");
+        }
+
+        Module module = moduleRepository.findById(moduleId).get();
+        var optionalUser = userApiRepository.findById(userid);
+
+        if (optionalUser.isEmpty()) {
+            return ResponseEntity.badRequest().body("Error : this user doesn't exist");
+        }
+
+        UserApi userApi = optionalUser.get();
+
+        if (!module.getParticipants().contains(userApi)) {
+            return ResponseEntity.badRequest().body("Error : this user isn't registered to this module");
+        }
+
+        List<String> studentAttempts = new ArrayList<>();
+
+        for (Question question : questionnary.getQuestionSet()) {
+            for (Attempt attempt : question.getAttempts()) {
+                if (attempt.getUserId().equals(userid)) {
+                    studentAttempts.add(attempt.getStudentAttempt());
+                }
+            }
+        }
+
+        StudentAttemptsResponse resp = new StudentAttemptsResponse();
+        resp.setStudentAttempts(studentAttempts);
+        return ResponseEntity.ok(resp);
     }
 
     @GetMapping("/{moduleId}/resources/{questionnaryId}/result")
