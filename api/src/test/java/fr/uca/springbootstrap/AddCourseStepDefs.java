@@ -195,7 +195,7 @@ public class AddCourseStepDefs extends SpringIntegration {
         Module mod = moduleRepository.findByName(arg1).get();
         Course course = new Course(courseName);
         String disc = course.getClass().getAnnotation(DiscriminatorValue.class).value();
-        ResourceRequest re = new ResourceRequest(course.getName(), disc, "", true, null, null);
+        ResourceRequest re = new ResourceRequest(course.getName(), disc, course.getDescription(), true, null, null);
         executePost("http://localhost:8080/api/modules/" + mod.getId() + "/resources", re, jwt);
     }
 
