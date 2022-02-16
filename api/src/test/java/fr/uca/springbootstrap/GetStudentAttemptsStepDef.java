@@ -6,6 +6,7 @@ import fr.uca.springbootstrap.models.modules.Module;
 import fr.uca.springbootstrap.models.modules.questions.*;
 import fr.uca.springbootstrap.models.users.UserApi;
 import fr.uca.springbootstrap.payload.request.AnswerQuestionRequest;
+import fr.uca.springbootstrap.payload.response.StudentAttemptsCollectionResponse;
 import fr.uca.springbootstrap.payload.response.StudentAttemptsResponse;
 import fr.uca.springbootstrap.payload.response.TeacherResponse;
 import fr.uca.springbootstrap.repository.*;
@@ -69,12 +70,6 @@ public class GetStudentAttemptsStepDef extends SpringIntegration{
         AnswerQuestionRequest re = new AnswerQuestionRequest(resp.getId(), resp.getDescription(), EQuestion.QCM);
         executePost(url, re, token);
 
-        //// FAIRE AVEC LES REPOS
-
-        /*UserApi user = userApiRepository.findByUsername(arg0).get();
-        QCMAttempt qcmAttempt = qcmAttemptRepository.findByQuestionIdAndUserId(qcm.getId(), user.getId()).orElse(new QCMAttempt());
-        assertNotNull(qcmAttempt);
-        assertEquals(arg1, qcmAttempt.getStudentAttempt());*/
         assertEquals(200, latestHttpResponse.getStatusLine().getStatusCode());
     }
 
@@ -99,5 +94,30 @@ public class GetStudentAttemptsStepDef extends SpringIntegration{
         assertTrue(resp.getStudentAttempts().contains(response1));
         assertTrue(resp.getStudentAttempts().contains(response2));
         System.out.println(resp.getStudentAttempts());
+    }
+
+    @When("{string} wants to get attempts of all students to the questionnary {string} of the module {string}")
+    public void wantsToGetAttemptsOfAllStudentsToTheQuestionnaryOfTheModule(String arg0, String arg1, String arg2) throws IOException {
+        Questionnary questionnary = questionnaryRepository.findByName(arg1).get();
+        Module module = moduleRepository.findByName(arg2).get();
+        String token = SpringIntegration.tokenHashMap.get(arg0);
+
+        String url = "http://localhost:8080/api"
+                + "/module/" + module.getId()
+                + "/resources/" + questionnary.getId()
+                + "/attempts";
+        executeGet(url, token);
+    }
+
+    @Then("{string} sees that {string} and {string} responded to all of the qcms")
+    public void seesThatAndRespondedToAllOfTheQcms(String arg0, String arg1, String arg2) throws JsonProcessingException {
+        var resp = ObjMapper.readValue(latestJson, StudentAttemptsCollectionResponse.class);
+        UserApi James = userApiRepository.findByUsername(arg1).get();
+        UserApi Jack = userApiRepository.findByUsername(arg2).get();
+
+        assertTrue(resp.getStudentsNames().contains(James.getUsername()));
+        assertTrue(resp.getStudentsNames().contains(Jack.getUsername()));
+
+        System.out.println(resp.getStudentAttemptsResponseList());
     }
 }

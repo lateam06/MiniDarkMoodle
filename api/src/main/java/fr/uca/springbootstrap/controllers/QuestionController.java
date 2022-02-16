@@ -2,14 +2,16 @@ package fr.uca.springbootstrap.controllers;
 
 import com.lateam.payload.response.MessageResponse;
 import fr.uca.springbootstrap.models.modules.Module;
-import fr.uca.springbootstrap.models.modules.Resource;
 import fr.uca.springbootstrap.models.modules.questions.*;
+import fr.uca.springbootstrap.models.users.ERole;
+import fr.uca.springbootstrap.models.users.Role;
 import fr.uca.springbootstrap.models.users.UserApi;
 import fr.uca.springbootstrap.payload.request.AnswerQuestionRequest;
 
 import fr.uca.springbootstrap.payload.request.CreateQuestionRequest;
 import fr.uca.springbootstrap.payload.response.AllQuestionsResponse;
 import fr.uca.springbootstrap.payload.response.ResultResponse;
+import fr.uca.springbootstrap.payload.response.StudentAttemptsCollectionResponse;
 import fr.uca.springbootstrap.payload.response.StudentAttemptsResponse;
 import fr.uca.springbootstrap.repository.*;
 
@@ -412,28 +414,53 @@ public class QuestionController {
             return ResponseEntity.badRequest().body("Error : this user isn't registered to this module");
         }
 
-        List<String> studentAttempts = new ArrayList<>();
+        StudentAttemptsResponse resp = new StudentAttemptsResponse();
+        resp.setStudentAttempts(getStudentAttempts(questionnary, userApi));
+        resp.setStudent(userApi);
 
-        for (Question question : questionnary.getQuestionSet()) {
-            for (Attempt attempt : question.getAttempts()) {
-                if (attempt.getUserId().equals(userid)) {
-                    studentAttempts.add(attempt.getStudentAttempt());
+        return ResponseEntity.ok(resp);
+    }
+
+    @GetMapping("/{moduleId}/resources/{questionnaryId}/attempts ")
+    @PreAuthorize("hasRole('TEACHER')")
+    public ResponseEntity<?> getAllStudentResponse(Principal principal, @PathVariable long moduleId, @PathVariable long questionnaryId) {
+
+        var responseCheck = checkModuleQuestionnaryUser(principal, moduleId, questionnaryId);
+        if (responseCheck != null)
+            return responseCheck;
+
+        Questionnary questionnary = questionnaryRepository.findById(questionnaryId).get();
+
+        if (questionnary.getQuestionSet().isEmpty()) {
+            return ResponseEntity.badRequest().body("Error: this questionnary doesn't contain any questions");
+        }
+
+        Module module = moduleRepository.findById(moduleId).get();
+        Set<UserApi> participants = module.getParticipants();
+
+        //List<String> attemptsResponseList = new ArrayList<>();
+        List<String> studentsNames = new ArrayList<>();
+
+        for (UserApi participant : participants) {
+            for (Role role : participant.getRoles()) {
+                if (role.getName().compareTo(ERole.ROLE_STUDENT) == 0) {
+                    studentsNames.add(participant.getUsername());
+                    //attemptsResponseList.add(getStudentAttempts(questionnary, participant));
+                   /* for (Question question : questionnary.getQuestionSet()) {
+                        for (Attempt attempt : question.getAttempts()) {
+                            if (attempt.getUserId().equals(participant.getId())) {
+                                attemptsResponseList.add(attempt.getStudentAttempt());
+                            }
+                        }
+                    }*/
                 }
             }
         }
 
-        StudentAttemptsResponse resp = new StudentAttemptsResponse();
-        resp.setStudentAttempts(studentAttempts);
+        StudentAttemptsCollectionResponse resp = new StudentAttemptsCollectionResponse();
+        //resp.setStudentAttemptsResponseList(attemptsResponseList);
+        resp.setStudentsNames(studentsNames);
         return ResponseEntity.ok(resp);
-    }
-
-    @GetMapping("/{moduleId}/resources/{questionnaryId}/result")
-    @PreAuthorize("hasRole('TEACHER')")
-    public ResponseEntity<?> getAllStudentResponse(Principal principal, @PathVariable long moduleId, @PathVariable long questionnaryId) {
-
-        // TODO
-
-        return null;
     }
 
     @PostMapping("/{moduleId}/resources/{resourceId}/questions/{questionId}")
@@ -521,6 +548,26 @@ public class QuestionController {
         resultRepository.save(result);
 
         return ResponseEntity.accepted().body(new ResultResponse(result.getRate()));
+    }
+
+    /*
+     * ##########################################
+     * #               FUNCTIONS                #
+     * ##########################################
+     */
+
+    private List<String> getStudentAttempts(Questionnary questionnary, UserApi userApi) {
+        List<String> studentAttempts = new ArrayList<>();
+
+        for (Question question : questionnary.getQuestionSet()) {
+            for (Attempt attempt : question.getAttempts()) {
+                if (attempt.getUserId().equals(userApi.getId())) {
+                    studentAttempts.add(attempt.getStudentAttempt());
+                }
+            }
+        }
+
+        return studentAttempts;
     }
 
 //    @GetMapping("/{moduleId}/resources/{questionnaryId}/result/{userid}")
