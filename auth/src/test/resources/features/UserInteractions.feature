@@ -50,3 +50,4 @@ Feature: UserInteraction
     When "Eric Zemmour" wants to sign in with password "password123"
     Then "Eric Zemmour" is connected
     And response status is 200
+    
