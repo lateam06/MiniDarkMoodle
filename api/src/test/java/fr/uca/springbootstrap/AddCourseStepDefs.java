@@ -10,10 +10,7 @@ import fr.uca.springbootstrap.models.modules.Resource;
 import fr.uca.springbootstrap.models.modules.courses.Course;
 import fr.uca.springbootstrap.models.users.ERole;
 import fr.uca.springbootstrap.repository.*;
-import io.cucumber.java.en.And;
-import io.cucumber.java.en.Given;
-import io.cucumber.java.en.Then;
-import io.cucumber.java.en.When;
+import io.cucumber.java.en.*;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
@@ -209,5 +206,10 @@ public class AddCourseStepDefs extends SpringIntegration {
         Module mod = moduleRepository.findByName(arg2).get();
         Course course = courseRepository.findByName(arg1).get();
         assertTrue(mod.getResources().contains(course));
+    }
+
+    @But("{string} is not registered to the module {string}")
+    public void isNotRegisteredToTheModule(String arg0, String arg1) {
+        isNotATeacherRegisteredToTheModule(arg0, arg1);
     }
 }

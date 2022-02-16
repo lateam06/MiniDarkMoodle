@@ -65,7 +65,6 @@ public class SpringIntegration {
 
         request.setEntity(new StringEntity(ObjMapper.writeValueAsString(obj)));
         latestHttpResponse = httpClient.execute(request);
-        latestJson = EntityUtils.toString(latestHttpResponse.getEntity());
     }
 
     void executePost(String url, String jwt) throws IOException {
