@@ -212,7 +212,7 @@ public class AddCodeRunnerStepDefs extends SpringIntegration {
         CodeRunner cr = codeRunnerRepository.findByName(arg1).get();
         CreateQuestionRequest request = new CreateQuestionRequest(cr.getName(), cr.getDescription(), cr.getResponse(), EQuestion.CODE, cr.getTestCode());
         String jwt = SpringIntegration.tokenHashMap.get(arg0);
-        String url = "http://localhost:8080/api/module/" + module.getId() + "/resources/" + resource.getId() + "/questions";
+        String url = "http://localhost:8080/api/modules/" + module.getId() + "/resources/" + resource.getId() + "/questions";
 
         executePost(url, request, jwt);
 
@@ -227,7 +227,7 @@ public class AddCodeRunnerStepDefs extends SpringIntegration {
         String jwt = SpringIntegration.tokenHashMap.get(arg0);
         Module module = moduleRepository.findByName(arg3).get();
 
-        String url = "http://localhost:8080/api/module/" + module.getId() + "/resources/" + q.getId() + "/questions/" + cr.getId();
+        String url = "http://localhost:8080/api/modules/" + module.getId() + "/resources/" + q.getId() + "/questions/" + cr.getId();
         String studentCode = "def fact(n):\n\tif n == 1 :\n\t\treturn 1\n\telse:\n\t\treturn n* fact(n-1)";
         AnswerQuestionRequest request = new AnswerQuestionRequest(cr.getId(), studentCode, EQuestion.CODE);
 
@@ -243,8 +243,7 @@ public class AddCodeRunnerStepDefs extends SpringIntegration {
         Questionnary quest = questionnaryRepository.findByName(arg1).get();
         Module mod = moduleRepository.findByName(arg2).get();
         String token = SpringIntegration.tokenHashMap.get(student.getUsername());
-        System.out.println(token);
-        executePost("http://localhost:8080/api/module/" + mod.getId() + "/resources/" + quest.getId(), token);
+        executePost("http://localhost:8080/api/modules/" + mod.getId() + "/resources/" + quest.getId(), token);
 
 
     }
@@ -252,7 +251,6 @@ public class AddCodeRunnerStepDefs extends SpringIntegration {
     @Then("{string} get a {int} because his reponse is true")
     public void getABecauseHisReponseIsTrue(String arg0, int arg1) throws JsonProcessingException {
         ResultResponse res = ObjMapper.readValue(latestJson, ResultResponse.class);
-        System.out.println(res);
         assertEquals(arg1, res.getGrade());
         resultRepository.deleteAll();
 

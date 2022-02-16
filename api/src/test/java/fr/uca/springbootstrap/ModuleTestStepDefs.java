@@ -104,7 +104,7 @@ public class ModuleTestStepDefs extends SpringIntegration {
     public void wantsToGetAllTheModules(String arg0) throws IOException {
         UserApi userApi = userRepository.findByUsername(arg0).get();
         String jwt = SpringIntegration.tokenHashMap.get(arg0);
-        executeGet("http://localhost:8080/api/module", jwt);
+        executeGet("http://localhost:8080/api/modules", jwt);
     }
 
     @Then("there are more than {int} modules created, {string} and {string} are part of them")
