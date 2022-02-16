@@ -136,6 +136,52 @@ Feature: AddQuestion
     When "Marcel" wants to get a QCM "Unique Ptr" from the questionnaire "Examens Pointeurs Intelligents" of the module "le C++ pour les nuls"
     Then "Marcel" can not get the QCM "Unique Ptr" from the questionnaire "Examens Pointeurs Intelligents" of the module "le C++ pour les nuls"
 
+# MODIFY
+  Scenario: Teacher want to modify a QCM from his questionnaire of his module
+    Given a questionnaire with name "Cpp 17 Ptr"
+    Given "Marcel" has registered the questionnaire "Cpp 17 Ptr" to the module "le C pour les nuls"
+    And "Marcel" has already registered a QCM "Box" to the questionnaire "Cpp 17 Ptr" of the module "le C pour les nuls"
+    When "Marcel" wants to modify the QCM "Box" from the questionnaire "Cpp 17 Ptr" of the module "le C pour les nuls" and set the response to "les pointeurs c dur"
+    Then The response of the QCM "Box" from the questionnaire "Cpp 17 Ptr" of the module "le C pour les nuls" is "les pointeurs c dur"
+
+  Scenario: Teacher want to modify a QCM description from his questionnaire of his module
+    Given a questionnaire with name "Cpp 17 Ptr"
+    Given "Marcel" has registered the questionnaire "Cpp 17 Ptr" to the module "le C pour les nuls"
+    And "Marcel" has already registered a QCM "Box" to the questionnaire "Cpp 17 Ptr" of the module "le C pour les nuls"
+    When "Marcel" wants to modify the QCM "Box" from the questionnaire "Cpp 17 Ptr" of the module "le C pour les nuls" and set the description to "Voici ma nouvelle description"
+    Then The description of the QCM "Box" from the questionnaire "Cpp 17 Ptr" of the module "le C pour les nuls" is "Voici ma nouvelle description"
+
+  Scenario: Teacher want to modify an Open from his questionnaire of his module
+    Given a questionnaire with name "Cpp 17 Ptr"
+    Given "Marcel" has registered the questionnaire "Cpp 17 Ptr" to the module "le C pour les nuls"
+    And "Marcel" has already registered an Open "Box syntaxe" to the questionnaire "Cpp 17 Ptr" of the module "le C pour les nuls"
+    When "Marcel" wants to modify the Open "Box syntaxe" from the questionnaire "Cpp 17 Ptr" of the module "le C pour les nuls" and set the response to "la vraie syntaxe c'est ca"
+    Then The response of the Open "Box syntaxe" from the questionnaire "Cpp 17 Ptr" of the module "le C pour les nuls" is "la vraie syntaxe c'est ca"
+
+  Scenario: Teacher want to modify an Open from his questionnaire of his module
+    Given a questionnaire with name "Cpp 17 Ptr"
+    Given "Marcel" has registered the questionnaire "Cpp 17 Ptr" to the module "le C pour les nuls"
+    And "Marcel" has already registered an Open "Box syntaxe" to the questionnaire "Cpp 17 Ptr" of the module "le C pour les nuls"
+    When "Marcel" wants to modify the Open "Box syntaxe" from the questionnaire "Cpp 17 Ptr" of the module "le C pour les nuls" and set the description to "la vraie description c'est ca"
+    Then The description of the Open "Box syntaxe" from the questionnaire "Cpp 17 Ptr" of the module "le C pour les nuls" is "la vraie description c'est ca"
+
+  Scenario: Teacher want to modify a QCM from his questionnaire of a module where he isn't registered
+    Given a teacher named "Enrico"
+    Given a questionnaire with name "Cpp 17 Ptr"
+    Given "Marcel" has registered the questionnaire "Cpp 17 Ptr" to the module "le C pour les nuls"
+    And "Marcel" has already registered a QCM "Box" to the questionnaire "Cpp 17 Ptr" of the module "le C pour les nuls"
+    When "Enrico" wants to modify the QCM "Box" from the questionnaire "Cpp 17 Ptr" of the module "le C pour les nuls" and set the response to "les pointeurs c dur"
+    But "Enrico" is not a teacher registered to the module "le C pour les nuls"
+    Then The response of the QCM "Box" from the questionnaire "Cpp 17 Ptr" of the module "le C pour les nuls" is "reponse a la question"
+
+  Scenario: Student want to modify a QCM
+    Given a questionnaire with name "Cpp 17 Ptr"
+    Given "Marcel" has registered the questionnaire "Cpp 17 Ptr" to the module "le C pour les nuls"
+    And "Marcel" has already registered a QCM "Box" to the questionnaire "Cpp 17 Ptr" of the module "le C pour les nuls"
+    And "Marcel" has registered "Louis" on the module "le C pour les nuls"
+    When "Louis" wants to modify the QCM "Box" from the questionnaire "Cpp 17 Ptr" of the module "le C pour les nuls" and set the response to "les pointeurs c dur"
+    Then The response of the QCM "Box" from the questionnaire "Cpp 17 Ptr" of the module "le C pour les nuls" is "reponse a la question"
+
 #    Scenario: Teacher want to add an answer to a QCM
 #      Given "Marcel" has registered the questionnaire "Examens Pointeurs" to the module "le C pour les nuls"
 #      And a QCM named "Syntaxe"

@@ -17,6 +17,8 @@ public class CreateQuestionRequest {
     private String description;
 
     private String response;
+    private String testCode;
+
     private EQuestion questionType;
 
 
@@ -24,11 +26,12 @@ public class CreateQuestionRequest {
 
     }
 
-    public CreateQuestionRequest(String name, String description, String response, EQuestion questionType) {
+    public CreateQuestionRequest(String name, String description, String response, EQuestion questionType, String testCode) {
         this.name = name;
         this.description = description;
         this.response = response;
         this.questionType = questionType;
+        this.testCode = testCode;
     }
 
     public String getName() {
@@ -61,5 +64,13 @@ public class CreateQuestionRequest {
 
     public void setQuestionType(EQuestion questionType) {
         this.questionType = questionType;
+    }
+
+    public String getTestCode() {
+        return testCode;
+    }
+
+    public void setTestCode(String testCode) {
+        this.testCode = testCode;
     }
 }
