@@ -1,7 +1,17 @@
 package fr.uca.springbootstrap.models.modules.questions;
 
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.lateam.payload.request.CodeRequest;
+import com.lateam.payload.response.CodeResponse;
+import com.lateam.payload.response.JwtResponse;
 import fr.uca.springbootstrap.repository.CodeRunnerRepository;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.util.EntityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.python.util.PythonInterpreter;
@@ -28,16 +38,26 @@ public class CodeRunnerAttempt extends Attempt {
 
     @Override
     public boolean computeResult() {
-        CodeRunner cr = (CodeRunner) question;
-        try (PythonInterpreter pyInterp = new PythonInterpreter()) {
-            StringWriter output = new StringWriter();
-            pyInterp.setOut(output);
-            pyInterp.exec(studentAttempt + "\n" + cr.getTestCode());
-            return output.toString().trim().equals(cr.getResponse());
+        try {
+            CodeRunner cr = (CodeRunner) question;
+            ObjectMapper ObjMapper = new ObjectMapper();
+            CloseableHttpClient httpClient = HttpClients.createDefault();
+            CodeRequest codeRequest = new CodeRequest(studentAttempt, cr.getTestCode(), cr.getResponse());
+
+            HttpPost request = new HttpPost("http://localhost:666/api/run");
+            request.addHeader("content-type", "application/json");
+
+            request.setEntity(new StringEntity(ObjMapper.writeValueAsString(codeRequest)));
+
+            HttpResponse response = httpClient.execute(request);
+            String runnerResponse = EntityUtils.toString(response.getEntity());
+            CodeResponse codeResponse = ObjMapper.readValue(runnerResponse, CodeResponse.class);
+            return codeResponse.isResult();
+
+
         } catch (Exception e) {
             return false;
         }
     }
-
 
 }
