@@ -30,4 +30,5 @@ public class Course extends Resource {
     public void setTexts(List<Text> texts) {
         this.texts = texts;
     }
+
 }
