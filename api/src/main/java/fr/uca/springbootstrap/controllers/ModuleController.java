@@ -11,6 +11,7 @@ import fr.uca.springbootstrap.models.users.Role;
 import fr.uca.springbootstrap.models.users.UserApi;
 import fr.uca.springbootstrap.payload.request.CreateModuleRequest;
 import fr.uca.springbootstrap.payload.request.ResourceRequest;
+import fr.uca.springbootstrap.payload.response.ModuleResponse;
 import fr.uca.springbootstrap.payload.response.TeacherResponse;
 import fr.uca.springbootstrap.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +26,7 @@ import java.util.*;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
-@RequestMapping("/api/module")
+@RequestMapping("/api/modules")
 public class ModuleController {
 
     @Autowired
@@ -55,17 +56,15 @@ public class ModuleController {
     @GetMapping("/{moduleId}")
     @PreAuthorize("hasRole('TEACHER')")
     public ResponseEntity<?> getModuleInformation(@PathVariable long moduleId) {
-        Optional<Module> omodule = moduleRepository.findById(moduleId);
+        Optional<Module> optionalModule = moduleRepository.findById(moduleId);
 
-        if (omodule.isEmpty()) {
+        if (optionalModule.isEmpty()) {
             return ResponseEntity
                     .badRequest()
                     .body(new MessageResponse("Error: No such module!"));
         }
 
-        Module module = omodule.get();
-        ObjectMapper obj = new ObjectMapper();
-        return ResponseEntity.ok(module);
+        return ResponseEntity.ok(new ModuleResponse(optionalModule.get()));
     }
 
     @GetMapping("")

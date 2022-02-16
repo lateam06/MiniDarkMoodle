@@ -52,7 +52,7 @@ public class AddQuestionnaireStepdefs extends  SpringIntegration {
         String jwt = SpringIntegration.tokenHashMap.get(arg0);
         Module module = moduleRepository.findByName(arg2).get();
         Questionnary questionnary = questionnaryRepository.findByName(arg1).get();
-        executePut("http://localhost:8080/api/module/" + module.getId() + "/resources/" + questionnary.getId(), jwt);
+        executePut("http://localhost:8080/api/modules/" + module.getId() + "/resources/" + questionnary.getId(), jwt);
     }
 
     @Then("The questionnaire {string} is added to the module {string}")
@@ -79,7 +79,7 @@ public class AddQuestionnaireStepdefs extends  SpringIntegration {
         Questionnary questionnary = questionnaryRepository.findByName(arg1).get();
         Module module = moduleRepository.findByName(arg2).get();
         String jwt = SpringIntegration.tokenHashMap.get(arg0);
-        String url = "http://localhost:8080/api/module/" + module.getId() + "/resources/" + questionnary.getId();
+        String url = "http://localhost:8080/api/modules/" + module.getId() + "/resources/" + questionnary.getId();
 
         executeGet(url,jwt);
         Questionnary resp = ObjMapper.readValue(latestJson,Questionnary.class);

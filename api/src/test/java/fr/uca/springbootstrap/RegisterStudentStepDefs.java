@@ -43,7 +43,7 @@ public class RegisterStudentStepDefs  extends  SpringIntegration{
         UserApi userApi = userRepository.findByUsername(arg0).get();
         String jwt = SpringIntegration.tokenHashMap.get(arg0);
 
-        executePost("http://localhost:8080/api/module/"+module.getId()+"/participants/"+ userApi.getId(), jwt);
+        executePost("http://localhost:8080/api/modules/"+module.getId()+"/participants/"+ userApi.getId(), jwt);
     }
 
 }

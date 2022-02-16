@@ -43,6 +43,6 @@ public class Questionnary extends Resource {
     }
 
     public static String generateUrl(Long moduleId, Long questionnaryId) {
-        return "http://localhost:8080/api/module/" + moduleId + "/resources/" + questionnaryId;
+        return "http://localhost:8080/api/modules/" + moduleId + "/resources/" + questionnaryId;
     }
 }
