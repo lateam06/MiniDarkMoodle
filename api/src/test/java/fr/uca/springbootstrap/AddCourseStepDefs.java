@@ -69,7 +69,7 @@ public class AddCourseStepDefs extends SpringIntegration {
             String bodyResponseAuthServer = EntityUtils.toString(response.getEntity());
             assertEquals(200, response.getStatusLine().getStatusCode());
 
-            UserApiResponse resp = ObjMapper.readValue(bodyResponseAuthServer,UserApiResponse.class); //TODO Récup le user depuis le server d'auth
+            UserApiResponse resp = ObjMapper.readValue(bodyResponseAuthServer,UserApiResponse.class);
 
             UserApi userApi = new UserApi(resp.getId(), resp.getUsername());
             userApi.setRoles(new HashSet<>() {{
@@ -102,7 +102,7 @@ public class AddCourseStepDefs extends SpringIntegration {
 
             assertEquals(200, response.getStatusLine().getStatusCode());
 
-            UserApiResponse resp = ObjMapper.readValue(bodyResponseAuthServer,UserApiResponse.class); //TODO Récup le user depuis le server d'auth
+            UserApiResponse resp = ObjMapper.readValue(bodyResponseAuthServer,UserApiResponse.class);
 
             UserApi userApi = new UserApi(resp.getId(), resp.getUsername());
             userApi.setRoles(new HashSet<>() {{
@@ -190,8 +190,7 @@ public class AddCourseStepDefs extends SpringIntegration {
         assertFalse(module.getParticipants().contains(teacher));
     }
 
-
-    @When("{string} adds the course {string} to the post request to the module {string}")
+    @When("{string} adds the course {string} to the module {string}")
     public void addsTheCourseObjectToThePostRequestToTheModule(String arg0, String courseName, String arg1) throws IOException {
         String jwt = SpringIntegration.tokenHashMap.get(arg0);
         Module mod = moduleRepository.findByName(arg1).get();

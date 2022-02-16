@@ -78,7 +78,6 @@ public class AddQuestionStepDefs extends SpringIntegration {
         String url = "http://localhost:8080/api/module/" + module.getId() + "/resources/" + questionnary.getId() + "/questions";
         String token = SpringIntegration.tokenHashMap.get(userApi.getUsername());
         executePost(url, question, token);
-        System.out.println("http: "+  EntityUtils.toString(latestHttpResponse.getEntity()));
         EntityUtils.consume(latestHttpResponse.getEntity());
     }
 
@@ -107,7 +106,6 @@ public class AddQuestionStepDefs extends SpringIntegration {
         String url = "http://localhost:8080/api/module/" + module.getId() + "/resources/" + questionnary.getId() + "/questions";
         String token = SpringIntegration.tokenHashMap.get(userApi.getUsername());
         executePost(url, openRequest, token);
-        System.out.println("http: "+  EntityUtils.toString(latestHttpResponse.getEntity()));
         EntityUtils.consume(latestHttpResponse.getEntity());
     }
 
@@ -198,7 +196,6 @@ public class AddQuestionStepDefs extends SpringIntegration {
         String url = "http://localhost:8080/api/module/" + module.getId() + "/resources/" + questionnary.getId() + "/questions";
         String token = SpringIntegration.tokenHashMap.get(userName);
         executePost(url, question, token);
-        System.out.println("http already : " + EntityUtils.toString(latestHttpResponse.getEntity()));
         EntityUtils.consume(latestHttpResponse.getEntity());
     }
 
@@ -213,7 +210,6 @@ public class AddQuestionStepDefs extends SpringIntegration {
             String url = "http://localhost:8080/api/module/" + module.getId() + "/resources/" + questionnary.getId() + "/questions";
             String token = SpringIntegration.tokenHashMap.get(userApi.getUsername());
             executePost(url, openRequest, token);
-            System.out.println("http already : " + EntityUtils.toString(latestHttpResponse.getEntity()));
             EntityUtils.consume(latestHttpResponse.getEntity());
         }
     }
