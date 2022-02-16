@@ -126,7 +126,6 @@ public class AddCourseStepDefs extends SpringIntegration {
     public void theCourseIsAddedToTheModule(String arg0, String arg1) {
         Course course = courseRepository.findByName(arg0).get();
         Module module = moduleRepository.findByName(arg1).get();
-        System.out.println(module.getResources());
         assertTrue(module.getResources().contains(course));
     }
 
@@ -136,7 +135,7 @@ public class AddCourseStepDefs extends SpringIntegration {
         String jwt = SpringIntegration.tokenHashMap.get(arg0);
         Module module = moduleRepository.findByName(arg2).get();
         Course course = courseRepository.findByName(arg1).get();
-        executePut("http://localhost:8080/api/module/" + module.getId() + "/resources/" + course.getId(), jwt);
+        executePut("http://localhost:8080/api/modules/" + module.getId() + "/resources/" + course.getId(), jwt);
     }
 
 
@@ -146,7 +145,7 @@ public class AddCourseStepDefs extends SpringIntegration {
         String jwt = SpringIntegration.tokenHashMap.get(arg0);
         Module module = moduleRepository.findByName(arg2).get();
         Resource course = resourcesRepository.findByName(arg1).get();
-        executeDelete("http://localhost:8080/api/module/" + module.getId() + "/resources/" + course.getId(), jwt);
+        executeDelete("http://localhost:8080/api/modules/" + module.getId() + "/resources/" + course.getId(), jwt);
     }
 
     @Then("the course {string} is deleted from the module {string}")
@@ -163,7 +162,7 @@ public class AddCourseStepDefs extends SpringIntegration {
         String jwt = SpringIntegration.tokenHashMap.get(arg0);
         Module module = moduleRepository.findByName(arg2).get();
         Resource course = resourcesRepository.findByName(arg1).get();
-        executeDelete("http://localhost:8080/api/module/" + module.getId() + "/resources/" + course.getId(), jwt);
+        executeDelete("http://localhost:8080/api/modules/" + module.getId() + "/resources/" + course.getId(), jwt);
     }
 
 
@@ -197,8 +196,7 @@ public class AddCourseStepDefs extends SpringIntegration {
         Course course = new Course(courseName);
         String disc = course.getClass().getAnnotation(DiscriminatorValue.class).value();
         ResourceRequest re = new ResourceRequest(course.getName(), disc, "", true, null, null);
-        executePost("http://localhost:8080/api/module/" + mod.getId() + "/resources", re, jwt);
-        System.out.println();
+        executePost("http://localhost:8080/api/modules/" + mod.getId() + "/resources", re, jwt);
     }
 
     @Then("{string} check that the {string} course has been added correcty in {string}")

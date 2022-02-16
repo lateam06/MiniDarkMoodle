@@ -21,7 +21,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class ModuleTestStepDefs extends SpringIntegration {
 
     private final static String PASSWORD = "password";
-    private final static String BASE_URL = "http://localhost:8080/api/module/";
+    private final static String BASE_URL = "http://localhost:8080/api/modules/";
 
     @Autowired
     ResourcesRepository resourcesRepository;
@@ -54,7 +54,7 @@ public class ModuleTestStepDefs extends SpringIntegration {
         Module module = moduleRepository.findByName(arg1).get();
         UserApi userApi = userRepository.findByUsername(arg0).get();
         String jwt = SpringIntegration.tokenHashMap.get(arg0);
-        executePost("http://localhost:8080/api/module/" + module.getId() + "/participants/" + userApi.getId(), jwt);
+        executePost("http://localhost:8080/api/modules/" + module.getId() + "/participants/" + userApi.getId(), jwt);
     }
 
     @When("{string} wants to create a new Module {string}")
@@ -62,7 +62,7 @@ public class ModuleTestStepDefs extends SpringIntegration {
         CreateModuleRequest createModuleRequest = new CreateModuleRequest(arg1);
         String jwt = SpringIntegration.tokenHashMap.get(arg0);
 
-        executePost("http://localhost:8080/api/module", createModuleRequest, jwt);
+        executePost("http://localhost:8080/api/modules", createModuleRequest, jwt);
         assertTrue(moduleRepository.findByName(arg1).isPresent());
     }
 
@@ -71,7 +71,7 @@ public class ModuleTestStepDefs extends SpringIntegration {
         Module module = moduleRepository.findByName(moduleName).get();
         UserApi userApi = userRepository.findByUsername(userName).get();
         String jwt = SpringIntegration.tokenHashMap.get(teacherName);
-        executePost("http://localhost:8080/api/module/" + module.getId() + "/participants/" + userApi.getId(), jwt);
+        executePost("http://localhost:8080/api/modules/" + module.getId() + "/participants/" + userApi.getId(), jwt);
     }
 
     @When("{string} wants to get all resources of the module {string}")

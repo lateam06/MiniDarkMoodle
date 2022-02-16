@@ -24,7 +24,7 @@ import java.util.Optional;
 
 @RestController
 @CrossOrigin(origins = "*", maxAge = 3600)
-@RequestMapping("/api/module")
+@RequestMapping("/api/modules")
 public class TextController {
 
     @Autowired

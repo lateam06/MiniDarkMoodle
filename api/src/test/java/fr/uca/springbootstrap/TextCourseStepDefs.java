@@ -39,7 +39,7 @@ public class TextCourseStepDefs extends SpringIntegration {
         Module module = moduleRepository.findByName(moduleName).get();
 
         String url = "http://localhost:8080/api"
-                + "/module/" + module.getId()
+                + "/modules/" + module.getId()
                 + "/resource/" + course.getId()
                 + "/text";
 
@@ -65,7 +65,7 @@ public class TextCourseStepDefs extends SpringIntegration {
         TextRequest re = new TextRequest(textBefore);
 
         String url = "http://localhost:8080/api"
-                + "/module/" + module.getId()
+                + "/modules/" + module.getId()
                 + "/resource/" + course.getId()
                 + "/text";
 
@@ -83,7 +83,7 @@ public class TextCourseStepDefs extends SpringIntegration {
         Module module = moduleRepository.findByName(moduleName).get();
 
         String url = "http://localhost:8080/api"
-                + "/module/" + module.getId()
+                + "/modules/" + module.getId()
                 + "/resource/" + course.getId()
                 + "/text/" + text.getId();
 
@@ -117,7 +117,7 @@ public class TextCourseStepDefs extends SpringIntegration {
         String token = tokenHashMap.get(teacherName);
 
         String url = "http://localhost:8080/api"
-                + "/module/" + module.getId()
+                + "/modules/" + module.getId()
                 + "/resource/" + course.getId()
                 + "/text/" + text.getId();
 
@@ -152,7 +152,7 @@ public class TextCourseStepDefs extends SpringIntegration {
         String token = tokenHashMap.get(studentName);
 
         String url = "http://localhost:8080/api"
-                + "/module/" + module.getId()
+                + "/modules/" + module.getId()
                 + "/resource/" + course.getId()
                 + "/text";
 
