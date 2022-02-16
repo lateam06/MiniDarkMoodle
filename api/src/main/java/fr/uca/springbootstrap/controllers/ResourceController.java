@@ -104,7 +104,7 @@ public class ResourceController {
 
         var arr = new AllResourcesResponse();
         for (Resource r : module.getResources()) {
-            arr.getResources().add(new ResourceResponse(r.getId(), r.getName(), r.getDescription()));
+            arr.getResources().add(new ResourceResponse(r.getId(), r.getName(), r.getDescription(), r.getClass().getAnnotation(DiscriminatorValue.class).value()));
         }
 
         return ResponseEntity.ok(arr);
@@ -113,36 +113,40 @@ public class ResourceController {
     @PostMapping("/{moduleId}/resources")
     @PreAuthorize("hasRole('TEACHER')")
     public ResponseEntity<?> createResource(@PathVariable long moduleId, @RequestBody ResourceRequest body) {
-        Optional<Module> omodule = moduleRepository.findById(moduleId);
-        if (omodule.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        } else {
-            Module m = omodule.get();
-            System.out.println(body.getType());
-            if (body.getType().compareTo("courses") == 0) {
-                Course c = new Course();
-                c.setName(body.getName());
-                c.setVisibility(body.getVisibility());
-                c.setDescription(body.getDescription());
-                c.setTexts(body.getTexts());
-                m.getResources().add(c);
-                courseRepository.save(c);
+        Optional<Module> optionalModule = moduleRepository.findById(moduleId);
 
-                return ResponseEntity.accepted().body(new ResourceResponse(c.getId(), c.getName(), c.getDescription()));
-            } else if (body.getType().compareTo("questionnaries") == 0) {
-                Questionnary q = new Questionnary();
-                q.setName(body.getName());
-                q.setVisibility(body.getVisibility());
-                q.setDescription(body.getDescription());
-                q.setQuestionSet(body.getQuestionSet());
-                m.getResources().add(q);
-                questionnaryRepository.save(q);
+        if(optionalModule.isEmpty())
+            return ResponseEntity.badRequest().body("Error: this module doesn't exists.");
 
-                return ResponseEntity.accepted().body(new ResourceResponse(q.getId(), q.getName(), q.getDescription()));
-            }
-            else {
-                return ResponseEntity.badRequest().body("Error: Unknown ressource type.");
-            }
+        Module module = optionalModule.get();
+        Optional<Resource> optionalResource = resourcesRepository.findByName(body.getName());
+
+        if(optionalResource.isPresent() && module.getResources().contains(optionalResource.get()))
+            return ResponseEntity.badRequest().body("This module already contains a course with this name.");
+
+        if (body.getType().compareTo("courses") == 0) {
+            Course c = courseRepository.findByName(body.getName()).orElse(new Course());
+            c.setName(body.getName());
+            c.setVisibility(body.getVisibility());
+            c.setDescription(body.getDescription());
+            c.setTexts(body.getTexts());
+            module.getResources().add(c);
+            courseRepository.save(c);
+
+            return ResponseEntity.accepted().body(new ResourceResponse(c.getId(), c.getName(), c.getDescription(), body.getType()));
+        } else if (body.getType().compareTo("questionnaries") == 0) {
+            Questionnary q = questionnaryRepository.findByName(body.getName()).orElse(new Questionnary());
+            q.setName(body.getName());
+            q.setVisibility(body.getVisibility());
+            q.setDescription(body.getDescription());
+            q.setQuestionSet(body.getQuestionSet());
+            module.getResources().add(q);
+            questionnaryRepository.save(q);
+
+            return ResponseEntity.accepted().body(new ResourceResponse(q.getId(), q.getName(), q.getDescription(), body.getType()));
+        }
+        else {
+            return ResponseEntity.badRequest().body("Error: Unknown resource type.");
         }
     }
 

@@ -199,6 +199,7 @@ public class AddCourseStepDefs extends SpringIntegration {
         String disc = course.getClass().getAnnotation(DiscriminatorValue.class).value();
         ResourceRequest re = new ResourceRequest(course.getName(), disc, "", true, null, null);
         executePost("http://localhost:8080/api/module/" + mod.getId() + "/resources", re, jwt);
+        System.out.println();
     }
 
     @Then("{string} check that the {string} course has been added correcty in {string}")

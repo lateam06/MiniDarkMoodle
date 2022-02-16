@@ -4,15 +4,17 @@ public class ResourceResponse {
     private long id;
     private String name;
     private String description;
+    private String type;
 
     public ResourceResponse() {
 
     }
 
-    public ResourceResponse(long id, String name, String description) {
+    public ResourceResponse(long id, String name, String description, String type) {
         this.id = id;
         this.name = name;
         this.description = description;
+        this.type = type;
     }
 
     public long getId() {
@@ -37,5 +39,13 @@ public class ResourceResponse {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 }

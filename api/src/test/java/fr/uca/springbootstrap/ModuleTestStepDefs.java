@@ -1,9 +1,11 @@
 package fr.uca.springbootstrap;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import fr.uca.springbootstrap.models.users.UserApi;
 import fr.uca.springbootstrap.payload.request.CreateModuleRequest;
 import fr.uca.springbootstrap.controllers.AuthController;
 import fr.uca.springbootstrap.models.modules.Module;
+import fr.uca.springbootstrap.payload.response.AllResourcesResponse;
 import fr.uca.springbootstrap.repository.*;
 import io.cucumber.java.en.*;
 import org.apache.http.util.EntityUtils;
@@ -19,6 +21,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class ModuleTestStepDefs extends SpringIntegration {
 
     private final static String PASSWORD = "password";
+    private final static String BASE_URL = "http://localhost:8080/api/module/";
 
     @Autowired
     ResourcesRepository resourcesRepository;
@@ -74,4 +77,45 @@ public class ModuleTestStepDefs extends SpringIntegration {
         EntityUtils.consume(latestHttpResponse.getEntity());
     }
 
+    @When("{string} wants to get all resources of the module {string}")
+    public void wantsToGetAllResourcesOfTheModule(String userName, String moduleName) throws IOException {
+        UserApi user = userRepository.findByUsername(userName).get();
+        Module module = moduleRepository.findByName(moduleName).get();
+
+        String token = SpringIntegration.tokenHashMap.get(user.getUsername());
+        String url = BASE_URL + module.getId() + "/resources";
+
+        executeGet(url, token);
+    }
+
+    @Then("{string} gets all resources of the module {string} with at least {int} resources")
+    public void getsAllResourcesOfTheModule(String userName, String moduleName, int minimum) throws JsonProcessingException {
+        UserApi user = userRepository.findByUsername(userName).get();
+        Module module = moduleRepository.findByName(moduleName).get();
+
+        AllResourcesResponse arr = ObjMapper.readValue(latestJson, AllResourcesResponse.class);
+
+        assertEquals(200, latestHttpResponse.getStatusLine().getStatusCode());
+        assertTrue(arr.getResources().size() >= minimum);
+    }
+
+    @And("find {string} with a description {string}")
+    public void findWithADescription(String courseName, String description) throws JsonProcessingException {
+        AllResourcesResponse arr = ObjMapper.readValue(latestJson, AllResourcesResponse.class);
+        assertTrue(arr.getResources().size() > 0);
+
+        boolean found = false;
+        for (var x : arr.getResources()) {
+            if (x.getName().equalsIgnoreCase(courseName) && x.getDescription().equalsIgnoreCase(description)) {
+                found = true;
+                break;
+            }
+        }
+        assertTrue(found);
+    }
+
+    @Then("{string} can not get all resources of the module {string}")
+    public void canNotGetAllResourcesOfTheModule(String arg0, String arg1) {
+        assertTrue(latestHttpResponse.getStatusLine().getStatusCode() >= 400);
+    }
 }
