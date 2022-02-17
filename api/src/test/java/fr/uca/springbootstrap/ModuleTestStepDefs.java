@@ -1,11 +1,14 @@
 package fr.uca.springbootstrap;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import fr.uca.springbootstrap.models.modules.courses.Course;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import fr.uca.springbootstrap.models.users.UserApi;
 import fr.uca.springbootstrap.payload.request.CreateModuleRequest;
 import fr.uca.springbootstrap.controllers.AuthController;
 import fr.uca.springbootstrap.models.modules.Module;
 import fr.uca.springbootstrap.payload.response.AllResourcesResponse;
+import fr.uca.springbootstrap.payload.response.ModulesResponse;
 import fr.uca.springbootstrap.repository.*;
 import io.cucumber.java.en.*;
 import org.apache.http.util.EntityUtils;
@@ -14,6 +17,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -96,6 +100,27 @@ public class ModuleTestStepDefs extends SpringIntegration {
         assertTrue(arr.getResources().size() >= minimum);
     }
 
+    @When("{string} wants to get all the modules")
+    public void wantsToGetAllTheModules(String arg0) throws IOException {
+        UserApi userApi = userRepository.findByUsername(arg0).get();
+        String jwt = SpringIntegration.tokenHashMap.get(arg0);
+        executeGet("http://localhost:8080/api/modules", jwt);
+    }
+
+    @Then("there are more than {int} modules created, {string} and {string} are part of them")
+    public void thereAreMoreThanModulesCreatedAndArePartOfThem(int arg0, String arg1, String arg2) throws JsonProcessingException {
+        assertEquals(200,latestHttpResponse.getStatusLine().getStatusCode());
+        ModulesResponse resp = ObjMapper.readValue(latestJson, ModulesResponse.class);
+        List<String> modules = resp.getModules();
+        assertTrue(modules.size() >= arg0);
+        Optional<Module> m1 = moduleRepository.findByName(arg1);
+        Optional<Module> m2 = moduleRepository.findByName(arg2);
+        assertTrue(m1.isPresent());
+        assertTrue(m2.isPresent());
+
+
+
+    }
     @And("find {string} with a description {string}")
     public void findWithADescription(String courseName, String description) throws JsonProcessingException {
         AllResourcesResponse arr = ObjMapper.readValue(latestJson, AllResourcesResponse.class);

@@ -6,10 +6,10 @@ import javax.persistence.Entity;
 
 @Entity
 @DiscriminatorValue("qcm_attempt")
-public class QCMAttempt extends Attempt{
+public class QCMAttempt extends Attempt {
 
-    public QCMAttempt(Long questionId, Long userId) {
-        super(questionId, userId);
+    public QCMAttempt(Question question, Long userId) {
+        super(question, userId);
     }
 
     public QCMAttempt() {

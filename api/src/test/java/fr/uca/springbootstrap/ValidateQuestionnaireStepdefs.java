@@ -60,4 +60,6 @@ public class ValidateQuestionnaireStepdefs extends SpringIntegration  {
         ResultResponse res = ObjMapper.readValue(latestJson, ResultResponse.class);
         assertEquals(arg0,res.getGrade());
     }
+
+
 }
