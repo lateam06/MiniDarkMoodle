@@ -42,7 +42,7 @@ public class AuthController {
     @PostMapping("/signin")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) throws IOException {
 
-        HttpPost request = new HttpPost("http://app-auth:8081/api/auth/signin");
+        HttpPost request = new HttpPost("http://app-api-auth:8081/api/auth/signin");
         request.addHeader("content-type", "application/json");
 
         request.setEntity(new StringEntity(ObjMapper.writeValueAsString(loginRequest)));
@@ -72,7 +72,7 @@ public class AuthController {
                     .body(new MessageResponse("Error: Username is already taken!"));
         }
 
-        HttpPost request = new HttpPost("http://app-auth:8081/api/auth/signup");
+        HttpPost request = new HttpPost("http://app-api-auth:8081/api/auth/signup");
         request.addHeader("content-type", "application/json");
 
         request.setEntity(new StringEntity(ObjMapper.writeValueAsString(signUpRequest)));
