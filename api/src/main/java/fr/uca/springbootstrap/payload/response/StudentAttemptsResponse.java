@@ -1,7 +1,5 @@
 package fr.uca.springbootstrap.payload.response;
 
-import fr.uca.springbootstrap.models.users.UserApi;
-
 import java.util.List;
 
 public class StudentAttemptsResponse {

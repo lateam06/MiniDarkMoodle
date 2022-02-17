@@ -24,7 +24,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.persistence.DiscriminatorValue;
 import javax.validation.Valid;
 import java.security.Principal;
-import java.util.Objects;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -442,55 +441,20 @@ public class QuestionController {
         Module module = moduleRepository.findById(moduleId).get();
         Set<UserApi> participants = module.getParticipants();
 
-        List<String> attemptsResponseList = new ArrayList<>();
         List<String> studentsNames = new ArrayList<>();
         List<Long> studentsId = new ArrayList<>();
 
-        /*for (UserApi participant : participants) {
-            for (Role role : participant.getRoles()) {
-                if (role.getName().compareTo(ERole.ROLE_STUDENT) == 0) {
-                    studentsNames.add(participant.getUsername());
-                    for (Question question : questionnary.getQuestionSet()) {
-                        for (Attempt attempt : question.getAttempts()) {
-                            if (attempt.getUserId().equals(participant.getId())) {
-                                attemptsResponseList.add(attempt.getStudentAttempt());
-                            }
-                        }
-                    }
-                }
-            }
-        }*/
-
-
-
         for (UserApi participant : participants) {
-
             for (Role role : participant.getRoles()) {
-
                 if (role.getName().compareTo(ERole.ROLE_STUDENT) == 0) {
-
                     studentsId.add(participant.getId());
                     studentsNames.add(participant.getUsername());
                 }
             }
         }
 
-        for (Question question : questionnary.getQuestionSet()) {
-            System.out.println(question.getName());
-            System.out.println(question.getAttempts().size());
-            for (Attempt attempt : question.getAttempts()) {
-                System.out.println(attempt.getId());
-                if (studentsId.contains(attempt.getUserId())) {
-                    System.out.println(attempt.getStudentAttempt());
-                    System.out.println("match");
-                    attemptsResponseList.add(attempt.getStudentAttempt());
-                }
-            }
-        }
-
-
         StudentAttemptsCollectionResponse resp = new StudentAttemptsCollectionResponse();
-        resp.setStudentAttemptsResponseList(attemptsResponseList);
+        resp.setStudentAttemptsResponseList(getAllStudentAttempts(questionnary, studentsId));
         resp.setStudentsNames(studentsNames);
         return ResponseEntity.ok(resp);
     }
@@ -602,64 +566,20 @@ public class QuestionController {
                 }
             }
         }
-
         return studentAttempts;
     }
 
-//    @GetMapping("/{moduleId}/resources/{questionnaryId}/result/{userid}")
-//    @PreAuthorize("hasRole('TEACHER')")
-//    public ResponseEntity<?> getStudentsResponses(@PathVariable long moduleId, @PathVariable long questionnaryId, @PathVariable long userid) {
-//        Optional<Module> omodule = moduleRepository.findById(moduleId);
-//        Optional<Questionnary> oquestionnary = questionnaryRepository.findById(questionnaryId);
-//        Optional<UserApi> ouser = userApiRepository.findById(userid);
-//
-//        if (omodule.isEmpty()) {
-//            return ResponseEntity
-//                    .badRequest()
-//                    .body(new MessageResponse("Error: No such Module"));
-//        }
-//
-//        if (oquestionnary.isEmpty()) {
-//            return ResponseEntity
-//                    .badRequest()
-//                    .body(new MessageResponse("Error: No such questionnary in the module"));
-//        }
-//
-//        if (ouser.isEmpty()) {
-//            return ResponseEntity
-//                    .badRequest()
-//                    .body(new MessageResponse("Error: No such user"));
-//        }
-//
-//        Questionnary questionnary = oquestionnary.get();
-////        int grade = questionnary.getStudentGrade(userid);
-////        return ResponseEntity.ok(new MessageResponse(String.format("student grade is %d", grade)));
-//        return ResponseEntity.ok(new MessageResponse("student grade is ???"));
-//    }
-//
+    private List<String> getAllStudentAttempts(Questionnary questionnary, List<Long> studentsId) {
+        List<String> attemptsResponseList = new ArrayList<>();
 
+        for (Question question : questionnary.getQuestionSet()) {
+            for (Attempt attempt : question.getAttempts()) {
+                if (studentsId.contains(attempt.getUserId())) {
+                    attemptsResponseList.add(attempt.getStudentAttempt());
+                }
+            }
+        }
+        return attemptsResponseList;
+    }
 
-//    public void validateQuestionnary(Long studentId) {
-//        int rate = 0;
-//        for (Question question : questionSet) {
-//            for (Attempt attempt : question.getAttempts()) {
-//                if (attempt.computeResult())
-//                    rate ++;
-//            }
-//        }
-//        Result result = new Result(studentId, rate);
-//    }
-
-//    public int getStudentGrade(long studentId) {
-//        // TODO parcourir les attempts de toutes les questions.
-//        // TODO Stocker le résultat dans results.
-////        for (Question question : questionSet) {
-////            for (Result result : results) {
-////                if(result.getUserId() == studentId && result.getValidated()) {
-////                    return result.getRate();
-////                }
-////            }
-////        }
-//        return -1;
-//    }
 }
