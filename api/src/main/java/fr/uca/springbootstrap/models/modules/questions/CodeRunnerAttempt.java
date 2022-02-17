@@ -1,15 +1,11 @@
 package fr.uca.springbootstrap.models.modules.questions;
 
 
-import fr.uca.springbootstrap.repository.CodeRunnerRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.python.util.PythonInterpreter;
 
-import javax.persistence.Basic;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
-import javax.persistence.Transient;
 import java.io.StringWriter;
 
 @CrossOrigin(origins = "*", maxAge = 3600)

@@ -1,7 +1,6 @@
 package fr.uca.springbootstrap.payload.request;
 
 import fr.uca.springbootstrap.models.modules.questions.EQuestion;
-import fr.uca.springbootstrap.models.modules.questions.Question;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
