@@ -8,6 +8,11 @@ services:
       - "8080:8080"
     depends_on:
       - apidb
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://apidb:5432/apidb
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=123
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
 
   apidb:
     container_name: app-api-db
@@ -28,6 +33,11 @@ services:
       - "8081:8081"
     depends_on:
       - authdb
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://authdb:5432/authdb
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=123
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
 
   authdb:
     container_name: app-api-auth-db
