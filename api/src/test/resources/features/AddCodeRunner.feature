@@ -3,18 +3,26 @@ Feature: CodeRunner
   Background:
     Given a teacher named "Arnaud"
     * "Arnaud" is connected
+    * a teacher named "Marcel"
+    * "Marcel" is connected
+    And a module named "le C pour les nuls"
     And a module named "Programming Challenge"
+    And a questionnaire with name "questionnaire"
     * "Arnaud" is the teacher registered to the module "Programming Challenge"
     * a questionnaire with name "Algos de graphes"
     * "Arnaud" has registered the questionnaire "Algos de graphes" to the module "Programming Challenge"
+    * a CodeRunner Question "factoriel en python"
     And a student named "Sami"
     * "Sami" is connected
+    And a student named "Louis"
+    * "Louis" is connected
+
 
   # ADD
     Scenario: Teacher add a code question on a questionnaire of his module
       When "Arnaud" wants to add the code question named "Find with DFS" with testCode "print(dfs(L))" and response "10" on "Algos de graphes" of "Programming Challenge"
       Then the code question "Find with DFS" is added on "Algos de graphes" of "Programming Challenge"
-      
+
     Scenario: Teacher add a code question on a module where he isn't registered
       Given a teacher named "Enrico"
       * "Enrico" is connected
@@ -103,3 +111,14 @@ Feature: CodeRunner
       Given "Arnaud" has already registered a code question code question named "Find Bellman-Ford" with testCode "print(bm(L))" and response "20" on "Algos de graphes" of "Programming Challenge"
       When "Sami" wants to modify the code question "Find Bellman-Ford" from "Algos de graphes" of "Programming Challenge" and change the testCode to "print(bford(L))"
       Then the code question "Find Bellman-Ford" from "Algos de graphes" of "Programming Challenge" testCode is "print(bm(L))"
+
+
+# ATTEMPT CODE RUNNER
+  Scenario: the teacher add the Student to the module, add the Questionnary and the question
+    Given "Marcel" is the teacher registered to the module "le C pour les nuls"
+    And "Marcel" has registered "Louis" on the module "le C pour les nuls"
+    When "Marcel" wants to add the questionnaire "questionnaire" to the module "le C pour les nuls"
+    And "Marcel" wants to add a CodeRunner "factoriel en python" to the questionnaire "questionnaire" from the module "le C pour les nuls"
+    And "Louis" wants to answer the CodeRunner "factoriel en python" of "questionnaire" from "le C pour les nuls"
+    When "Louis" validate his questionnary  with the code runner "questionnaire" of the module "le C pour les nuls"
+    Then "Louis" get a 1 because his reponse is true

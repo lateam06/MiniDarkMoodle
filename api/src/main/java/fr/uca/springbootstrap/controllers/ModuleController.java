@@ -12,6 +12,7 @@ import fr.uca.springbootstrap.models.users.UserApi;
 import fr.uca.springbootstrap.payload.request.CreateModuleRequest;
 import fr.uca.springbootstrap.payload.request.ResourceRequest;
 import fr.uca.springbootstrap.payload.response.ModuleResponse;
+import fr.uca.springbootstrap.payload.response.ModulesResponse;
 import fr.uca.springbootstrap.payload.response.TeacherResponse;
 import fr.uca.springbootstrap.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -68,13 +69,18 @@ public class ModuleController {
     }
 
     @GetMapping("")
-    @PreAuthorize("hasRole('TEACHER')")
-    public ResponseEntity<?> getAllModules() {
 
-        // TODO
+    public ResponseEntity<?> getAllModules(Principal principal) {
+        List<Module> modules = moduleRepository.findAll();
+        if (modules.size() == 0) {
+            return ResponseEntity.status(204).body(new MessageResponse("No module registered"));
+        } else {
+            ModulesResponse resp = new ModulesResponse(modules);
+            return ResponseEntity.ok(resp);
 
-        return null;
+        }
     }
+
 
     @PostMapping("")
     @PreAuthorize("hasRole('TEACHER')")

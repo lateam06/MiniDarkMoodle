@@ -8,14 +8,22 @@ Feature: Module Creation and Managing
     * "Yann" is connected
     * "Marcel" is connected
     And a module named "le C pour les nuls"
+    And a module named "le R pour les nuls"
     * "Marcel" is the teacher registered to the module "le C pour les nuls"
 
   Scenario: Teacher create a new module and assign himself on it
     Given "Ernesto" is a teacher not registered to any module
     When "Ernesto" wants to create a new Module "Un super Module d'enfer"
+
+
+  Scenario: a teacher get's all the modules
+    Given "Ernesto" is the teacher registered to the module "le C pour les nuls"
+    When "Ernesto" wants to get all the modules
+  Then there are more than 2 modules created, "le C pour les nuls" and "le R pour les nuls" are part of them
+
 #    Then The module "Un super module d'enfer" is created
 #    But "Ernesto wants to add "Yann" to the module "Un super module d'enfer"
-  
+
   Scenario: Teacher want to get all resources of his module
     Given a course named "Les structures" with a description "Ici on apprend a creer des structures"
     * a course named "Les types" with a description "Apprentissage des types primitifs"

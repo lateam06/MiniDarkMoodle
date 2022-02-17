@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.persistence.DiscriminatorValue;
 import javax.validation.Valid;
 import java.security.Principal;
+import java.util.Objects;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -74,6 +75,9 @@ public class QuestionController {
     @Autowired
     AttemptRepository attemptRepository;
 
+    @Autowired
+    CodeRunnerAttemptRepository codeRunnerAttemptRepository;
+
     /*
      * ##########################################
      * #             VERIFICATION               #
@@ -112,19 +116,19 @@ public class QuestionController {
     }
 
     private ResponseEntity<?> verifyQuestion(Principal principal, long moduleId, long resourceId, long questionId) {
-        var oqcm = qcmRepository.findById(questionId);
+        var oquestion = questionRepository.findById(questionId);
         var omodule = moduleRepository.findById(moduleId);
         var oquestionnary = questionnaryRepository.findById(resourceId);
 
         UserApi actor = userApiRepository.findByUsername(principal.getName()).get();
 
-        if (oqcm.isEmpty() || omodule.isEmpty() || oquestionnary.isEmpty()) {
+        if (oquestion.isEmpty() || omodule.isEmpty() || oquestionnary.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
 
         Module mod = omodule.get();
         Questionnary quest = oquestionnary.get();
-        Question qcm = oqcm.get();
+        Question qcm = oquestion.get();
         if (!mod.getParticipants().contains(actor)) {
             return ResponseEntity.status(403).body(new MessageResponse("User not registered to this module"));
         }
@@ -506,6 +510,7 @@ public class QuestionController {
         if (oattempt.isPresent()) {
             question.getAttempts().remove(oattempt.get());
             attemptRepository.delete(oattempt.get());
+            questionRepository.save(question);
         }
 
         switch (answer.getQuestionType()) {
@@ -517,7 +522,7 @@ public class QuestionController {
                             .body(new MessageResponse("Error : this answer don't belongs to the qcm."));
                 }
 
-                QCMAttempt qcmAttempt = new QCMAttempt(qcm.getId(), actor.getId());
+                QCMAttempt qcmAttempt = new QCMAttempt(qcm, actor.getId());
                 qcmAttempt.setStudentAttempt(answer.getResponse());
 
                 qcm.getAttempts().add(qcmAttempt);
@@ -535,8 +540,11 @@ public class QuestionController {
             case CODE:
                 Optional<CodeRunner> orunner = codeRunnerRepository.findById(questionId);
                 CodeRunner runner = orunner.get();
-
-                //runner.setStudentResponse(answer.getResponse());
+                CodeRunnerAttempt codeRunnerAttempt = new CodeRunnerAttempt(runner, actor.getId());
+                codeRunnerAttempt.setStudentAttempt(answer.getResponse());
+//                runner.setResponse(answer.getResponse());
+                runner.getAttempts().add(codeRunnerAttempt);
+                codeRunnerAttemptRepository.save(codeRunnerAttempt);
                 codeRunnerRepository.save(runner);
 
                 break;
@@ -641,7 +649,7 @@ public class QuestionController {
 //        }
 //        Result result = new Result(studentId, rate);
 //    }
-//
+
 //    public int getStudentGrade(long studentId) {
 //        // TODO parcourir les attempts de toutes les questions.
 //        // TODO Stocker le résultat dans results.
