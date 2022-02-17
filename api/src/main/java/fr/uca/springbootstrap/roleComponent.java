@@ -23,8 +23,6 @@ public class roleComponent {
         roleRepository.save(t);
         roleRepository.save(a);
         roleRepository.save(s);
-
-
     }
 
 

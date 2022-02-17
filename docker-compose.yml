@@ -1,0 +1,41 @@
+version: '3.8'
+services:
+  app:
+    container_name: app-api
+    image: api
+    build: api
+    ports:
+      - "8080:8080"
+    depends_on:
+      - apidb
+
+  apidb:
+    container_name: app-api-db
+    image: postgres
+    ports:
+      - "5432:5432"
+    restart: unless-stopped
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=123
+      - POSTGRES_DB=apidb
+
+  app-auth:
+    container_name: app-api-auth
+    image: api-auth
+    build: auth
+    ports:
+      - "8081:8081"
+    depends_on:
+      - authdb
+
+  authdb:
+    container_name: app-api-auth-db
+    image: postgres
+    ports:
+      - "5433:5432"
+    restart: unless-stopped
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=123
+      - POSTGRES_DB=authdb
