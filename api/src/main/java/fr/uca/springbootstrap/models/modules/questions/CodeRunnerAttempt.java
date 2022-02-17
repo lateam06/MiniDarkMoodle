@@ -22,6 +22,8 @@ import javax.persistence.Entity;
 import javax.persistence.Transient;
 import java.io.StringWriter;
 
+import static fr.uca.springbootstrap.controllers.AuthController.HOST_CODE_RUNNER;
+
 @CrossOrigin(origins = "*", maxAge = 3600)
 
 @Entity
@@ -44,7 +46,7 @@ public class CodeRunnerAttempt extends Attempt {
             CloseableHttpClient httpClient = HttpClients.createDefault();
             CodeRequest codeRequest = new CodeRequest(studentAttempt, cr.getTestCode(), cr.getResponse());
 
-            HttpPost request = new HttpPost("http://app-code-runner:666/api/run");
+            HttpPost request = new HttpPost("http://" + HOST_CODE_RUNNER +":666/api/run");
             request.addHeader("content-type", "application/json");
 
             request.setEntity(new StringEntity(ObjMapper.writeValueAsString(codeRequest)));
