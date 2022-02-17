@@ -252,8 +252,9 @@ public class AddCodeRunnerStepDefs extends SpringIntegration {
     public void getABecauseHisReponseIsTrue(String arg0, int arg1) throws JsonProcessingException {
         ResultResponse res = ObjMapper.readValue(latestJson, ResultResponse.class);
         assertEquals(arg1, res.getGrade());
-//        resultRepository.deleteAll();
-//        assertEquals(resourcesRepository.findAll().size(),0);
+        resultRepository.deleteAll();
+        resultRepository.flush();
+        assertEquals(0,resultRepository.findAll().size());
 
     }
 }
