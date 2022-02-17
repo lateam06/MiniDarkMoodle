@@ -1,6 +1,8 @@
 package fr.uca.springbootstrap.controllers;
 
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.validation.Valid;
 
@@ -10,6 +12,8 @@ import com.lateam.payload.request.SignupRequest;
 import com.lateam.payload.response.JwtResponse;
 import com.lateam.payload.response.MessageResponse;
 import com.lateam.payload.response.UserApiResponse;
+import fr.uca.springbootstrap.models.users.ERole;
+import fr.uca.springbootstrap.models.users.Role;
 import fr.uca.springbootstrap.models.users.UserApi;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
@@ -81,7 +85,32 @@ public class AuthController {
 
         if (response.getStatusLine().getStatusCode() == 200) {
             UserApiResponse resp = ObjMapper.readValue(bodyResponseAuthServer, UserApiResponse.class);
-            userApiRepository.save(new UserApi(resp.getId(), resp.getUsername()));
+            UserApi userApi = new UserApi(resp.getId(), resp.getUsername());
+
+            Set<Role> roles = new HashSet<>();
+
+            signUpRequest.getRole().forEach(role -> {
+                switch (role) {
+                    case "admin":
+                        Role adminRole = roleRepository.findByName(ERole.ROLE_ADMIN)
+                                .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+                        roles.add(adminRole);
+
+                        break;
+                    case "teacher":
+                        Role modRole = roleRepository.findByName(ERole.ROLE_TEACHER)
+                                .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+                        roles.add(modRole);
+
+                        break;
+                    default:
+                        Role userRole = roleRepository.findByName(ERole.ROLE_STUDENT)
+                                .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+                        roles.add(userRole);
+                }
+            });
+            userApi.setRoles(roles);
+            userApiRepository.save(userApi);
 
             return ResponseEntity.ok(resp);
         }
