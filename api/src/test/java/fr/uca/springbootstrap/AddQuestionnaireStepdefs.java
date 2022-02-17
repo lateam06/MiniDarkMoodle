@@ -2,20 +2,26 @@ package fr.uca.springbootstrap;
 
 import fr.uca.springbootstrap.controllers.AuthController;
 import fr.uca.springbootstrap.models.modules.Module;
+import fr.uca.springbootstrap.models.modules.Resource;
+import fr.uca.springbootstrap.models.modules.questions.CodeRunner;
+import fr.uca.springbootstrap.models.modules.questions.EQuestion;
 import fr.uca.springbootstrap.models.modules.questions.Questionnary;
 import fr.uca.springbootstrap.models.users.UserApi;
+import fr.uca.springbootstrap.payload.request.CreateQuestionRequest;
 import fr.uca.springbootstrap.repository.*;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
+import org.apache.http.util.EntityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.io.IOException;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class AddQuestionnaireStepdefs extends  SpringIntegration {
+public class AddQuestionnaireStepdefs extends SpringIntegration {
     private static final String PASSWORD = "password";
 
     @Autowired
@@ -39,9 +45,16 @@ public class AddQuestionnaireStepdefs extends  SpringIntegration {
     @Autowired
     QuestionnaryRepository questionnaryRepository;
 
+    @Autowired
+    QuestionRepository questionRepository;
+
+    @Autowired
+    CodeRunnerRepository codeRunnerRepository;
+
     @And("a questionnaire with name {string}")
     public void aQuestionnaireWithName(String arg0) {
         Questionnary questionnary = questionnaryRepository.findByName(arg0).orElse(new Questionnary(arg0));
+        questionnary.setVisibility(true);
         resourcesRepository.save(questionnary);
     }
 
@@ -63,7 +76,6 @@ public class AddQuestionnaireStepdefs extends  SpringIntegration {
         assertTrue(module.getResources().contains(questionnary));
 
 
-
     }
 
     @And("another questionnaire with name {string} and description {string}")
@@ -81,14 +93,11 @@ public class AddQuestionnaireStepdefs extends  SpringIntegration {
         String jwt = SpringIntegration.tokenHashMap.get(arg0);
         String url = "http://localhost:8080/api/modules/" + module.getId() + "/resources/" + questionnary.getId();
 
-        executeGet(url,jwt);
-        Questionnary resp = ObjMapper.readValue(latestJson,Questionnary.class);
+        executeGet(url, jwt);
+        Questionnary resp = ObjMapper.readValue(latestJson, Questionnary.class);
 
         assertEquals(arg3.compareTo(resp.getDescription()), 0);
     }
 
-    @And("a CodeRunner Question {string}")
-    public void aCodeRunnerQuestion(String arg0) {
 
-    }
 }

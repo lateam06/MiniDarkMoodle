@@ -4,8 +4,10 @@ package fr.uca.springbootstrap.models.modules.questions;
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 @Entity
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
@@ -27,7 +29,7 @@ public class Question {
     private String description;
 
     @OneToMany(fetch = FetchType.EAGER)
-    private List<Attempt> attempts = new java.util.ArrayList<>();
+    private Set<Attempt> attempts;
 
     @OneToOne(fetch = FetchType.EAGER)
     @JoinTable(name = "question_questionnary",
@@ -36,11 +38,11 @@ public class Question {
         )
     private Questionnary questionnary;
 
-    public void setAttempts(List<Attempt> attempts) {
+    public void setAttempts(Set<Attempt> attempts) {
         this.attempts = attempts;
     }
 
-    public List<Attempt> getAttempts() {
+    public Set<Attempt> getAttempts() {
         return attempts;
     }
 
