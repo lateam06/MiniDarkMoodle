@@ -3,11 +3,12 @@ services:
   app:
     container_name: app-api
     image: api
-    build: api
+    build: .
     ports:
       - "8080:8080"
     depends_on:
       - apidb
+      - app-auth
 
   apidb:
     container_name: app-api-db
@@ -24,6 +25,7 @@ services:
     container_name: app-api-auth
     image: api-auth
     build: auth
+    restart: unless-stopped
     ports:
       - "8081:8081"
     depends_on:
