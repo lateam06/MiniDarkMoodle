@@ -69,7 +69,6 @@ public class ModuleController {
     }
 
     @GetMapping("")
-
     public ResponseEntity<?> getAllModules(Principal principal) {
         List<Module> modules = moduleRepository.findAll();
         if (modules.size() == 0) {
