@@ -23,7 +23,7 @@ services:
   app-auth:
     container_name: app-api-auth
     image: api-auth
-    build: api
+    build: auth
     ports:
       - "8081:8081"
     depends_on:
