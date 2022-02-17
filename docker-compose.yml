@@ -39,3 +39,10 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=123
       - POSTGRES_DB=authdb
+  coderunner:
+    container_name: app-code-runner
+    image: app-code-runner
+    build: coderunner
+    ports:
+       - "666:666"
+    restart: unless-stopped

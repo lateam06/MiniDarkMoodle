@@ -44,7 +44,7 @@ public class CodeRunnerAttempt extends Attempt {
             CloseableHttpClient httpClient = HttpClients.createDefault();
             CodeRequest codeRequest = new CodeRequest(studentAttempt, cr.getTestCode(), cr.getResponse());
 
-            HttpPost request = new HttpPost("http://localhost:666/api/run");
+            HttpPost request = new HttpPost("http://app-code-runner:666/api/run");
             request.addHeader("content-type", "application/json");
 
             request.setEntity(new StringEntity(ObjMapper.writeValueAsString(codeRequest)));
@@ -56,6 +56,7 @@ public class CodeRunnerAttempt extends Attempt {
 
 
         } catch (Exception e) {
+            System.out.println(e.toString());
             return false;
         }
     }

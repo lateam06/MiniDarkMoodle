@@ -2,17 +2,15 @@ package code.runner.controllers;
 
 import com.lateam.payload.request.CodeRequest;
 import com.lateam.payload.response.CodeResponse;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.util.EntityUtils;
+
+
 import org.python.util.PythonInterpreter;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.io.IOException;
-import java.io.StringWriter;
+import java.io.*;
+import java.util.Scanner;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
@@ -23,13 +21,30 @@ public class RunnerController {
 
     @PostMapping("")
     public ResponseEntity<?> ComputeCode(@Valid @RequestBody CodeRequest codeRequest) throws IOException {
-        try (PythonInterpreter pyInterp = new PythonInterpreter()) {
-            StringWriter output = new StringWriter();
-            pyInterp.setOut(output);
-            pyInterp.exec(codeRequest.getStudentCode() + "\n" + codeRequest.getTest());
-            CodeResponse response = new CodeResponse(output.toString().trim().equals(codeRequest.getTestResult()));
+        try {
+
+            String code = codeRequest.getStudentCode() + "\n" + codeRequest.getTest();
+
+            FileWriter fw = new FileWriter("/home/temp.py");
+            fw.append(code);
+            fw.close();
+            Process p = Runtime.getRuntime().exec("python2.7 /home/temp.py");
+            BufferedReader stdInput = new BufferedReader(new InputStreamReader(p.getInputStream()));
+
+            String result = stdInput.readLine();
+            CodeResponse response = new CodeResponse(result.compareTo(codeRequest.getTestResult()) == 0);
+
+
+
+
+
+
+
+
             return ResponseEntity.ok(response);
         } catch (Exception e) {
+            System.out.println("laaaaaaaaaaaaaa");
+            System.out.println(e.toString());
             return ResponseEntity.ok(new CodeResponse(false));
         }
 
