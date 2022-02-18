@@ -438,6 +438,46 @@ public class QuestionController {
         return ResponseEntity.ok(resp);
     }
 
+    @GetMapping("/{moduleId}/resources/{questionnaryId}/results/{userid}")
+    @PreAuthorize("hasRole('TEACHER')")
+    public ResponseEntity<?> getStudentResutls(Principal principal, @PathVariable long moduleId, @PathVariable long questionnaryId, @PathVariable long userid) {
+
+        var responseCheck = checkModuleQuestionnaryUser(principal, moduleId, questionnaryId);
+        if (responseCheck != null)
+            return responseCheck;
+
+        Questionnary questionnary = questionnaryRepository.findById(questionnaryId).get();
+
+        if (questionnary.getQuestionSet().isEmpty()) {
+            return ResponseEntity.badRequest().body("Error: this questionnary doesn't contain any questions");
+        }
+
+        Module module = moduleRepository.findById(moduleId).get();
+        var optionalUser = userApiRepository.findById(userid);
+
+        if (optionalUser.isEmpty()) {
+            return ResponseEntity.badRequest().body("Error : this user doesn't exist");
+        }
+
+        UserApi userApi = optionalUser.get();
+
+        if (!module.getParticipants().contains(userApi)) {
+            return ResponseEntity.badRequest().body("Error : this user isn't registered to this module");
+        }
+
+
+        Optional<Result> ores =  resultRepository.findByQuestionnaryIdAndUserId(questionnaryId,userid);
+
+        if(ores.isEmpty()){
+            return ResponseEntity.badRequest().body(new MessageResponse("NO result for this user"));
+        }
+        else{
+            return ResponseEntity.ok(new ResultResponse(ores.get().getRate()));
+        }
+
+    }
+
+
     @GetMapping("/{moduleId}/resources/{questionnaryId}/attempts")
     @PreAuthorize("hasRole('TEACHER')")
     public ResponseEntity<?> getAllStudentResponse(Principal principal, @PathVariable long moduleId, @PathVariable long questionnaryId) {
@@ -600,5 +640,8 @@ public class QuestionController {
         }
         return attemptsResponseList;
     }
+
+
+
 
 }
