@@ -1,0 +1,62 @@
+version: '3.8'
+services:
+  app:
+    container_name: app-api
+    image: api
+    build: .
+    ports:
+      - "8080:8080"
+    depends_on:
+      - apidb
+      - app-auth
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://apidb:5432/apidb
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=123
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+    expose:
+      - "8080"
+
+  apidb:
+    container_name: app-api-db
+    image: postgres
+    ports:
+      - "5432:5432"
+    restart: unless-stopped
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=123
+      - POSTGRES_DB=apidb
+
+  app-auth:
+    container_name: app-api-auth
+    image: api-auth
+    build: auth
+    restart: unless-stopped
+    ports:
+      - "8081:8081"
+    depends_on:
+      - authdb
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://authdb:5432/authdb
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=123
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+
+  authdb:
+    container_name: app-api-auth-db
+    image: postgres
+    ports:
+      - "5433:5432"
+    restart: unless-stopped
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=123
+      - POSTGRES_DB=authdb
+  coderunner:
+    container_name: app-code-runner
+    image: app-code-runner
+    build: coderunner
+    ports:
+       - "666:666"
+    restart: unless-stopped
