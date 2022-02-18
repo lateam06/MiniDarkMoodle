@@ -18,8 +18,10 @@ public class AllResourcesResponse {
     public AllResourcesResponse(Module module) {
         this();
         this.resources = new ArrayList<>();
-        for (Resource r : module.getResources()) {
-            getResources().add(new ResourceResponse(r.getId(), r.getName(), r.getDescription(), r.getClass().getAnnotation(DiscriminatorValue.class).value()));
+        if (module.getResources() != null && !module.getResources().isEmpty()) {
+            for (Resource r : module.getResources()) {
+                getResources().add(new ResourceResponse(r.getId(), r.getName(), r.getDescription(), r.getClass().getAnnotation(DiscriminatorValue.class).value()));
+            }
         }
     }
 
