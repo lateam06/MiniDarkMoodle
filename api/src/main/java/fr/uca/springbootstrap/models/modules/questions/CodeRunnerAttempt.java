@@ -16,10 +16,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.python.util.PythonInterpreter;
 
-import javax.persistence.Basic;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
-import javax.persistence.Transient;
 import java.io.StringWriter;
 
 import static fr.uca.springbootstrap.controllers.AuthController.HOST_CODE_RUNNER;
@@ -58,9 +56,9 @@ public class CodeRunnerAttempt extends Attempt {
 
 
         } catch (Exception e) {
-            System.out.println(e.toString());
             return false;
         }
     }
+
 
 }

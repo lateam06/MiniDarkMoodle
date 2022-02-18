@@ -9,7 +9,7 @@ import fr.uca.springbootstrap.repository.*;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.password.PasswordEncoder;
+
 
 import java.io.IOException;
 

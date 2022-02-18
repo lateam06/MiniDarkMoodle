@@ -1,8 +1,6 @@
 package fr.uca.springbootstrap;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import fr.uca.springbootstrap.models.modules.courses.Course;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import fr.uca.springbootstrap.models.users.UserApi;
 import fr.uca.springbootstrap.payload.request.CreateModuleRequest;
 import fr.uca.springbootstrap.controllers.AuthController;
@@ -11,9 +9,7 @@ import fr.uca.springbootstrap.payload.response.AllResourcesResponse;
 import fr.uca.springbootstrap.payload.response.ModulesResponse;
 import fr.uca.springbootstrap.repository.*;
 import io.cucumber.java.en.*;
-import org.apache.http.util.EntityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.io.IOException;
 import java.util.List;

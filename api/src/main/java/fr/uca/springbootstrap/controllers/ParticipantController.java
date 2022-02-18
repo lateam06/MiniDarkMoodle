@@ -2,11 +2,14 @@ package fr.uca.springbootstrap.controllers;
 
 
 import com.lateam.payload.response.MessageResponse;
+import com.lateam.payload.response.UserApiResponse;
 import fr.uca.springbootstrap.models.modules.Module;
 import fr.uca.springbootstrap.models.users.ERole;
 import fr.uca.springbootstrap.models.users.Role;
 import fr.uca.springbootstrap.models.users.UserApi;
+import fr.uca.springbootstrap.payload.response.AllUserResponse;
 import fr.uca.springbootstrap.payload.response.TeacherResponse;
+import fr.uca.springbootstrap.payload.response.UserResponse;
 import fr.uca.springbootstrap.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -72,7 +75,16 @@ public class ParticipantController {
                     .badRequest()
                     .body(new MessageResponse("Error: No such user in this module"));
         }
-        return ResponseEntity.ok(userApi);
+
+        UserResponse userResp = new UserResponse();
+        userResp.setId(userApi.getId());
+        userResp.setName(userApi.getUsername());
+        List<String> roles = new ArrayList<>();
+        for (Role role : userApi.getRoles()) {
+            roles.add(role.getName().toString());
+        }
+        userResp.setRoles(roles);
+        return ResponseEntity.ok(userResp);
     }
 
     @GetMapping("/{moduleId}/teachers")
@@ -129,7 +141,23 @@ public class ParticipantController {
                     .body(new MessageResponse("Error: Not allowed to get information about this module"));
         }
 
-        return ResponseEntity.ok(module.getParticipants());
+        List<String> names = new ArrayList<>();
+        List<Long> iDs = new ArrayList<>();
+        List<String> roles = new ArrayList<>();
+
+        for (UserApi participant : participants) {
+            names.add(participant.getUsername());
+            iDs.add(participant.getId());
+            for (Role role : participant.getRoles()) {
+                roles.add(role.getName().toString());
+            }
+        }
+
+        AllUserResponse usersResp = new AllUserResponse();
+        usersResp.setNames(names);
+        usersResp.setiDs(iDs);
+        usersResp.setRoles(roles);
+        return ResponseEntity.ok(usersResp);
     }
 
     @PostMapping("/{moduleId}/participants/{userid}")
@@ -162,7 +190,7 @@ public class ParticipantController {
                     .body(new MessageResponse("Error: Not allowed to add user!"));
         }
         moduleRepository.save(module);
-        return ResponseEntity.ok(new MessageResponse("User successfully added to module!"));
+        return ResponseEntity.ok(new UserApiResponse(userApi.getId(), userApi.getUsername()));
     }
 
     @DeleteMapping("/{moduleId}/participants/{userId}")
@@ -195,6 +223,7 @@ public class ParticipantController {
                     .body(new MessageResponse("Error: Not allowed to remove user!"));
         }
         moduleRepository.save(module);
-        return ResponseEntity.ok((new MessageResponse("User successfully remove from module")));
+        return ResponseEntity.ok((new MessageResponse("User " + userApi.getId() + " named "
+                + userApi.getUsername() + " removed from the module " + module.getId() + " named " + module.getId())));
     }
 }

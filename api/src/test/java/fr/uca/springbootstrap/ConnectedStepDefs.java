@@ -1,16 +1,12 @@
 package fr.uca.springbootstrap;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
+
 import com.lateam.payload.request.LoginRequest;
-import com.lateam.payload.request.SignupRequest;
 import com.lateam.payload.response.JwtResponse;
 import io.cucumber.java.en.And;
-import javassist.NotFoundException;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 
 import java.io.IOException;

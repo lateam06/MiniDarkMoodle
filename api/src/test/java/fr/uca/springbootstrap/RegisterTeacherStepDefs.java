@@ -1,19 +1,15 @@
 package fr.uca.springbootstrap;
 
 import fr.uca.springbootstrap.controllers.AuthController;
-import fr.uca.springbootstrap.models.users.ERole;
 import fr.uca.springbootstrap.models.modules.Module;
-import fr.uca.springbootstrap.models.users.Role;
 import fr.uca.springbootstrap.models.users.UserApi;
 import fr.uca.springbootstrap.repository.ModuleRepository;
 import fr.uca.springbootstrap.repository.RoleRepository;
 import fr.uca.springbootstrap.repository.UserApiRepository;
 import io.cucumber.java.en.And;
-import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.test.context.support.WithUserDetails;
 
 import java.util.HashSet;

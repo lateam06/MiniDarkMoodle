@@ -4,7 +4,7 @@ import fr.uca.springbootstrap.models.modules.Resource;
 
 import javax.persistence.*;
 import java.util.List;
-import java.util.Set;
+
 
 @Entity
 @DiscriminatorValue("courses")

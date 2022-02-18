@@ -6,7 +6,6 @@ import fr.uca.springbootstrap.models.modules.Module;
 import fr.uca.springbootstrap.models.modules.Resource;
 import fr.uca.springbootstrap.models.modules.questions.CodeRunner;
 import fr.uca.springbootstrap.models.modules.questions.EQuestion;
-import fr.uca.springbootstrap.models.modules.questions.Question;
 import fr.uca.springbootstrap.models.modules.questions.Questionnary;
 import fr.uca.springbootstrap.models.users.UserApi;
 import fr.uca.springbootstrap.payload.request.AnswerQuestionRequest;
@@ -18,7 +17,6 @@ import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import org.apache.http.util.EntityUtils;
-import org.python.antlr.op.Mod;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
