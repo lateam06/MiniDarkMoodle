@@ -387,6 +387,10 @@ public class QuestionController {
             return ResponseEntity.badRequest().body("Error: this question isn't in this module.");
         }
 
+        for (var a : question.getAttempts()) {
+            question.getAttempts().remove(a);
+            attemptRepository.delete(a);
+        }
         questionnary.getQuestionSet().remove(question);
         questionRepository.deleteById(question.getId());
 
