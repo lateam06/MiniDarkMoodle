@@ -1,9 +1,8 @@
 package fr.uca.springbootstrap.payload.response;
 
-import fr.uca.springbootstrap.models.modules.Resource;
-import fr.uca.springbootstrap.models.modules.Module;
 
-import javax.persistence.DiscriminatorValue;
+import fr.uca.springbootstrap.models.modules.Module;
+;
 
 public class ModuleResponse extends AllResourcesResponse {
     private long id;

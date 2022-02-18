@@ -3,11 +3,16 @@ package fr.uca.springbootstrap.controllers;
 import com.lateam.payload.response.MessageResponse;
 import fr.uca.springbootstrap.models.modules.Module;
 import fr.uca.springbootstrap.models.modules.questions.*;
+import fr.uca.springbootstrap.models.users.ERole;
+import fr.uca.springbootstrap.models.users.Role;
 import fr.uca.springbootstrap.models.users.UserApi;
 import fr.uca.springbootstrap.payload.request.AnswerQuestionRequest;
 
 import fr.uca.springbootstrap.payload.request.CreateQuestionRequest;
+import fr.uca.springbootstrap.payload.response.AllQuestionsResponse;
 import fr.uca.springbootstrap.payload.response.ResultResponse;
+import fr.uca.springbootstrap.payload.response.StudentAttemptsCollectionResponse;
+import fr.uca.springbootstrap.payload.response.StudentAttemptsResponse;
 import fr.uca.springbootstrap.repository.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +24,8 @@ import org.springframework.web.bind.annotation.*;
 import javax.persistence.DiscriminatorValue;
 import javax.validation.Valid;
 import java.security.Principal;
-import java.util.Objects;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -193,9 +199,24 @@ public class QuestionController {
     @GetMapping("/{moduleId}/resources/{resourcesId}/questions")
     public ResponseEntity<?> getAllQuestion(Principal principal, @PathVariable long moduleId, @PathVariable long resourcesId) {
 
-        // TODO
+        var responseCheck = checkModuleQuestionnaryUser(principal, moduleId, resourcesId);
+        if (responseCheck != null)
+            return responseCheck;
 
-        return null;
+        Questionnary questionnary = questionnaryRepository.findById(resourcesId).get();
+
+        if (questionnary.getQuestionSet().isEmpty()) {
+            return ResponseEntity.badRequest().body("Error: the questionnary doesn't contain any questions.");
+        }
+
+        List<String> questionNames = new ArrayList<>();
+        for (Question question : questionnary.getQuestionSet()) {
+            questionNames.add(question.getName());
+        }
+
+        AllQuestionsResponse questionsResponse = new AllQuestionsResponse();
+        questionsResponse.setQuestionNames(questionNames);
+        return ResponseEntity.ok(questionsResponse);
     }
 
     @PostMapping("/{moduleId}/resources/{resourcesId}/questions")
@@ -369,22 +390,73 @@ public class QuestionController {
      * ##########################################
      */
 
-    @GetMapping("/{moduleId}/resources/{questionnaryId}/result/{userid}")
+    @GetMapping("/{moduleId}/resources/{questionnaryId}/attempts/{userid}")
     @PreAuthorize("hasRole('TEACHER')")
     public ResponseEntity<?> getStudentResponse(Principal principal, @PathVariable long moduleId, @PathVariable long questionnaryId, @PathVariable long userid) {
 
-        // TODO
+        var responseCheck = checkModuleQuestionnaryUser(principal, moduleId, questionnaryId);
+        if (responseCheck != null)
+            return responseCheck;
 
-        return null;
+        Questionnary questionnary = questionnaryRepository.findById(questionnaryId).get();
+
+        if (questionnary.getQuestionSet().isEmpty()) {
+            return ResponseEntity.badRequest().body("Error: this questionnary doesn't contain any questions");
+        }
+
+        Module module = moduleRepository.findById(moduleId).get();
+        var optionalUser = userApiRepository.findById(userid);
+
+        if (optionalUser.isEmpty()) {
+            return ResponseEntity.badRequest().body("Error : this user doesn't exist");
+        }
+
+        UserApi userApi = optionalUser.get();
+
+        if (!module.getParticipants().contains(userApi)) {
+            return ResponseEntity.badRequest().body("Error : this user isn't registered to this module");
+        }
+
+        StudentAttemptsResponse resp = new StudentAttemptsResponse();
+        resp.setStudentAttempts(getStudentAttempts(questionnary, userApi));
+        resp.setStudentName(userApi.getUsername());
+
+        return ResponseEntity.ok(resp);
     }
 
-    @GetMapping("/{moduleId}/resources/{questionnaryId}/result")
+    @GetMapping("/{moduleId}/resources/{questionnaryId}/attempts")
     @PreAuthorize("hasRole('TEACHER')")
     public ResponseEntity<?> getAllStudentResponse(Principal principal, @PathVariable long moduleId, @PathVariable long questionnaryId) {
 
-        // TODO
+        var responseCheck = checkModuleQuestionnaryUser(principal, moduleId, questionnaryId);
+        if (responseCheck != null)
+            return responseCheck;
 
-        return null;
+        Questionnary questionnary = questionnaryRepository.findById(questionnaryId).get();
+
+        if (questionnary.getQuestionSet().isEmpty()) {
+            return ResponseEntity.badRequest().body("Error: this questionnary doesn't contain any questions");
+        }
+
+        Module module = moduleRepository.findById(moduleId).get();
+        Set<UserApi> participants = module.getParticipants();
+
+        List<String> studentsNames = new ArrayList<>();
+        List<Long> studentsId = new ArrayList<>();
+
+        for (UserApi participant : participants) {
+            for (Role role : participant.getRoles()) {
+                if (role.getName().compareTo(ERole.ROLE_STUDENT) == 0) {
+                    studentsId.add(participant.getId());
+                    studentsNames.add(participant.getUsername());
+                }
+            }
+        }
+
+        StudentAttemptsCollectionResponse resp = new StudentAttemptsCollectionResponse();
+        resp.setStudentAttemptsResponseList(getAllStudentAttempts(questionnary, studentsId));
+        resp.setStudentsNames(studentsNames);
+        return ResponseEntity.ok(resp);
     }
 
     @PostMapping("/{moduleId}/resources/{resourceId}/questions/{questionId}")
@@ -478,60 +550,36 @@ public class QuestionController {
         return ResponseEntity.accepted().body(new ResultResponse(result.getRate()));
     }
 
-//    @GetMapping("/{moduleId}/resources/{questionnaryId}/result/{userid}")
-//    @PreAuthorize("hasRole('TEACHER')")
-//    public ResponseEntity<?> getStudentsResponses(@PathVariable long moduleId, @PathVariable long questionnaryId, @PathVariable long userid) {
-//        Optional<Module> omodule = moduleRepository.findById(moduleId);
-//        Optional<Questionnary> oquestionnary = questionnaryRepository.findById(questionnaryId);
-//        Optional<UserApi> ouser = userApiRepository.findById(userid);
-//
-//        if (omodule.isEmpty()) {
-//            return ResponseEntity
-//                    .badRequest()
-//                    .body(new MessageResponse("Error: No such Module"));
-//        }
-//
-//        if (oquestionnary.isEmpty()) {
-//            return ResponseEntity
-//                    .badRequest()
-//                    .body(new MessageResponse("Error: No such questionnary in the module"));
-//        }
-//
-//        if (ouser.isEmpty()) {
-//            return ResponseEntity
-//                    .badRequest()
-//                    .body(new MessageResponse("Error: No such user"));
-//        }
-//
-//        Questionnary questionnary = oquestionnary.get();
-////        int grade = questionnary.getStudentGrade(userid);
-////        return ResponseEntity.ok(new MessageResponse(String.format("student grade is %d", grade)));
-//        return ResponseEntity.ok(new MessageResponse("student grade is ???"));
-//    }
-//
+    /*
+     * ##########################################
+     * #               FUNCTIONS                #
+     * ##########################################
+     */
 
+    private List<String> getStudentAttempts(Questionnary questionnary, UserApi userApi) {
+        List<String> studentAttempts = new ArrayList<>();
 
-//    public void validateQuestionnary(Long studentId) {
-//        int rate = 0;
-//        for (Question question : questionSet) {
-//            for (Attempt attempt : question.getAttempts()) {
-//                if (attempt.computeResult())
-//                    rate ++;
-//            }
-//        }
-//        Result result = new Result(studentId, rate);
-//    }
+        for (Question question : questionnary.getQuestionSet()) {
+            for (Attempt attempt : question.getAttempts()) {
+                if (attempt.getUserId().equals(userApi.getId())) {
+                    studentAttempts.add(attempt.getStudentAttempt());
+                }
+            }
+        }
+        return studentAttempts;
+    }
 
-//    public int getStudentGrade(long studentId) {
-//        // TODO parcourir les attempts de toutes les questions.
-//        // TODO Stocker le résultat dans results.
-////        for (Question question : questionSet) {
-////            for (Result result : results) {
-////                if(result.getUserId() == studentId && result.getValidated()) {
-////                    return result.getRate();
-////                }
-////            }
-////        }
-//        return -1;
-//    }
+    private List<String> getAllStudentAttempts(Questionnary questionnary, List<Long> studentsId) {
+        List<String> attemptsResponseList = new ArrayList<>();
+
+        for (Question question : questionnary.getQuestionSet()) {
+            for (Attempt attempt : question.getAttempts()) {
+                if (studentsId.contains(attempt.getUserId())) {
+                    attemptsResponseList.add(attempt.getStudentAttempt());
+                }
+            }
+        }
+        return attemptsResponseList;
+    }
+
 }

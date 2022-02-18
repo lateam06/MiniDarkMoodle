@@ -3,7 +3,7 @@ package fr.uca.springbootstrap.models.modules.questions;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.validation.constraints.NotNull;
-import java.util.Objects;
+
 
 @Entity
 @DiscriminatorValue("code_runners")

@@ -1,26 +1,18 @@
 package fr.uca.springbootstrap.controllers;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+
 import com.lateam.payload.response.MessageResponse;
 import fr.uca.springbootstrap.models.modules.Module;
-import fr.uca.springbootstrap.models.modules.Resource;
-import fr.uca.springbootstrap.models.modules.courses.Course;
-import fr.uca.springbootstrap.models.modules.questions.Questionnary;
-import fr.uca.springbootstrap.models.users.ERole;
-import fr.uca.springbootstrap.models.users.Role;
 import fr.uca.springbootstrap.models.users.UserApi;
 import fr.uca.springbootstrap.payload.request.CreateModuleRequest;
-import fr.uca.springbootstrap.payload.request.ResourceRequest;
 import fr.uca.springbootstrap.payload.response.ModuleResponse;
 import fr.uca.springbootstrap.payload.response.ModulesResponse;
-import fr.uca.springbootstrap.payload.response.TeacherResponse;
 import fr.uca.springbootstrap.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import javax.persistence.DiscriminatorValue;
 import javax.validation.Valid;
 import java.security.Principal;
 import java.util.*;
