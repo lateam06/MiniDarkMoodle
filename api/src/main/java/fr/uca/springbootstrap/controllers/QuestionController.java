@@ -9,10 +9,7 @@ import fr.uca.springbootstrap.models.users.UserApi;
 import fr.uca.springbootstrap.payload.request.AnswerQuestionRequest;
 
 import fr.uca.springbootstrap.payload.request.CreateQuestionRequest;
-import fr.uca.springbootstrap.payload.response.AllQuestionsResponse;
-import fr.uca.springbootstrap.payload.response.ResultResponse;
-import fr.uca.springbootstrap.payload.response.StudentAttemptsCollectionResponse;
-import fr.uca.springbootstrap.payload.response.StudentAttemptsResponse;
+import fr.uca.springbootstrap.payload.response.*;
 import fr.uca.springbootstrap.repository.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -243,7 +240,7 @@ public class QuestionController {
                 questionnary.getQuestionSet().add(open);
                 openQuestionRepository.save(open);
                 questionnaryRepository.save(questionnary);
-                break;
+                return ResponseEntity.ok(new QuestionResponse(open, EQuestion.OPEN));
 
             case QCM:
 
@@ -259,8 +256,8 @@ public class QuestionController {
                 questionnary.getQuestionSet().add(qcm);
                 qcmRepository.save(qcm);
                 questionnaryRepository.save(questionnary);
+                return ResponseEntity.ok(new QuestionResponse(qcm, EQuestion.QCM));
 
-                break;
             case CODE:
                 CodeRunner cr = codeRunnerRepository.findByName(cnoRequest.getName())
                         .orElse(new CodeRunner());
@@ -275,10 +272,11 @@ public class QuestionController {
                 questionnary.getQuestionSet().add(cr);
                 codeRunnerRepository.save(cr);
                 questionnaryRepository.save(questionnary);
-                break;
-        }
+                return ResponseEntity.ok(new QuestionResponse(cr, EQuestion.CODE));
 
-        return ResponseEntity.ok(new MessageResponse("Question added successfully!"));
+            default:
+                return ResponseEntity.badRequest().body(new MessageResponse("unknown question type."));
+        }
     }
 
     @PutMapping("/{moduleId}/resources/{resourcesId}/questions/{questionId}")

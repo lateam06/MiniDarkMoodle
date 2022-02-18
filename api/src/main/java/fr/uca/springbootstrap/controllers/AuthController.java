@@ -38,7 +38,7 @@ public class AuthController {
     private final static String PROD_HOST_CODE_RUNNER = "app-code-runner";
 
 
-    public final static String HOST_CODE_RUNNER = PROD_HOST_CODE_RUNNER;
+    public final static String HOST_CODE_RUNNER = DEV_HOST;
     private final static String HOST = DEV_HOST;
 
     @Autowired
