@@ -253,6 +253,8 @@ public class AddCodeRunnerStepDefs extends SpringIntegration {
         ResultResponse res = ObjMapper.readValue(latestJson, ResultResponse.class);
         assertEquals(arg1, res.getGrade());
         resultRepository.deleteAll();
+        resultRepository.flush();
+        assertEquals(0,resultRepository.findAll().size());
 
     }
 }

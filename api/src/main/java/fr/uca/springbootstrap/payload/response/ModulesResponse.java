@@ -10,7 +10,7 @@ public class ModulesResponse {
     public ModulesResponse(List<Module> modules) {
         for (Module module : modules) {
 
-            this.modules.add(module.getName());}
+            this.modules.add(module.getName() + String.format(" id : %d",module.getId()));}
 
         }
 

@@ -14,6 +14,8 @@ services:
       - SPRING_DATASOURCE_USERNAME=postgres
       - SPRING_DATASOURCE_PASSWORD=123
       - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+    expose:
+      - "8080"
 
   apidb:
     container_name: app-api-db
@@ -51,3 +53,10 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=123
       - POSTGRES_DB=authdb
+  coderunner:
+    container_name: app-code-runner
+    image: app-code-runner
+    build: coderunner
+    ports:
+       - "666:666"
+    restart: unless-stopped

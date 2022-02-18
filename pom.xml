@@ -7,6 +7,7 @@
         <module>api</module>
 		<module>auth</module>
         <module>common</module>
+        <module>coderunner</module>
     </modules>
     <parent>
 		<groupId>org.springframework.boot</groupId>
