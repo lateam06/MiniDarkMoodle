@@ -19,11 +19,11 @@ public class Question {
     private Long id;
 
     @NotBlank
-    @Size(max = 20)
+    @Size(max = 256)
     private String name;
 
     @NotBlank
-    @Size(max = 256)
+    @Size(max = 1024)
     private String description;
 
     @OneToMany(fetch = FetchType.EAGER)

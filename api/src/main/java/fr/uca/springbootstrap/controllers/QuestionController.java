@@ -21,6 +21,8 @@ import org.springframework.web.bind.annotation.*;
 import javax.persistence.DiscriminatorValue;
 import javax.validation.Valid;
 import java.security.Principal;
+import java.util.HashSet;
+import java.util.Objects;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -73,6 +75,12 @@ public class QuestionController {
 
     @Autowired
     CodeRunnerAttemptRepository codeRunnerAttemptRepository;
+
+    @Autowired
+    OpenAttemptRepository openAttemptRepository;
+
+    @Autowired
+    QCMResponseRepository qcmResponseRepository;
 
     /*
      * ##########################################
@@ -178,7 +186,8 @@ public class QuestionController {
         switch (discriminator) {
             case "qcms":
                 QCM qcm = qcmRepository.findById(question.getId()).get();
-                var qcmr = new CreateQuestionRequest(qcm.getName(), qcm.getDescription(), qcm.getResponse(), EQuestion.QCM, "");
+                var set = new HashSet<String>();
+                var qcmr = new CreateQuestionRequest(qcm.getName(), qcm.getDescription(), qcm.getResponse(), EQuestion.QCM, set);
                 return ResponseEntity.ok(qcmr);
             case "open_questions":
                 OpenQuestion op = openQuestionRepository.findById(question.getId()).get();
@@ -252,6 +261,8 @@ public class QuestionController {
                 qcm.setName(cnoRequest.getName());
                 qcm.setDescription(cnoRequest.getDescription());
                 qcm.setResponse(cnoRequest.getResponse());
+                qcm.setResponses(cnoRequest.getQcmResponses());
+                qcmResponseRepository.saveAll(qcm.getResponses());
 
                 questionnary.getQuestionSet().add(qcm);
                 qcmRepository.save(qcm);
@@ -317,7 +328,7 @@ public class QuestionController {
             }
         }
 
-        switch(cnoRequest.getQuestionType()) {
+        switch (cnoRequest.getQuestionType()) {
             case CODE:
                 CodeRunner cr = codeRunnerRepository.findById(questionId).orElse(new CodeRunner());
 
@@ -340,6 +351,7 @@ public class QuestionController {
                 questionnary.getQuestionSet().remove(oq);
                 questionnary.getQuestionSet().add(oq);
                 openQuestionRepository.save(oq);
+
                 return ResponseEntity.ok("The question has been added/updated.\n" + oq.getId() + " - " + oq.getName() + " - " + oq.getResponse());
             case QCM:
                 QCM qcm = qcmRepository.findById(questionId).orElse(new QCM());
@@ -498,9 +510,14 @@ public class QuestionController {
                 break;
 
             case OPEN:
+                OpenQuestion openQuestion = openQuestionRepository.findById(questionId).get();
 
-                // TODO
+                OpenAttempt attempt = new OpenAttempt(openQuestion, actor.getId());
+                attempt.setStudentAttempt(answer.getResponse());
 
+                openQuestion.getAttempts().add(attempt);
+                openAttemptRepository.save(attempt);
+                openQuestionRepository.save(openQuestion);
                 break;
 
             case CODE:

@@ -17,6 +17,19 @@ public class QCMAttempt extends Attempt {
 
     @Override
     public boolean computeResult() {
-        return true;
+        try {
+            QCM qcm = (QCM) question;
+            String correct = qcm.getResponse();
+            String studentResp = getStudentAttempt();
+
+            if (correct.equals(studentResp)) {
+                return true;
+            }
+            else {
+                return false;
+            }
+        } catch (Exception e){
+            return false;
+        }
     }
 }

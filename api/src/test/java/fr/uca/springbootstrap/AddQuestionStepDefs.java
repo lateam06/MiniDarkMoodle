@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.Optional;
 
 public class AddQuestionStepDefs extends SpringIntegration {
@@ -70,8 +71,8 @@ public class AddQuestionStepDefs extends SpringIntegration {
         UserApi userApi = userRepository.findByUsername(userName).get();
         Questionnary questionnary = questionnaryRepository.findByName(questionnaireName).get();
         Module module = moduleRepository.findByName(moduleName).get();
-
-        CreateQuestionRequest question = new CreateQuestionRequest(qcmName, "description du cours", "reponse a la question", EQuestion.QCM, "");
+        var set = new HashSet<String>();
+        CreateQuestionRequest question = new CreateQuestionRequest(qcmName, "description du cours", "reponse a la question", EQuestion.QCM, set);
         String url = "http://localhost:8080/api/modules/" + module.getId() + "/resources/" + questionnary.getId() + "/questions";
         String token = SpringIntegration.tokenHashMap.get(userApi.getUsername());
         executePost(url, question, token);
@@ -182,8 +183,8 @@ public class AddQuestionStepDefs extends SpringIntegration {
         UserApi userApi = userRepository.findByUsername(userName).get();
         Questionnary questionnary = questionnaryRepository.findByName(questionnaireName).get();
         Module module = moduleRepository.findByName(moduleName).get();
-
-        CreateQuestionRequest question = new CreateQuestionRequest(qcmName, "description du cours", "reponse a la question", EQuestion.QCM, "");
+        var set = new HashSet<String>();
+        CreateQuestionRequest question = new CreateQuestionRequest(qcmName, "description du cours", "reponse a la question", EQuestion.QCM, set);
         String url = "http://localhost:8080/api/modules/" + module.getId() + "/resources/" + questionnary.getId() + "/questions";
         String token = SpringIntegration.tokenHashMap.get(userName);
         executePost(url, question, token);
@@ -223,8 +224,9 @@ public class AddQuestionStepDefs extends SpringIntegration {
         Questionnary questionnary = questionnaryRepository.findByName(questionnaireName).get();
         Module module = moduleRepository.findByName(moduleName).get();
         QCM qcm = qcmRepository.findByName(qcmName).get();
+        var set = new HashSet<String>();
 
-        CreateQuestionRequest question = new CreateQuestionRequest(qcm.getName(), qcm.getDescription(), newResponse, EQuestion.QCM, "");
+        CreateQuestionRequest question = new CreateQuestionRequest(qcm.getName(), qcm.getDescription(), newResponse, EQuestion.QCM, set);
         String url = "http://localhost:8080/api/modules/" + module.getId() + "/resources/" + questionnary.getId() + "/questions/" + qcm.getId();
         String token = SpringIntegration.tokenHashMap.get(userName);
         executePut(url, question, token);
@@ -267,8 +269,9 @@ public class AddQuestionStepDefs extends SpringIntegration {
         Questionnary questionnary = questionnaryRepository.findByName(questionnaireName).get();
         Module module = moduleRepository.findByName(moduleName).get();
         QCM qcm = qcmRepository.findByName(qcmName).get();
+        var set = new HashSet<String>();
 
-        CreateQuestionRequest question = new CreateQuestionRequest(qcm.getName(), newDescription, qcm.getResponse(), EQuestion.QCM, "");
+        CreateQuestionRequest question = new CreateQuestionRequest(qcm.getName(), newDescription, qcm.getResponse(), EQuestion.QCM, set);
         String url = "http://localhost:8080/api/modules/" + module.getId() + "/resources/" + questionnary.getId() + "/questions/" + qcm.getId();
         String token = SpringIntegration.tokenHashMap.get(userName);
         executePut(url, question, token);
