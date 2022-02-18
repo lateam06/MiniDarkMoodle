@@ -95,7 +95,7 @@ public class ModuleController {
         Module module = new Module(moduleRequest.getName());
         moduleRepository.save(module);
 
-        return ResponseEntity.accepted().body(new MessageResponse("Module successfully created"));
+        return ResponseEntity.accepted().body(new ModuleResponse(module));
     }
 
     @DeleteMapping("/{moduleId}")
@@ -120,6 +120,6 @@ public class ModuleController {
                     .badRequest()
                     .body(new MessageResponse("Error : not allowed to remove module"));
         }
-        return ResponseEntity.ok(new MessageResponse("Module successfully remove"));
+        return ResponseEntity.ok(new MessageResponse("Module " + module.getId() + " named " + module.getName() + " deleted."));
     }
 }

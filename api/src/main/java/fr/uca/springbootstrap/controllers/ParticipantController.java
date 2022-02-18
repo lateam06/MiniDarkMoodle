@@ -2,6 +2,7 @@ package fr.uca.springbootstrap.controllers;
 
 
 import com.lateam.payload.response.MessageResponse;
+import com.lateam.payload.response.UserApiResponse;
 import fr.uca.springbootstrap.models.modules.Module;
 import fr.uca.springbootstrap.models.users.ERole;
 import fr.uca.springbootstrap.models.users.Role;
@@ -162,7 +163,7 @@ public class ParticipantController {
                     .body(new MessageResponse("Error: Not allowed to add user!"));
         }
         moduleRepository.save(module);
-        return ResponseEntity.ok(new MessageResponse("User successfully added to module!"));
+        return ResponseEntity.ok(new UserApiResponse(userApi.getId(), userApi.getUsername()));
     }
 
     @DeleteMapping("/{moduleId}/participants/{userId}")
@@ -195,6 +196,7 @@ public class ParticipantController {
                     .body(new MessageResponse("Error: Not allowed to remove user!"));
         }
         moduleRepository.save(module);
-        return ResponseEntity.ok((new MessageResponse("User successfully remove from module")));
+        return ResponseEntity.ok((new MessageResponse("User " + userApi.getId() + " named "
+                + userApi.getUsername() + " removed from the module " + module.getId() + " named " + module.getId())));
     }
 }

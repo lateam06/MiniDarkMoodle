@@ -177,7 +177,8 @@ public class ResourceController {
                     .body(new MessageResponse("Error: Not allowed to add resource!"));
         }
         moduleRepository.save(module);
-        return ResponseEntity.ok(new MessageResponse("resource successfully added to module!"));
+        return ResponseEntity.ok(new MessageResponse("resource " + res.getId() + " named " + res.getName()
+                                                    + " added to the module " + module.getId() + " named " + module.getName()));
     }
 
 
@@ -214,7 +215,8 @@ public class ResourceController {
                     .body(new MessageResponse("Error: Not allowed to add resource!"));
         }
         moduleRepository.save(module);
-        return ResponseEntity.ok(new MessageResponse("resource successfully added to module!"));
+        return ResponseEntity.ok(new MessageResponse("resource " + res.getId() + " named " + " deleted from " + " module "
+                                                    + module.getId() + " named " + module.getName()));
 
     }
 

@@ -39,7 +39,7 @@ public class AuthController {
 
 
     public final static String HOST_CODE_RUNNER = PROD_HOST_CODE_RUNNER;
-    private final static String HOST = PROD_HOST;
+    private final static String HOST = DEV_HOST;
 
     @Autowired
     UserApiRepository userApiRepository;
